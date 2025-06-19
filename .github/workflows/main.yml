@@ -14,10 +14,8 @@ on:
 
 jobs:
   build_and_deploy:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest  
-
-    environment: QA  
 
     steps:
       - name: Checkout code
@@ -32,7 +30,7 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=PoliedroSoftware_backend-api-eds
+            -Dsonar.projectKey=PoliedroSoftware_backend-api-billing
             -Dsonar.organization=poliedro-software-sonarqube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -57,7 +55,7 @@ jobs:
           echo "$JMETER_HOME/bin" >> $GITHUB_PATH
       - name: Run JMeter Load Test
         run: |
-          ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/EDS.jmx -l LoadTest/results.jtl -e -o LoadTest/report
+          ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/Billing.jmx -l LoadTest/results.jtl -e -o LoadTest/report
           
       - name: Upload JMeter HTML Reports
         uses: actions/upload-artifact@v4
@@ -118,4 +116,4 @@ jobs:
             --task-definition ${{ secrets.TASK_DEFINITION_ARN_BILLING }} \
             --query 'taskDefinition.containerDefinitions[0].image' --output text)
           
-          echo "Imagen de la task definition: $task_definition_image"
+          echo "Imagen de la task definition billing: $task_definition_image"
