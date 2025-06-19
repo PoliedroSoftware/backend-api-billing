@@ -55,7 +55,7 @@ jobs:
           echo "$JMETER_HOME/bin" >> $GITHUB_PATH
       - name: Run JMeter Load Test
         run: |
-          ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/EDS.jmx -l LoadTest/results.jtl -e -o LoadTest/report
+          ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/Billing.jmx -l LoadTest/results.jtl -e -o LoadTest/report
           
       - name: Upload JMeter HTML Reports
         uses: actions/upload-artifact@v4
