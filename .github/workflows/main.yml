@@ -116,4 +116,4 @@ jobs:
             --task-definition ${{ secrets.TASK_DEFINITION_ARN_BILLING }} \
             --query 'taskDefinition.containerDefinitions[0].image' --output text)
           
-          echo "Imagen de la task definition: $task_definition_image"
+          echo "Imagen de la task definition billing: $task_definition_image"
