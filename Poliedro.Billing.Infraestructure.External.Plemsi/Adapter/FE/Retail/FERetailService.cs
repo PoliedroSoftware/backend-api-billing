@@ -58,7 +58,7 @@ IConfiguration config) : IFERetailService
                     int InvoiceNumber = int.Parse(item.invoice[^4..]);
                     int invoice = await invoiceLastRepository.GetInvoiceLastAsync(connectionString, clientItem, cancellationToken);
                     if (invoice == 0) return FERetailResponse;
-                    if (invoice == 1) invoice = clientItem.DianResolution.InitialRange;
+                    if (invoice == 1) invoice = clientItem.DianResolution.CurrentlyNumber + 1;
                     if (invoice < clientItem.DianResolution.InitialRange) invoice = clientItem.DianResolution.InitialRange;
                     DateTime date = DateTime.Now;
                     string formattedDate = date.ToString("yyyy-MM-dd");
@@ -173,7 +173,7 @@ IConfiguration config) : IFERetailService
 
 
                         await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-                           new ParametersCurrentlyNumber(invoice, item.transaction_date, clientItem.ResolutionId),
+                           new ParametersCurrentlyNumber(invoice, date.ToString(), clientItem.ResolutionId),
                            cancellationToken);
 
 
@@ -198,7 +198,7 @@ IConfiguration config) : IFERetailService
                                     item.invoice);
 
                                 await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-                                    new ParametersCurrentlyNumber(invoice, item.transaction_date, clientItem.ResolutionId),
+                                    new ParametersCurrentlyNumber(invoice, date.ToString(), clientItem.ResolutionId),
                                     cancellationToken);
                             }
                         }
