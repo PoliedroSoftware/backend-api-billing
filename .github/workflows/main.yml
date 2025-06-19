@@ -30,8 +30,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=poliedrocloud_Poliedro.Billing
-            -Dsonar.organization=poliedrocloud
+            -Dsonar.projectKey=PoliedroSoftware_backend-api-billing
+            -Dsonar.organization=poliedro-software-sonarqube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
