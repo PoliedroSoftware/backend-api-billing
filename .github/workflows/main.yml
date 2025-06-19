@@ -14,10 +14,8 @@ on:
 
 jobs:
   build_and_deploy:
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest  
-
-    environment: QA  
 
     steps:
       - name: Checkout code
@@ -32,8 +30,8 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           args: >
-            -Dsonar.projectKey=PoliedroSoftware_backend-api-eds
-            -Dsonar.organization=poliedro-software-sonarqube
+            -Dsonar.projectKey=poliedrocloud_Poliedro.Billing
+            -Dsonar.organization=poliedrocloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           
