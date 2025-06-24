@@ -169,7 +169,7 @@ IConfiguration config) : IFERetailService
                             config["EmailSettings:CompanyEmail"]!
                         );
 
-                        await _emailNotificationService.SendEmailAsync(message);
+                        //await _emailNotificationService.SendEmailAsync(message);
 
 
                         await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
@@ -224,7 +224,7 @@ IConfiguration config) : IFERetailService
                     errorBilling,
                     config["EmailSettings:CompanyEmail"]!);
 
-                await _emailNotificationService.SendEmailAsync(message);
+                //await _emailNotificationService.SendEmailAsync(message);
             }
             
         }

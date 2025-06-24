@@ -14,6 +14,7 @@ using Poliedro.Billing.Domain.NotifyResolution.Services;
 using Poliedro.Billing.Domain.PdfInvoice.Service;
 using Poliedro.Billing.Domain.PedingInvoice.DomainPedingInvoice;
 using Poliedro.Billing.Domain.Ports;
+using Poliedro.Billing.Domain.PrepareInvoicesBilling.Ports;
 using Poliedro.Billing.Domain.Resolution.DomainService;
 using Poliedro.Billing.Domain.Server.DomainService;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
@@ -25,6 +26,7 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicePos;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
+using Poliedro.Billing.Infraestructure.Persistence.Mysql.PrepareInvoicesBilling.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
 
 
@@ -58,11 +60,14 @@ public static class DependencyInjectionService
 
         services.AddScoped<IInvoiceElectronicRepository, InvoiceDetailElectronicService>();
 
-        //services.AddTransient<IInvoicesPendingWithDetailsRepository,InvoicesPendingWithDetailsFERepository>();
-
         services.AddTransient<InvoicesPendingWithDetailsFERepository>();
         services.AddTransient<InvoicesPendingWithDetailsPOSRepository>();
         services.AddTransient<IInvoicesPendingWithDetailsStrategyFactory, InvoicesPendingWithDetailsStrategyFactory>();
+
+        services.AddTransient<PrepareInvoicesBillingPOSRepository>();
+        services.AddTransient<PrepareInvoicesBillingFERepository>();
+        services.AddTransient<IPrepareInvoicesBillingFactory, PrepareInvoicesBillingFactory>();
+
 
 
 
