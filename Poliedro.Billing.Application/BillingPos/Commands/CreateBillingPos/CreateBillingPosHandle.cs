@@ -13,12 +13,12 @@ public class CreateBillingPosHandle(
     IClientDomainService _clientDomainService,
     IBillingService _billingService,
     IInvoicePos invoiceRepository,
-    IServerDomainService _serverDomainService) : IRequestHandler<CreateBillingPosCommand, Result<ApiResponseBillingPos, Error>>
+    IServerDomainService _serverDomainService) : IRequestHandler<CreateBillingCommand, Result<ApiResponseBillingPos, Error>>
 {
     private readonly IInvoicePos invoiceRepository = invoiceRepository;
     private readonly IServerDomainService serverDomainService = _serverDomainService;
 
-    public async Task<Result<ApiResponseBillingPos, Error>> Handle(CreateBillingPosCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ApiResponseBillingPos, Error>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
     {
         var clients = await _clientDomainService.GetAllAsync(cancellationToken);
         var result = await _billingService.CreateInvoicesPosAsync(clients.Value!, cancellationToken);
