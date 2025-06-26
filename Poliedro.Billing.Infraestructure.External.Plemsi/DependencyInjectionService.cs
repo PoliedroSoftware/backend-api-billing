@@ -22,6 +22,8 @@ using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Infrastructure.GetInvoice.Adapters;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.DomainService.Imp;
+using Polideiro.Billing.Infraestructure.Plemsi.Adapter.Billing.DomainService.Imp;
 
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi
@@ -58,6 +60,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<ICustomersIdRepository, CustomersIdRepository>();
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
+            services.AddTransient<CreateBillingFERepository>();
+            services.AddTransient<CreateBillingPOSRepository>();
+            services.AddTransient<ICreateBillingFactory, PrepareBillingFactory>();
+
             services.AddTransient<EmailErrorHandler>();
             return services;
         }

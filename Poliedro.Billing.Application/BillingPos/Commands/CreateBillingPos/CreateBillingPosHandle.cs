@@ -1,30 +1,39 @@
 ﻿using MediatR;
-using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.BillingPos;
 using Poliedro.Billing.Domain.BillingPos.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
-using Poliedro.Billing.Domain.Common.Results;
-using Poliedro.Billing.Domain.Common.Results.Errors;
-using Poliedro.Billing.Domain.Server.DomainService;
+
 
 namespace Poliedro.Billing.Application.BillingPos.Commands.CreateBillingPos;
 
 public class CreateBillingPosHandle(
     IClientDomainService _clientDomainService,
-    IBillingService _billingService,
-    IInvoicePos invoiceRepository,
-    IServerDomainService _serverDomainService) : IRequestHandler<CreateBillingCommand, Result<ApiResponseBillingPos, Error>>
+    ICreateBillingFactory _createBillingFactory
+    ) : IRequestHandler<CreateBillingCommand, List<CreateBilling>>
 {
-    private readonly IInvoicePos invoiceRepository = invoiceRepository;
-    private readonly IServerDomainService serverDomainService = _serverDomainService;
-
-    public async Task<Result<ApiResponseBillingPos, Error>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
+    public async Task<List<CreateBilling>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
     {
-        var clients = await _clientDomainService.GetAllAsync(cancellationToken);
-        var result = await _billingService.CreateInvoicesPosAsync(clients.Value!, cancellationToken);
-        if (!result.IsSuccess)
-            return result.Error!;
+        var client = await _clientDomainService.GetByIdAsync(request.token, cancellationToken);
 
-        return result.Value!;
+        if (client == null) throw new KeyNotFoundException("Cliente no encontrado.");
+
+        var TypeResolution = client.Value.DianResolution.ResolutionType.ToString();
+
+
+
+        var Provider = client.Value.ProviderId.ToString(); //enum
+
+        if( string.IsNullOrEmpty(Provider))
+        {
+            throw new ArgumentException($"Tipo de resolución o proveedor no especificado.{Provider}");
+        }
+
+        var processor = await _createBillingFactory.GetProcessorAsync(TypeResolution, Provider);
+
+        var processedInvoices = await processor.CreateInvoicesAsync(request.invoices, cancellationToken);
+
+        return request.invoices;
+
     }
+
 }
