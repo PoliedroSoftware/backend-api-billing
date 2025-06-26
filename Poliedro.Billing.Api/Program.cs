@@ -20,6 +20,9 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
 using WorkerServiceBilling;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -102,8 +105,18 @@ builder.Services.AddHostedService<Worker>();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCreditNoteCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 builder.Services.AddSingleton<IMessageProvider, MessageProvider>();
-var app = builder.Build();
+builder.Services.AddHealthChecks()
+    .AddMySql(builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
+var app = builder.Build();
+app.MapHealthChecks("/health", new HealthCheckOptions()
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+app.MapHealthChecksUI(options =>
+{
+    options.UIPath = "/health-ui";
+});
 app.UseCors("PoliedroBilling");
 
 app.UseSwagger();
