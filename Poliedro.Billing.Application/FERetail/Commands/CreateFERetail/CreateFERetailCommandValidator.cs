@@ -57,37 +57,37 @@ namespace Poliedro.Billing.Application.FERetail.Commands.CreateFERetail
         {
             //RuleForEach(x => x.allowance_charges).SetValidator(new AllowanceChargeValidator(messageProvider)); 
             
-            RuleFor(x => x.unit_measure_id)
+            RuleFor(x => x.UnitMeasureId)
                 .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
 
-            RuleFor(x => x.line_extension_amount)
+            RuleFor(x => x.LineExtensionAmount)
                 .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
 
-            RuleFor(x => x.free_of_charge_indicator)
+            RuleFor(x => x.FreeOfChargeIndicator)
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldIsRequired);
 
 
-            RuleFor(x => x.allowance_charges)
+            RuleFor(x => x.AllowanceCharges)
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
 
-            RuleFor(x => x.description)
+            RuleFor(x => x.Description)
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull)
                 .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldNotEmpty);
 
-            RuleFor(x => x.price_amount)
+            RuleFor(x => x.PriceAmount)
                 .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
 
-            RuleFor(x => x.code)
+            RuleFor(x => x.Code)
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull)
                 .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldIsRequired);
            
-            RuleFor(x => x.type_item_identification_id)
+            RuleFor(x => x.TypeItemIdentificationId)
                 .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
 
-            RuleFor(x => x.base_quantity)
+            RuleFor(x => x.BaseQuantity)
                 .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
 
-            RuleFor(x => x.invoiced_quantity)
+            RuleFor(x => x.InvoicedQuantity)
                 .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
         }
     }

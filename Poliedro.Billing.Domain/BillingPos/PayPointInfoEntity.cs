@@ -5,13 +5,13 @@ namespace Poliedro.Billing.Domain.BillingPos;
 public class PayPointInfoEntity
 {
     [JsonPropertyName("code")]
-    public string code { get; set; }
+    public string Code { get; set; }
     [JsonPropertyName("address")]
-    public string address { get; set; }
+    public string Address { get; set; }
     [JsonPropertyName("cashierName")]
-    public string cashierName { get; set; }
+    public string CashierName { get; set; }
     [JsonPropertyName("payPointType")]
-    public string payPointType { get; set; }
+    public string PayPointType { get; set; }
     [JsonPropertyName("saleCode")]
-    public string saleCode { get; set; }
+    public string SaleCode { get; set; }
 }

@@ -1,7 +1,6 @@
-﻿namespace Poliedro.Billing.Domain.FERetail.Entity
+﻿namespace Poliedro.Billing.Domain.FERetail.Entity;
+
+public class OrderReferenceEntity
 {
-    public class OrderReferenceEntity
-    {
-        public string? id_order { get; set; }
-    }
+    public string? IdOrder { get; set; }
 }

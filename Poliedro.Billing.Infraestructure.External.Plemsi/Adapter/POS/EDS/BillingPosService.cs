@@ -74,11 +74,11 @@ public class BillingPosService(
                         },
                         payPointInfo = new PayPointInfoEntity
                         {
-                            code = "000001",
-                            address = "Direccion Principal",
-                            cashierName = "Cajero de Turno",
-                            payPointType = "Caja Auxiliar",
-                            saleCode = "V2398123",
+                            Code = "000001",
+                            Address = "Direccion Principal",
+                            CashierName = "Cajero de Turno",
+                            PayPointType = "Caja Auxiliar",
+                            SaleCode = "V2398123",
                         },
                         invoiceBaseTotal = item.InvoiceBaseTotal.ToString(),
                         invoiceTaxExclusiveTotal = item.InvoiceTaxExclusiveTotal.ToString(),

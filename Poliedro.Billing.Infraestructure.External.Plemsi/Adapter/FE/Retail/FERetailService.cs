@@ -47,9 +47,9 @@ IConfiguration config) : IFERetailService
                 {
 
                     List<ItemElectronicEntity> Itens = await getItemsInvoiceFERetail.GetItemsInvoiceFERetailAsync(item.Id.ToString(), connectionString);
-                    double totalToBase = Itens?.Sum(item => item.line_extension_amount) ?? 0;
-                    double totalTaxableAmount = Itens?.Sum(item => item.tax_totals.Sum(tax => tax.tax_amount)) ?? 0;
-                    double totalBaseGravable = Itens?.Sum(item => item.tax_totals.Sum(tax => tax.taxable_amount)) ?? 0;
+                    double totalToBase = Itens?.Sum(item => item.LineExtensionAmount) ?? 0;
+                    double totalTaxableAmount = Itens?.Sum(item => item.TaxTotals.Sum(tax => tax.TaxAmount)) ?? 0;
+                    double totalBaseGravable = Itens?.Sum(item => item.TaxTotals.Sum(tax => tax.TaxableAmount)) ?? 0;
                     double totalToPay = totalToBase + totalTaxableAmount;
                     List<AllTaxTotalEntity> allTaxTotals = [];
 
@@ -90,41 +90,41 @@ IConfiguration config) : IFERetailService
                         number = invoice,
                         orderReference = new OrderReferenceEntity
                         {
-                            id_order = "COT2022043155"
+                            IdOrder = "COT2022043155"
                         },
                         send_email = true,
                         attachment1 = new AttachmentEntity
                         {
-                            filename = "prueba.xml",
-                            b64data = "-> lugar para el archivo convertido a base64 string"
+                            FileName = "prueba.xml",
+                            B64Data = "-> lugar para el archivo convertido a base64 string"
                         },
                         attachment2 = new AttachmentEntity
                         {
-                            filename = "prueba.xml",
-                            b64data = "-> lugar para el archivo convertido a base64 string"
+                            FileName = "prueba.xml",
+                            B64Data = "-> lugar para el archivo convertido a base64 string"
                         },
 
                         customer = new CustomerEntity
                         {
-                            identification_number = identification,
-                            dv = dv,
-                            name = item.contact_name,
-                            phone = item.mobile,
-                            address = "Cra 4ta #12-56",
-                            email = item.email,
-                            merchant_registration = "00000000",
-                            type_document_identification_id = (int)documentType,
-                            type_organization_id = 1,
-                            type_liability_id = 117,
-                            municipality_id = 149,
-                            type_regime_id = 1
+                            IdentificationNumber = identification,
+                            Dv = dv,
+                            Name = item.contact_name,
+                            Phone = item.mobile,
+                            Address = "Cra 4ta #12-56",
+                            Email = item.email,
+                            MerchantRegistration = "00000000",
+                            TypeDocumentIdentificationId = (int)documentType,
+                            TypeOrganizationId = 1,
+                            TypeLiabilityId = 117,
+                            MunicipalityId = 149,
+                            TypeRegimeId = 1
                         },
                         payment = new PaymentEntity
                         {
-                            payment_form_id = 1,
-                            payment_method_id = 10,
-                            payment_due_date = formattedDate,
-                            duration_measure = "30"
+                            PaymentFormId = 1,
+                            PaymentMethodId = 10,
+                            PaymentDueDate = formattedDate,
+                            DurationMeasure = "30"
                         },
                         generalAllowances = [],
                         items = Itens,
@@ -142,10 +142,10 @@ IConfiguration config) : IFERetailService
                         allHoldingsTaxTotals = [
                     new AllHoldingsTaxTotalEntity
                         {
-                            tax_id = 6,
-                            tax_amount = 0,
-                            percent = 0,
-                            taxable_amount = totalToPay
+                            TaxId = 6,
+                            TaxAmount = 0,
+                            Percent = 0,
+                            TaxableAmount = totalToPay
                         }],
 
                         customSubtotals = [],
@@ -243,14 +243,14 @@ IConfiguration config) : IFERetailService
 
         foreach (var item in items)
         {
-            foreach (var tax in item.tax_totals)
+            foreach (var tax in item.TaxTotals)
             {
                 allTaxTotals.Add(new AllTaxTotalEntity
                 {
-                    tax_id = tax.tax_id,
-                    tax_amount = tax.tax_amount,
-                    percent = tax.percent,
-                    taxable_amount = tax.taxable_amount
+                    TaxId = tax.TaxId,
+                    TaxAmount = tax.TaxAmount,
+                    Percent = tax.Percent,
+                    TaxableAmount = tax.TaxableAmount
                 });
             }
         }

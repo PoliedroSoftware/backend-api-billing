@@ -6,14 +6,14 @@ public class TaxTotalEntity
 {
 
     [JsonPropertyName("tax_id")]
-    public int tax_id { get; set; }
+    public int TaxId { get; set; }
 
     [JsonPropertyName("percent")]
-    public double percent { get; set; }
+    public double Percent { get; set; }
 
     [JsonPropertyName("tax_amount")]
-    public double tax_amount { get; set; }
+    public double TaxAmount { get; set; }
 
     [JsonPropertyName("taxable_amount")]
-    public double taxable_amount { get; set; }
+    public double TaxableAmount { get; set; }
 }

@@ -6,41 +6,41 @@ public class ItemElectronicEntity
 {
 
     [JsonPropertyName("unit_measure_id")]
-    public int unit_measure_id { get; set; }
+    public int UnitMeasureId { get; set; }
 
     [JsonPropertyName("line_extension_amount")]
-    public double line_extension_amount { get; set; }
+    public double LineExtensionAmount { get; set; }
 
     [JsonPropertyName("free_of_charge_indicator")]
-    public bool free_of_charge_indicator { get; set; }
+    public bool FreeOfChargeIndicator { get; set; }
 
     [JsonPropertyName("allowance_charges")]
-    public List<AllowanceChargeEntity>? allowance_charges { get; set; }
+    public List<AllowanceChargeEntity>? AllowanceCharges { get; set; }
 
     [JsonPropertyName("tax_totals")]
-    public List<TaxTotalEntity>? tax_totals { get; set; }
+    public List<TaxTotalEntity>? TaxTotals { get; set; }
 
     [JsonPropertyName("with_holding_tax_total")]
-    public List<WIthHoldingTaxTotalEntity>? with_holding_tax_total { get; set; }
+    public List<WIthHoldingTaxTotalEntity>? WithHoldingTaxTotal { get; set; }
 
     [JsonPropertyName("description")]
-    public string? description { get; set; }
+    public string? Description { get; set; }
 
     [JsonPropertyName("notes")]
-    public string? notes { get; set; }
+    public string? Notes { get; set; }
 
     [JsonPropertyName("code")]
-    public string? code { get; set; }
+    public string? Code { get; set; }
 
     [JsonPropertyName("type_item_identification_id")]
-    public int type_item_identification_id { get; set; }
+    public int TypeItemIdentificationId { get; set; }
 
     [JsonPropertyName("price_amount")]
-    public double price_amount { get; set; }
+    public double PriceAmount { get; set; }
 
     [JsonPropertyName("base_quantity")]
-    public double base_quantity { get; set; }
+    public double BaseQuantity { get; set; }
 
     [JsonPropertyName("invoiced_quantity")]
-    public double invoiced_quantity { get; set; }
+    public double InvoicedQuantity { get; set; }
 }

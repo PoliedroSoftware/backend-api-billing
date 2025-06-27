@@ -13,27 +13,27 @@ public class GetItemsInvoiceFERetail(IGetItemFE getItem) : IGetItemsInvoiceFERet
         {
             var itemInvoice = new ItemElectronicEntity
             {
-                unit_measure_id = 70,
-                line_extension_amount = index.unit_preci * index.invoiced_quantity,
-                invoiced_quantity = index.invoiced_quantity,
-                free_of_charge_indicator = false,
-                allowance_charges = [],
+                UnitMeasureId = 70,
+                LineExtensionAmount = index.unit_preci * index.invoiced_quantity,
+                InvoicedQuantity = index.invoiced_quantity,
+                FreeOfChargeIndicator = false,
+                AllowanceCharges = [],
 
-                tax_totals = [
+                TaxTotals = [
                     new TaxTotalEntity {
-                    tax_id = 1,
-                    percent = index.percent,
-                    tax_amount = index.tax_amount * index.invoiced_quantity,
-                    taxable_amount = index.unit_preci * index.invoiced_quantity
+                    TaxId = 1,
+                    Percent = index.percent,
+                    TaxAmount = index.tax_amount * index.invoiced_quantity,
+                    TaxableAmount = index.unit_preci * index.invoiced_quantity
                 }],
-                with_holding_tax_total = [],
-                description = $"{index.description} {(index.tax_amount > 0 ? $"IVA {index.tax_amount}" : "")}",
+                WithHoldingTaxTotal = [],
+                Description = $"{index.description} {(index.tax_amount > 0 ? $"IVA {index.tax_amount}" : "")}",
 
-                notes = "",
-                code = index.code.ToString(),
-                type_item_identification_id = 1,
-                price_amount = index.unit_preci,
-                base_quantity = index.invoiced_quantity,
+                Notes = "",
+                Code = index.code.ToString(),
+                TypeItemIdentificationId = 1,
+                PriceAmount = index.unit_preci,
+                BaseQuantity = index.invoiced_quantity,
             };
             itemsInvoiceResponse.Add(itemInvoice);
         }
