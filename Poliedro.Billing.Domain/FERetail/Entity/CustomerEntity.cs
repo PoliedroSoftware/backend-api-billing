@@ -10,6 +10,7 @@ public class CustomerEntity
     [JsonPropertyName("dv")]
     public string? Dv { get; set; }
 
+    [JsonPropertyName("profit")]
     public int? Profit { get; set; }
 
     [JsonPropertyName("name")]

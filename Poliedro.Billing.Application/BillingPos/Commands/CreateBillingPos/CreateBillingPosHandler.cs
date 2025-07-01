@@ -6,7 +6,7 @@ using Poliedro.Billing.Domain.Client.DomainService;
 
 namespace Poliedro.Billing.Application.BillingPos.Commands.CreateBillingPos;
 
-public class CreateBillingPosHandle(
+public class CreateBillingPosHandler(
     IClientDomainService _clientDomainService,
     ICreateBillingFactory _createBillingFactory
     ) : IRequestHandler<CreateBillingCommand, List<CreateBilling>>
@@ -18,8 +18,6 @@ public class CreateBillingPosHandle(
         if (client == null) throw new KeyNotFoundException("Cliente no encontrado.");
 
         var TypeResolution = client.Value.DianResolution.ResolutionType.ToString();
-
-
 
         var Provider = client.Value.ProviderId.ToString(); //enum
 

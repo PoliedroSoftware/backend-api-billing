@@ -22,8 +22,7 @@ using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Infrastructure.GetInvoice.Adapters;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.DomainService.Imp;
-using Polideiro.Billing.Infraestructure.Plemsi.Adapter.Billing.DomainService.Imp;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing;
 
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi

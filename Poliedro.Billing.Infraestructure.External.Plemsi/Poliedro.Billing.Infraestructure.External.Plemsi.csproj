@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Adapter\Billing\DomainService\" />
     <Folder Include="Adapter\FE\EDS\" />
     <Folder Include="Adapter\POS\Retail\" />
   </ItemGroup>
