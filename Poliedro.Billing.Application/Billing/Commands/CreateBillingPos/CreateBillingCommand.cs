@@ -2,8 +2,8 @@
 using Poliedro.Billing.Domain.BillingPos;
 namespace Poliedro.Billing.Application.BillingPos.Commands.CreateBillingPos;
 public record CreateBillingCommand(
-List<CreateBilling> invoices,
-string token
+List<CreateBilling> Invoices,
+string ApiKey
 ) : IRequest<List<CreateBilling>>;
 
 

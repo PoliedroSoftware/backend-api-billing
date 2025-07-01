@@ -20,10 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BillingPos\AutoMapper\" />
-    <Folder Include="BillingPos\Dtos\" />
-    <Folder Include="BillingPos\Erros\" />
-    <Folder Include="BillingPos\Queries\" />
+    <Folder Include="Billing\AutoMapper\" />
+    <Folder Include="Billing\Dtos\" />
+    <Folder Include="Billing\Erros\" />
+    <Folder Include="Billing\Queries\" />
     <Folder Include="CreditNote\Commands\CreateCreditNote\Command\" />
   </ItemGroup>
 

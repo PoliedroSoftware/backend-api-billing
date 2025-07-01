@@ -1,28 +1,27 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.BillingPos.Ports;
 using Poliedro.Billing.Domain.CreditNote.Ports;
+using Poliedro.Billing.Domain.CustomersId.Ports;
 using Poliedro.Billing.Domain.FERetail.Ports;
+using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SendEmail.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
-using Poliedro.Billing.Domain.CustomersId.Ports;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendMessage;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SuccessInvoice;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.UpdateCurrentlyNumber;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
-using Poliedro.Billing.Application.SendEmail.Ports;
-using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Infrastructure.GetInvoice.Adapters;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing;
 
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi
@@ -59,9 +58,9 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<ICustomersIdRepository, CustomersIdRepository>();
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
-            services.AddTransient<CreateBillingFERepository>();
-            services.AddTransient<CreateBillingPOSRepository>();
-            services.AddTransient<ICreateBillingFactory, PrepareBillingFactory>();
+            //services.AddTransient<CreateBillingFERepository>();
+            //services.AddTransient<CreateBillingPOSRepository>();
+            //services.AddTransient<ICreateBillingFactory, PrepareBillingFactory>();
 
             services.AddTransient<EmailErrorHandler>();
             return services;
