@@ -20,7 +20,7 @@ public class BillingController(IMediator mediator) : ControllerBase
     [Produces("application/json")]
     [HttpPost]
     public async Task<ActionResult<CreateBilling>> CreateBillingCommand(
-        [FromBody] List<CreateBilling> invoices, CancellationToken cancellationToken)
+        [FromBody] IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
     {
         var token = TokenHelper.ExtractBearerToken(Request);
         if (string.IsNullOrEmpty(token))

@@ -12,8 +12,8 @@ public class BillingStrategySelector(
     {
         ICreateBillingStrategy strategy = (provider, resolutionType) switch
         {
-            ("1", "FE") => serviceProvider.GetRequiredService<PrepareBillingFE>(),
-            ("1", "POS") => serviceProvider.GetRequiredService<PrepareBillingPOS>(),
+            ("PLEMSI", "FE") => serviceProvider.GetRequiredService<PrepareBillingFE>(),
+            ("PLEMSI", "POS") => serviceProvider.GetRequiredService<PrepareBillingPOS>(),
             _ => throw new ArgumentException($"Unknown provider ({provider}) or type ({resolutionType})")
         };
         return Task.FromResult(strategy);

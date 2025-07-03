@@ -1,4 +1,5 @@
 ﻿using Poliedro.Billing.Domain.Client.Enums;
+using Poliedro.Billing.Domain.Provider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Server.Entities;
 

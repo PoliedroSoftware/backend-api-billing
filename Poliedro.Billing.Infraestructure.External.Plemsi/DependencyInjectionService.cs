@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Poliedro.Billing.Application.BillingPos.Services.Selectors.Plemsi;
+using Poliedro.Billing.Application.BillingPos.Services.Strategies;
 using Poliedro.Billing.Application.SendEmail.Ports;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.BillingPos.Ports;
 using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.CustomersId.Ports;
@@ -11,6 +14,8 @@ using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SendEmail.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
@@ -58,9 +63,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<ICustomersIdRepository, CustomersIdRepository>();
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
-            //services.AddTransient<CreateBillingFERepository>();
-            //services.AddTransient<CreateBillingPOSRepository>();
-            //services.AddTransient<ICreateBillingFactory, PrepareBillingFactory>();
+            services.AddTransient<ICreateBillingFactory, BillingStrategySelector>();
+            services.AddTransient<IBillingSender, BillingFESender>();
+            services.AddTransient<IBillingSender, BillingPOSSender>();
+
 
             services.AddTransient<EmailErrorHandler>();
             return services;
