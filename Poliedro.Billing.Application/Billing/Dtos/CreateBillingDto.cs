@@ -1,7 +1,7 @@
 ﻿
 namespace Poliedro.Billing.Application.Billing.Dtos;
 
-public record CreateBillingDto
+public record CreateBillingDTO
     (
         DateTime Date,
         DateTime Time,
@@ -15,6 +15,7 @@ public record CreateBillingDto
         AttachmentDTO? Attachment1,
         AttachmentDTO? Attachment2,
         CustomerBillingDTO? CustomerEntity,
+        PayPointInfoDTO? PayPointInfoEntity,
         PaymentDTO? PaymentEntity,
         List<GeneralAllowanceDTO>? GeneralAllowanceEntity,
         List<ItemElectronicDTO>? ItemElectronicEntity,

@@ -1,6 +1,7 @@
-﻿using Poliedro.Billing.Domain.Billing.Ports;
+﻿using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
 
-namespace Poliedro.Billing.Domain.Billing.Services.Selectors.Plemsi;
+namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
 public class PrepareBillingFE : ICreateBillingStrategy
 {

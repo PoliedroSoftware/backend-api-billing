@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Poliedro.Billing.Domain.BillingPos;
+﻿
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;

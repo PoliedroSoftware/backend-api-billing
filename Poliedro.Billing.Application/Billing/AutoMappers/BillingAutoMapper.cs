@@ -1,5 +1,6 @@
 using AutoMapper;
 using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.FERetail.Entity;
 
@@ -9,8 +10,9 @@ public class BillingAutoMapper : Profile
 {
     public BillingAutoMapper()
     {
-        CreateMap<CreateBilling, CreateBillingDto>();
-
+        CreateMap<CreateBilling, CreateBillingDTO>();
+        CreateMap<CreateBilling, PlemiFEInvoiceDTO>();
+        CreateMap<CreateBilling, PlemiPOSInvoiceDTO>();//
         CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerDTO>().ReverseMap();
         CreateMap<PayPointInfoEntity, PayPointInfoDTO>().ReverseMap();
         CreateMap<OrderReferenceEntity, OrderReferenceDTO>().ReverseMap();

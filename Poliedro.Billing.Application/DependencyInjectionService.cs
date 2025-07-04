@@ -8,7 +8,7 @@ using Poliedro.Billing.Application.CustomersId.AutoMappers;
 using Poliedro.Billing.Application.DianResolution.AutoMappers;
 using Poliedro.Billing.Application.GetInvoice.AutoMappers;
 using Poliedro.Billing.Application.InvoiceDetailElectronic.AutoMappers;
-using Poliedro.Billing.Application.InvoicePendingWithDetails.AutoMappers;
+using Poliedro.Billing.Application.InvoicesPendingWithDetails.AutoMappers;
 using Poliedro.Billing.Application.NotifyResolution.AutoMappers;
 using Poliedro.Billing.Application.PendingInvoice.AutoMappers;
 using Poliedro.Billing.Application.Server.AutoMappers;

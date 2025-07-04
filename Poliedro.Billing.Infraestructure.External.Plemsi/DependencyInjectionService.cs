@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Poliedro.Billing.Application.Billing.Services.Factories;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+using Poliedro.Billing.Application.Billing.Services.Strategies;
 using Poliedro.Billing.Application.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Billing.Services.Strategies;
 using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.CustomersId.Ports;
 using Poliedro.Billing.Domain.FERetail.Ports;
@@ -14,7 +15,8 @@ using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Strategies;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
@@ -63,8 +65,12 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
             services.AddTransient<ICreateBillingFactory, BillingStrategySelector>();
-            //services.AddTransient<IBillingSender, BillingFESender>();
-            //services.AddTransient<IBillingSender, BillingPOSSender>();
+            services.AddScoped<PrepareBillingFE>();
+            services.AddScoped<PrepareBillingPOS>();
+            services.AddTransient<IBillingSenderFactory,BillingSenderSelector>();
+            services.AddTransient<BillingSenderFE>();
+            services.AddTransient<BillingSenderPOS>();
+            services.AddTransient<IBillingSenderOrchestrator, BillingSenderOrchestrator>();
 
 
             services.AddTransient<EmailErrorHandler>();

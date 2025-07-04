@@ -1,8 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
+using Poliedro.Billing.Application.Billing.Services.Factories;
+using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Billing.Services.Selectors.Plemsi;
 
-namespace Poliedro.Billing.Domain.Billing.Services.Strategies;
+namespace Poliedro.Billing.Application.Billing.Services.Strategies;
 
 public class BillingStrategySelector(
     IServiceProvider serviceProvider

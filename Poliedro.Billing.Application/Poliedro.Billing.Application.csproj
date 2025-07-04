@@ -7,6 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Billing\AutoMapper\**" />
+    <Compile Remove="Billing\Erros\**" />
+    <Compile Remove="Billing\Queries\**" />
+    <EmbeddedResource Remove="Billing\AutoMapper\**" />
+    <EmbeddedResource Remove="Billing\Erros\**" />
+    <EmbeddedResource Remove="Billing\Queries\**" />
+    <None Remove="Billing\AutoMapper\**" />
+    <None Remove="Billing\Erros\**" />
+    <None Remove="Billing\Queries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
@@ -20,10 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Billing\AutoMapper\" />
-    <Folder Include="Billing\Dtos\" />
-    <Folder Include="Billing\Erros\" />
-    <Folder Include="Billing\Queries\" />
     <Folder Include="CreditNote\Commands\CreateCreditNote\Command\" />
   </ItemGroup>
 

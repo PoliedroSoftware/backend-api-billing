@@ -1,6 +1,6 @@
 ﻿namespace Poliedro.Billing.Domain.Billing.Ports;
 
-public interface IBillingSenderStrategy
+public interface IBillingSenderStrategy<TDto>
 {
-    Task SendInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken CancellationToken);
+    Task SendInvoicesAsync(IEnumerable<TDto> invoices, CancellationToken CancellationToken);
 }

@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Polideiro.Billing.Application.InvoiceDetailElectronic.Queries.GetAllInvoiceDetailElectronic;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Common.Features;
 using Poliedro.Billing.Application.InvoiceDetailElectronic.Dtos;
+using Poliedro.Billing.Application.InvoiceDetailElectronic.Queries.GetAllInvoiceDetailElectronic;
 using Poliedro.Billing.Domain.InvoiceDetailElectronic.Ports;
 using Swashbuckle.AspNetCore.Annotations;
 

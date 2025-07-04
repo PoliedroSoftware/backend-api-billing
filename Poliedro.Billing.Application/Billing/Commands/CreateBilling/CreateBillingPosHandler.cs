@@ -1,45 +1,36 @@
 ﻿using AutoMapper;
 using MediatR;
 using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Billing.Services.Factories;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
-
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
 public class CreateBillingPosHandler(
     IClientDomainService _clientDomainService,
     ICreateBillingFactory _createBillingFactory,
-    IBillingSenderFactory _billingSenderFactory,
+    IBillingSenderOrchestrator _billingSenderOrchestrator,   
     IMapper mapper
-    ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDto>>
+    ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDTO>>
 {
-    public async Task<IEnumerable<CreateBillingDto>> Handle(CreateBillingCommand request, CancellationToken CancellationToken)
+    public async Task<IEnumerable<CreateBillingDTO>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
     {
-        var client = await _clientDomainService.GetByIdAsync(request.ApiKey, CancellationToken);
+        var client = await _clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
 
-        var TypeResolution = client.Value.DianResolution.ResolutionType.ToString();
+        string typeResolution = client.Value.DianResolution.ResolutionType.ToString();
         var providerType = (ProviderType)client.Value.ProviderId;
-        string Provider = providerType.ToString();
+        string provider = providerType.ToString();
 
-        ICreateBillingStrategy Processor = await _createBillingFactory.GetProcessorAsync(TypeResolution, Provider);
-        IBillingSenderStrategy sender = await _billingSenderFactory.GetSenderAsync(Provider, TypeResolution);
+        var processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
 
-        IEnumerable<Domain.Billing.CreateBilling> BillingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
+        var billingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
+        var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, cancellationToken);
 
-        IEnumerable<Domain.Billing.CreateBilling> ProcessedInvoices = await Processor.CreateInvoicesAsync(BillingEntities, CancellationToken);
-        // create billig FOR provider and TypeResolution
-        
+        await _billingSenderOrchestrator.SendInvoicesAsync(processedInvoices, provider, typeResolution, cancellationToken);
 
-
-
-        await sender.SendInvoicesAsync(ProcessedInvoices, CancellationToken);
-
-        var billingDtos = mapper.Map<IEnumerable<CreateBillingDto>>(ProcessedInvoices);
-
+        var billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
         return billingDtos;
-
     }
-
 }

@@ -4,7 +4,6 @@ using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.EntityConfigurations;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.PedingInvoice.Entities;
-using Poliedro.Billing.Domain.BillingPos;
 using Poliedro.Billing.Domain.InvoiceDetailElectronic.Entities;
 using Poliedro.Billing.Domain.Provider.Entities;
 using Poliedro.Billing.Domain.Billing;

@@ -1,0 +1,25 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Poliedro.Billing.Application.Billing.Services.Factories;
+using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
+using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
+
+namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Strategies;
+
+public class BillingSenderSelector(IServiceProvider serviceProvider) : IBillingSenderFactory
+{
+    public Task<IBillingSenderStrategy<TDto>> GetSenderAsync<TDto>(string Provider, string TypeResolution)
+    {
+        object sender = (Provider, TypeResolution) switch
+        {
+            ("PLEMSI", "FE") when typeof(TDto) == typeof(PlemiFEInvoiceDTO)
+                => serviceProvider.GetRequiredService<BillingSenderFE>(),
+            ("PLEMSI", "POS") when typeof(TDto) == typeof(PlemiPOSInvoiceDTO)
+                => serviceProvider.GetRequiredService<BillingSenderPOS>(),
+            _ => throw new ArgumentException($"Unknown sender for provider {Provider} and resolutionType {TypeResolution}")
+        };
+
+        return Task.FromResult((IBillingSenderStrategy<TDto>)sender);
+
+    }
+}
