@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Poliedro.Billing.Application.GetInvoice.Dtos;
 using Poliedro.Billing.Domain.GetInvoice.Entities;
 
 namespace Poliedro.Billing.Application.GetInvoice.AutoMappers;

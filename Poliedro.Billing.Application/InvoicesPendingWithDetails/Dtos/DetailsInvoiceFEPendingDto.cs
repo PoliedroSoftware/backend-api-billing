@@ -1,4 +1,4 @@
-namespace Poliedro.Billing.Application.InvoicePendingWithDetails.Dtos;
+namespace Poliedro.Billing.Application.InvoicesPendingWithDetails.Dtos;
 
 public record DetailsInvoiceFEPendingDto
     (

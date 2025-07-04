@@ -1,6 +1,4 @@
-﻿
-using Poliedro.Billing.Domain.InvoicePendingWithDetails.Ports;
-using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Enums;
+﻿using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Enums;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;

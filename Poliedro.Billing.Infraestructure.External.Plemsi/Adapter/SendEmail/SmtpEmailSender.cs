@@ -4,7 +4,6 @@ using System.Net.Mail;
 using System.Net;
 using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Application.SendEmail.Ports;
-using Poliedro.Billing.Domain.SendEmail.Ports;
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 
 public class SmtpEmailSender(IConfiguration _config, IEmailBodyRenderer _renderer) : IEmailSender

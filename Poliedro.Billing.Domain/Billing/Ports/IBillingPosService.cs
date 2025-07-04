@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.BillingPos.Ports;
+﻿namespace Poliedro.Billing.Domain.Billing.Ports;
 
 public interface IBillingPosService
 {

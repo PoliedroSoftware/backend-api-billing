@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Poliedro.Billing.Application.InvoicePendingWithDetails.Dtos;
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Dtos;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Entities;
 

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using MediatR;
-using Polideiro.Billing.Application.InvoiceDetailElectronic.Queries.GetAllInvoiceDetailElectronic;
 using Poliedro.Billing.Application.InvoiceDetailElectronic.Dtos;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.FERetail.Ports;

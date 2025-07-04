@@ -11,12 +11,11 @@ public class BillingSenderSelector(IServiceProvider serviceProvider) : IBillingS
     {
         IBillingSenderStrategy sender = (Provider, TypeResolution) switch
         {
-            ("PLEMSI", "FE") => serviceProvider.GetRequiredService<BillingSenderFE>(),
-            ("PLEMSI", "POS") => serviceProvider.GetRequiredService<BillingSenderPOS>(),
+            ("PLEMSI", "FE") => serviceProvider.GetRequiredService<IBillingSenderStrategy>(),
+            ("PLEMSI", "POS") => serviceProvider.GetRequiredService<IBillingSenderStrategy>(),
             _ => throw new ArgumentException($"Unknown provider ({Provider}) or type ({TypeResolution})")
         };
         return Task.FromResult(sender);
 
-    }
     }
 }

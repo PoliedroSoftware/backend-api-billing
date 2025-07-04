@@ -1,4 +1,6 @@
-﻿namespace Poliedro.Billing.Domain.GetInvoice.Entities;
+﻿using Poliedro.Billing.Domain.GetInvoice.Entities;
+
+namespace Poliedro.Billing.Application.GetInvoice.Dtos;
 
 public class GetInvoiceDto
 {

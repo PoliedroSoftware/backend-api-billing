@@ -1,9 +1,8 @@
 using AutoMapper;
-using Poliedro.Billing.Application.InvoicePendingWithDetails.Dtos;
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Dtos;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Entities;
 
-namespace Poliedro.Billing.Application.InvoicePendingWithDetails.AutoMappers;
+namespace Poliedro.Billing.Application.InvoicesPendingWithDetails.AutoMappers;
 
 public class InvoiceFEPendingWithDetailsProfile : Profile
 {

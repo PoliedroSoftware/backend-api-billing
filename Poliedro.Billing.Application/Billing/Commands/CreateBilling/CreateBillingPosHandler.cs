@@ -4,7 +4,6 @@ using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
-using Poliedro.Billing.Domain.Ports;
 
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
@@ -22,14 +21,18 @@ public class CreateBillingPosHandler(
 
         var TypeResolution = client.Value.DianResolution.ResolutionType.ToString();
         var providerType = (ProviderType)client.Value.ProviderId;
-        var Provider = providerType.ToString();
+        string Provider = providerType.ToString();
 
-        var Processor = await _createBillingFactory.GetProcessorAsync(TypeResolution, Provider);
-        var sender = await _billingSenderFactory.GetSenderAsync(Provider, TypeResolution);
+        ICreateBillingStrategy Processor = await _createBillingFactory.GetProcessorAsync(TypeResolution, Provider);
+        IBillingSenderStrategy sender = await _billingSenderFactory.GetSenderAsync(Provider, TypeResolution);
 
-        IEnumerable<Poliedro.Billing.Domain.Billing.CreateBilling> BillingEntities = mapper.Map<IEnumerable<Poliedro.Billing.Domain.Billing.CreateBilling>>(request.Invoices);
+        IEnumerable<Domain.Billing.CreateBilling> BillingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
 
-        var ProcessedInvoices = await Processor.CreateInvoicesAsync(BillingEntities, CancellationToken);
+        IEnumerable<Domain.Billing.CreateBilling> ProcessedInvoices = await Processor.CreateInvoicesAsync(BillingEntities, CancellationToken);
+        // create billig FOR provider and TypeResolution
+        
+
+
 
         await sender.SendInvoicesAsync(ProcessedInvoices, CancellationToken);
 

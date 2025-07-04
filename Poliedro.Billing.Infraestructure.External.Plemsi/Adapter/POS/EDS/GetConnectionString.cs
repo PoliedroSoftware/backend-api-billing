@@ -1,5 +1,5 @@
 ﻿using MySqlConnector;
-using Poliedro.Billing.Domain.BillingPos.Ports;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Domain.GetInvoice.Entities;
 
-namespace Poliedro.Billing.Infrastructure.GetInvoice.Adapters;
+namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.GetInvoice;
 
 public class GetInvoiceDomainGetInvoice(IConfiguration config) : IGetInvoiceDomainGetInvoice
 {

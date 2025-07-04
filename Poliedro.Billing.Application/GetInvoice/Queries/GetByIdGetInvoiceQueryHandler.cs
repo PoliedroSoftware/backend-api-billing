@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
+using Poliedro.Billing.Application.GetInvoice.Dtos;
 using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
-using Poliedro.Billing.Domain.GetInvoice.Entities;
 
-namespace Poliedro.Billing.Application.GetInvoice.Queries.GetByIdGetInvoice;
+namespace Poliedro.Billing.Application.GetInvoice.Queries;
 
 public class GetByIdGetInvoiceQueryHandler(IGetInvoiceDomainGetInvoice getInvoiceDomainGetInvoice, IMapper mapper)
     : IRequestHandler<GetByIdGetInvoiceQuery, GetInvoiceDto>

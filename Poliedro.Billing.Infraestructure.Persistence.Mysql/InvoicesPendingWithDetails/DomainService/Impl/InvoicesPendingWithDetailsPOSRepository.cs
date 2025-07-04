@@ -3,8 +3,8 @@ using MySqlConnector;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Ports;
-using Poliedro.Billing.Domain.InvoicePendingWithDetails.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Entities;
+using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;

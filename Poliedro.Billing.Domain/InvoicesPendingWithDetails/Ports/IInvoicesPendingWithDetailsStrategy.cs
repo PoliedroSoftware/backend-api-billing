@@ -1,7 +1,7 @@
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
-namespace Poliedro.Billing.Domain.InvoicePendingWithDetails.Ports;
+namespace Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 
 public interface IInvoicesPendingWithDetailsStrategy
 {
