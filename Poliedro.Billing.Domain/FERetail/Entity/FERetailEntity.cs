@@ -1,4 +1,6 @@
-﻿namespace Poliedro.Billing.Domain.FERetail.Entity;
+﻿using Poliedro.Billing.Domain.Billing;
+
+namespace Poliedro.Billing.Domain.FERetail.Entity;
 
 public class FERetailEntity
 {

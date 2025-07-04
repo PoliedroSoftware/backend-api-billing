@@ -1,6 +1,6 @@
 using AutoMapper;
 using Poliedro.Billing.Application.Billing.Dtos;
-using Poliedro.Billing.Domain.BillingPos;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.FERetail.Entity;
 
 namespace Poliedro.Billing.Application.Billing.AutoMappers;

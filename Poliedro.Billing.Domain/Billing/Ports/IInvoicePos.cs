@@ -1,7 +1,7 @@
 ﻿using Poliedro.Billing.Domain.BillingPos;
 using Poliedro.Billing.Domain.Client.Entities;
 
-namespace Poliedro.Billing.Domain.BillingPos.Ports;
+namespace Poliedro.Billing.Domain.Billing.Ports;
 
 public interface IInvoicePos
 {

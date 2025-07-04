@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Poliedro.Billing.Application.BillingPos.Services.Selectors.Plemsi;
-using Poliedro.Billing.Application.BillingPos.Services.Strategies;
+using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+using Poliedro.Billing.Application.Billing.Services.Strategies;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.BillingPos.Ports;
@@ -64,8 +64,8 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
             services.AddTransient<ICreateBillingFactory, BillingStrategySelector>();
-            services.AddTransient<IBillingSender, BillingFESender>();
-            services.AddTransient<IBillingSender, BillingPOSSender>();
+            //services.AddTransient<IBillingSender, BillingFESender>();
+            //services.AddTransient<IBillingSender, BillingPOSSender>();
 
 
             services.AddTransient<EmailErrorHandler>();

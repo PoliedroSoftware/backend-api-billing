@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Poliedro.Billing.Domain.BillingPos;
+namespace Poliedro.Billing.Domain.Billing;
 
 public class ItemFERetailEntity
 {

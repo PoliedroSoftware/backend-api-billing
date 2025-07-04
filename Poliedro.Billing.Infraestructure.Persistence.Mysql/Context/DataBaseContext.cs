@@ -7,6 +7,7 @@ using Poliedro.Billing.Domain.PedingInvoice.Entities;
 using Poliedro.Billing.Domain.BillingPos;
 using Poliedro.Billing.Domain.InvoiceDetailElectronic.Entities;
 using Poliedro.Billing.Domain.Provider.Entities;
+using Poliedro.Billing.Domain.Billing;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
 

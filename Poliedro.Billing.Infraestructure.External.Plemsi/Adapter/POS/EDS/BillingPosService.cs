@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Poliedro.Billing.Application.Helper.EmailBuilder;
 using Poliedro.Billing.Application.SendEmail.Dtos;
+using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.BillingPos;
 using Poliedro.Billing.Domain.BillingPos.Ports;
 using Poliedro.Billing.Domain.Client.Entities;

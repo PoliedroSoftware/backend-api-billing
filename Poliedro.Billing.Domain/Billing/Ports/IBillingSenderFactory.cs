@@ -1,6 +1,7 @@
+﻿
 namespace Poliedro.Billing.Domain.Billing.Ports;
 
 public interface IBillingSenderFactory
 {
-    IBillingSender GetSender(string typeResolution, string providerType);
+    Task<IBillingSenderStrategy> GetSenderAsync(string Provider, string TypeResolution);
 }

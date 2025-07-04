@@ -1,9 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Api.Common.Helpers;
-using Poliedro.Billing.Application.BillingPos.Commands.CreateBillingPos;
+using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Common.Features;
-using Poliedro.Billing.Domain.BillingPos;
+using Poliedro.Billing.Domain.Billing;
+
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Poliedro.Billing.Api.Controllers.v1.Billing;

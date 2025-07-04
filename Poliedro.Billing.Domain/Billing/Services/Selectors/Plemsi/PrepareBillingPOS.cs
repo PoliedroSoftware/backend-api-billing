@@ -1,11 +1,11 @@
-﻿using Poliedro.Billing.Domain.BillingPos;
-using Poliedro.Billing.Domain.BillingPos.Ports;
+﻿using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
 
-namespace Poliedro.Billing.Application.BillingPos.Services.Selectors.Plemsi;
+namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
 public class PrepareBillingPOS : ICreateBillingStrategy
 {
-    public Task<List<CreateBilling>> CreateInvoicesAsync(List<CreateBilling> invoices, CancellationToken cancellationToken)
+    public Task<IEnumerable<CreateBilling>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
     {
 
         return Task.FromResult(invoices);
