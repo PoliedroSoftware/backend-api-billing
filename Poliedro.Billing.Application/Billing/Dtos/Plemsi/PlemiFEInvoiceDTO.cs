@@ -4,7 +4,7 @@ public record PlemiFEInvoiceDTO
 {
     public DateTime Date { get; init; }
     public DateTime Time { get; init; }
-    public string Prefix { get; init; }
+    public required string Prefix { get; init; }
     public int Number { get; init; }
     public OrderReferenceDTO? OrderReference { get; init; }
     public bool SendEmail { get; init; }

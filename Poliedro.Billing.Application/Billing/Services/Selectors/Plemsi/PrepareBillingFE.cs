@@ -7,7 +7,17 @@ public class PrepareBillingFE : ICreateBillingStrategy
 {
     public Task<IEnumerable<CreateBilling>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
     {
+        var Prepared = invoices.Select(invoice =>
+        {
+            
+                invoice.Date = DateTime.UtcNow;
 
-        return Task.FromResult(invoices);
+
+
+            return invoice;
+        });
+
+
+        return Task.FromResult(Prepared);
     }
 }

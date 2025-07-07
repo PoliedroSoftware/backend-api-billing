@@ -10,7 +10,7 @@ public record PlemiPOSInvoiceDTO
     public CustomerBillingDTO? CustomerEntity { get; init; }
     public PayPointInfoDTO? PayPointInfoEntity { get; init; }
     public int Resolution { get; init; }
-    public string Prefix { get; init; }
+    public required string Prefix { get; init; }
     public string? HeadNote { get; init; }
     public string? FootNote { get; init; }
     public PaymentDTO? PaymentEntity { get; init; }
