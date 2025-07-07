@@ -15,7 +15,6 @@ public record CreateBillingDTO
         AttachmentDTO? Attachment1,
         AttachmentDTO? Attachment2,
         CustomerBillingDTO? CustomerEntity,
-        PayPointInfoDTO? PayPointInfoEntity,
         PaymentDTO? PaymentEntity,
         List<GeneralAllowanceDTO>? GeneralAllowanceEntity,
         List<ItemElectronicDTO>? ItemElectronicEntity,

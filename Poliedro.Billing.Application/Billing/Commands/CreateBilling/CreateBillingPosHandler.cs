@@ -31,6 +31,7 @@ public class CreateBillingPosHandler(
         await _billingSenderOrchestrator.SendInvoicesAsync(processedInvoices, provider, typeResolution, cancellationToken);
 
         var billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
+
         return billingDtos;
     }
 }
