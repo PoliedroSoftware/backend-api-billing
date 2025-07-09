@@ -2,6 +2,7 @@
 
 using Poliedro.Billing.Domain.FERetail.Entity;
 
+
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare;
 
 public class PrepareItemElectronic
@@ -9,30 +10,39 @@ public class PrepareItemElectronic
     public List<ItemElectronicEntity> UpdateItem(List<ItemElectronicEntity> items)
     {
 
+        List<ItemElectronicEntity> itemsInvoiceResponse = new();
 
-        foreach (var item in items)
+        foreach (ItemsInvoiceEntity item in items)
         {
-
-            List<ItemElectronicEntity> Itens = null;
-
-            double totalToBase = Itens?.Sum(item => item.LineExtensionAmount) ?? 0;
-
-
-            Itens = new List<ItemElectronicEntity>
+            var itemInvoice = new ItemElectronicEntity
             {
-                new ItemElectronicEntity { LineExtensionAmount = 100 },
-                new ItemElectronicEntity { LineExtensionAmount = 200 }
+                UnitMeasureId = 70,
+                LineExtensionAmount = item.unit_preci * item.invoiced_quantity,
+                InvoicedQuantity = item.invoiced_quantity,
+                FreeOfChargeIndicator = false,
+                AllowanceCharges = [],
+
+                TaxTotals = [
+                     new TaxTotalEntity {
+                         TaxId = 1,
+                         Percent = item.percent,
+                         TaxAmount = item.tax_amount * item.invoiced_quantity,
+                         TaxableAmount = item.unit_preci * item.invoiced_quantity
+                }],
+                WithHoldingTaxTotal = [],
+                Description = $"{item.description} {(item.tax_amount > 0 ? $"IVA {item.tax_amount}" : "")}",
+
+                Notes = "",
+                Code = item.code.ToString(),
+                TypeItemIdentificationId = 1,
+                PriceAmount = item.unit_preci,
+                BaseQuantity = item.invoiced_quantity,
             };
-
-            totalToBase = Itens?.Sum(item => item.LineExtensionAmount) ?? 0;
-            double totalTaxableAmount = item.TaxTotals?.Sum(tax => tax.TaxAmount) ?? 0;
-            double totalBaseGravable = item.TaxTotals?.Sum(tax => tax.TaxableAmount) ?? 0;
-            double totalToPay = totalToBase + totalTaxableAmount;
-
+            itemsInvoiceResponse.Add(itemInvoice);
 
         }
 
-        return items;
+        return itemsInvoiceResponse;
     }
 
 }
