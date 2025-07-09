@@ -9,35 +9,41 @@ public class PrepareItemElectronic : IUdateItem
     {
         List<ItemElectronicEntity> itemsInvoiceResponse = [];
 
-        //foreach (ItemsInvoiceEntity item in items)
-        //{
-        //    var itemInvoice = new ItemElectronicEntity
-        //    {
-        //        UnitMeasureId = 70,
-        //        LineExtensionAmount = item.unit_preci * item.invoiced_quantity,
-        //        InvoicedQuantity = item.invoiced_quantity,
-        //        FreeOfChargeIndicator = false,
-        //        AllowanceCharges = [],
+        foreach (ItemElectronicEntity item in items)
+        {
+            var itemInvoice = new ItemElectronicEntity
+            {
+                UnitMeasureId = 70,
+                LineExtensionAmount = item.PriceAmount * item.InvoicedQuantity,
+                InvoicedQuantity = item.InvoicedQuantity,
+                FreeOfChargeIndicator = false,
 
-        //        TaxTotals = [
-        //             new TaxTotalEntity {
-        //                 TaxId = 1,
-        //                 Percent = item.percent,
-        //                 TaxAmount = item.tax_amount * item.invoiced_quantity,
-        //                 TaxableAmount = item.unit_preci * item.invoiced_quantity
-        //        }],
-        //        WithHoldingTaxTotal = [],
-        //        Description = $"{item.description} {(item.tax_amount > 0 ? $"IVA {item.tax_amount}" : "")}",
 
-        //        Notes = "",
-        //        Code = item.code.ToString(),
-        //        TypeItemIdentificationId = 1,
-        //        PriceAmount = item.unit_preci,
-        //        BaseQuantity = item.invoiced_quantity,
-        //    };
-        //    itemsInvoiceResponse.Add(itemInvoice);
+                AllowanceCharges = [],
 
-        //}
+
+                TaxTotals = [
+                     new TaxTotalEntity {
+                         TaxId = 1,
+                         Percent = item.TaxTotals?.FirstOrDefault()?.Percent ?? 0,
+                         TaxAmount = (item.TaxTotals?.FirstOrDefault()?.TaxAmount ?? 0) * item.InvoicedQuantity,
+                         TaxableAmount = item.PriceAmount * item.InvoicedQuantity
+                }],
+
+
+                WithHoldingTaxTotal = [],
+
+
+                Description = $"{item.Description} {(item.TaxTotals?.FirstOrDefault()?.TaxAmount > 0 ? $"IVA {item.TaxTotals?.FirstOrDefault()?.TaxAmount}" : "")}",
+                Notes = "",
+                Code = item.Code.ToString(),
+                TypeItemIdentificationId = 1,
+                PriceAmount = item.PriceAmount,
+                BaseQuantity = item.InvoicedQuantity,
+            };
+            itemsInvoiceResponse.Add(itemInvoice);
+
+        }
 
         return itemsInvoiceResponse;
     }
