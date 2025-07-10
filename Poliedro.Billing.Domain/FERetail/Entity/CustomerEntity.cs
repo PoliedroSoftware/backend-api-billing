@@ -40,6 +40,9 @@ public class CustomerEntity
     [JsonPropertyName("municipality_id")]
     public int? MunicipalityId { get; set; }
 
+    [JsonPropertyName("municipality_code")]
+    public int? MunicipalityCode { get; set; }
+
     [JsonPropertyName("type_regime_id")]
     public required int TypeRegimeId { get; set; }
 }

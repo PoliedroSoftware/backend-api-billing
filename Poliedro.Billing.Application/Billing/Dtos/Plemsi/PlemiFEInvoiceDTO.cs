@@ -14,7 +14,7 @@ public record PlemiFEInvoiceDTO
     public PaymentDTO? PaymentEntity { get; init; }
     public List<GeneralAllowanceDTO>? GeneralAllowanceEntity { get; init; }
     public List<ItemElectronicDTO>? ItemElectronicEntity { get; init; }
-    public int Resolution { get; init; }
+    public decimal Resolution { get; init; }
     public string? HeadNote { get; init; }
     public string? FootNote { get; init; }
     public string? Notes { get; init; }

@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.Services.Factories;
-using Poliedro.Billing.Application.Billing.Services.Ports;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Strategies;
 using Poliedro.Billing.Application.SendEmail;
@@ -74,7 +73,8 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<BillingSenderPOS>();
             services.AddTransient<IBillingSenderOrchestrator, BillingSenderOrchestrator>();
 
-            services.AddTransient<IUdateItem, PrepareItemElectronic>();
+            services.AddTransient<IPrepareItemBilling, PrepareItemElectronic>();
+            services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
 
 
             services.AddTransient<EmailErrorHandler>();

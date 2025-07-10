@@ -1,12 +1,12 @@
-﻿using Poliedro.Billing.Application.Billing.Services.Ports;
+﻿using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare;
 
-public class PrepareItemElectronic : IUdateItem
+public class PrepareItemElectronic : IPrepareItemBilling
 {
-       public async Task<List<ItemElectronicEntity>> UpdateItemAsync(List<ItemElectronicEntity> items)
-    {
+       public async Task<List<ItemElectronicEntity>> PrepareItemBillingAsync(List<ItemElectronicEntity> items)
+        {
         List<ItemElectronicEntity> itemsInvoiceResponse = [];
 
         foreach (ItemElectronicEntity item in items)
@@ -45,6 +45,6 @@ public class PrepareItemElectronic : IUdateItem
 
         }
 
-        return itemsInvoiceResponse;
+        return await Task.FromResult(itemsInvoiceResponse);
     }
 }

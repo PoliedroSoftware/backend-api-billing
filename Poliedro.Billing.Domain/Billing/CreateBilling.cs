@@ -21,7 +21,8 @@ public class CreateBilling
     public List<GeneralAllowanceEntity>? GeneralAllowanceEntity { get; set; }
 
     public List<ItemElectronicEntity>? ItemElectronicEntity { get; set; }
-    public int Resolution { get; set; }
+    public decimal Resolution { get; set; }
+    public string? ResolutionText { get; set; }
     public string? HeadNote { get; set; }
     public string? FootNote { get; set; }
     public string? Notes { get; set; }

@@ -1,8 +1,12 @@
-﻿using Poliedro.Billing.Application.Billing.Services.Ports;
-using Poliedro.Billing.Domain.Billing;
-using Poliedro.Billing.Domain.Billing.Ports;namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+﻿using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.FERetail.Entity;
+namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
-public class PrepareBillingFE(IUdateItem prepareItemElectronic) : ICreateBillingStrategy {
+public class PrepareBillingFE(
+    IPrepareItemBilling _prepareItemElectronic,
+    IGetAllTaxTotalsBilling _getAllTaxTotals
+    ) : ICreateBillingStrategy {
 
 
 
@@ -13,7 +17,7 @@ public class PrepareBillingFE(IUdateItem prepareItemElectronic) : ICreateBilling
         {
             if (invoice.ItemElectronicEntity != null)
             {
-                invoice.ItemElectronicEntity = await prepareItemElectronic.UpdateItemAsync(invoice.ItemElectronicEntity);
+                invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(invoice.ItemElectronicEntity);
 
                 double totalToBase = invoice.ItemElectronicEntity.Sum(item => item.LineExtensionAmount);
                 double totalTaxableAmount = invoice.ItemElectronicEntity.Sum(item => item.TaxTotals.Sum(tax => tax.TaxAmount));
@@ -24,6 +28,12 @@ public class PrepareBillingFE(IUdateItem prepareItemElectronic) : ICreateBilling
                 invoice.InvoiceTaxInclusiveTotal = (decimal)totalToPay;
                 invoice.TotalToPay = (decimal)totalToPay;
                 invoice.FinalTotalToPay = (decimal)totalToPay;
+
+                List<AllTaxTotalEntity> AllTaxTotals = [];
+
+                AllTaxTotals = await _getAllTaxTotals.IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
+
+
             }
             return invoice;
         })

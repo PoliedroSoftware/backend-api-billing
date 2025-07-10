@@ -9,7 +9,7 @@ public record PlemiPOSInvoiceDTO
     public SoftwareManufacturerDTO? SoftwareManufacturer { get; init; }
     public CustomerBillingDTO? CustomerEntity { get; init; }
     public PayPointInfoDTO? PayPointInfoEntity { get; init; }
-    public int Resolution { get; init; }
+    public decimal Resolution { get; init; }
     public required string Prefix { get; init; }
     public string? HeadNote { get; init; }
     public string? FootNote { get; init; }
