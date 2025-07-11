@@ -10,8 +10,8 @@ public class CreateBilling
     public SoftwareManufacturerEntity? SoftwareManufacturer { get; set; }
 
     public PayPointInfoEntity? PayPointInfo { get; set; }
-    public required string  Prefix { get; set; }
-    public required int Number { get; set; }
+    
+    public required string Number { get; set; }
     public OrderReferenceEntity? OrderReference { get; set; }
     public bool SendEmail { get; set; }
     public AttachmentEntity? Attachment1 { get; set; }

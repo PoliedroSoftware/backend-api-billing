@@ -25,6 +25,7 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInv
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare;
+using Poliedro.Billing.Domain.Billing.Ports;
 
 
 
@@ -64,7 +65,10 @@ public static class DependencyInjectionService
         services.AddTransient<IInvoicesPendingWithDetailsStrategyFactory, InvoicesPendingWithDetailsStrategyFactory>();
 
         
-        services.AddTransient<PrepareItemElectronic>();
+        services.AddTransient<IPrepareItemBilling, PrepareItemElectronic>();
+        services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
+
+        //services.AddTransient<IGetLastInvoiceBilling>();
 
 
         return services;

@@ -2,7 +2,7 @@
 
 public record PlemiPOSInvoiceDTO
 {
-    public int Number { get; init; }
+    public required string Number { get; init; }
     public DateTime Date { get; init; }
     public DateTime Time { get; init; }
     public string? SendToEmail { get; init; }

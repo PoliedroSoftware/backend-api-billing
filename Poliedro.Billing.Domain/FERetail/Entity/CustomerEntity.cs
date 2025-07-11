@@ -7,6 +7,16 @@ public class CustomerEntity
     [JsonPropertyName("identification_number")]
     public required string IdentificationNumber { get; set; }
 
+    [JsonPropertyName("prefix")]
+    public string? Prefix { get; set; }
+
+
+    [JsonPropertyName("multiple_resolution")]
+    public string? MultipleResolution { get; set; }
+
+    [JsonPropertyName("api_key")]
+    public string? ApiKey { get; set; }
+
     [JsonPropertyName("dv")]
     public string? Dv { get; set; }
 

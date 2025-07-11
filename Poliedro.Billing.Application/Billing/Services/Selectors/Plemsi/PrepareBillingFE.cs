@@ -5,7 +5,8 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
 public class PrepareBillingFE(
     IPrepareItemBilling _prepareItemElectronic,
-    IGetAllTaxTotalsBilling _getAllTaxTotals
+    IGetAllTaxTotalsBilling _getAllTaxTotals,
+    IGetLastInvoiceBilling _getLastInvoiceBilling
     ) : ICreateBillingStrategy {
 
 
@@ -33,8 +34,16 @@ public class PrepareBillingFE(
 
                 AllTaxTotals = await _getAllTaxTotals.IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
 
-
             }
+
+            int InvoiceNumber = int.Parse(invoice.Number[^4..]);
+
+            int Invoice = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice.CustomerEntity, cancellationToken);
+
+
+            Invoice = (Invoice <= 0 || Invoice < InvoiceNumber) ? InvoiceNumber : Invoice + 1;
+
+
             return invoice;
         })
         );
