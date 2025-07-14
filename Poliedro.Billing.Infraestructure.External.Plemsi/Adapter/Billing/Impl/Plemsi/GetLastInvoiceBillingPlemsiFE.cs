@@ -5,7 +5,7 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using System.Net.Http.Headers;
 
-namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Services;
+namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
 public class GetLastInvoiceBillingPlemsiFE(IConfiguration config) : IGetLastInvoiceBilling
 {

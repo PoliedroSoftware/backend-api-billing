@@ -1,12 +1,12 @@
 ﻿
 using AutoMapper;
 using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-using Poliedro.Billing.Application.Billing.Services.Factories;
+using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
 
-namespace Poliedro.Billing.Application.Billing.Services.Strategies;
+namespace Poliedro.Billing.Application.Billing.Services.Strategies.Plemsi;
 
-public class BillingSenderOrchestrator
+public class BillingSenderStrategy
     (
     IBillingSenderFactory senderFactory,
     IMapper mapper

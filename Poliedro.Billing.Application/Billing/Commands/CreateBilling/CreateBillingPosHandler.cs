@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Poliedro.Billing.Application.Billing.Dtos;
-using Poliedro.Billing.Application.Billing.Services.Factories;
+using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;

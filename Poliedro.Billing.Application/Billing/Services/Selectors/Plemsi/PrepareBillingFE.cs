@@ -7,7 +7,7 @@ public class PrepareBillingFE(
     IPrepareItemBilling _prepareItemElectronic,
     IGetAllTaxTotalsBilling _getAllTaxTotals,
     IGetLastInvoiceBilling _getLastInvoiceBilling
-    ) : ICreateBillingStrategy {
+    ) : ICreateBilling {
 
 
 

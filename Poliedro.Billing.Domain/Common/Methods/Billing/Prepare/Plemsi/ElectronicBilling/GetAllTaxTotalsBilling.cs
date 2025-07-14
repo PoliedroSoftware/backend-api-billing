@@ -2,7 +2,7 @@
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.Siigo.Models;
 
-namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare;
+namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 public class GetAllTaxTotalsBilling : IGetAllTaxTotalsBilling
 {
     public async Task<List<AllTaxTotalEntity>> IGetAllTaxTotalsBillingAsync(List<ItemElectronicEntity> AllTaxTotal)

@@ -24,8 +24,8 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDeta
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 
 
 

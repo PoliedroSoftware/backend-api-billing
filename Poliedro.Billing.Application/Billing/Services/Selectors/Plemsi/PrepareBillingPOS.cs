@@ -3,7 +3,7 @@ using Poliedro.Billing.Domain.Billing.Ports;
 
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
-public class PrepareBillingPOS : ICreateBillingStrategy
+public class PrepareBillingPOS : ICreateBilling
 {
     public Task<IEnumerable<CreateBilling>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
     {

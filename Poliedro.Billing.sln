@@ -51,6 +51,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Siigo", "Siigo", "{B497D995
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poliedro.Billing.Infraestructure.External.Siigo", "Poliedro.Billing.Infraestructure.External.Siigo\Poliedro.Billing.Infraestructure.External.Siigo.csproj", "{DA9F622B-1578-4000-8459-FF0860EC5144}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NewFolder1", "NewFolder1", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -120,6 +122,7 @@ Global
 		{6CAACDB9-F71D-4CB6-9CBA-746EF0CE0D8A} = {B0989FC2-A30D-4739-A936-DF64FE7618BF}
 		{B497D995-D379-4E4C-BB05-703EBD1C4A40} = {37D6279A-7AD2-4EB6-A9FB-BB2B1EC3E7F5}
 		{DA9F622B-1578-4000-8459-FF0860EC5144} = {B497D995-D379-4E4C-BB05-703EBD1C4A40}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {37D6279A-7AD2-4EB6-A9FB-BB2B1EC3E7F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A82B1A5-6565-4330-90EC-FBC001E78304}

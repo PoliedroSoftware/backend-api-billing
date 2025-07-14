@@ -14,4 +14,9 @@
     <PackageReference Include="PDFsharp" Version="6.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Common\Methods\Billing\Prepare\TNS\" />
+    <Folder Include="Common\Methods\Billing\Prepare\Siigo\" />
+  </ItemGroup>
+
 </Project>
