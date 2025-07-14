@@ -1,5 +1,5 @@
 ﻿namespace Poliedro.Billing.Domain.Billing.Ports;
-public interface ICreateBilling
+public interface ICreateBilling<TInput,TOutput>
 {
-    Task<IEnumerable<CreateBilling>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken);
+    Task<IEnumerable<TOutput>> CreateInvoicesAsync(IEnumerable<TInput> invoices, CancellationToken cancellationToken);
 }

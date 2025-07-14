@@ -10,7 +10,7 @@ namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
 public class CreateBillingPosHandler(
     IClientDomainService _clientDomainService,
-    ICreateBillingFactory _createBillingFactory,
+    ICreateBillingFactory<Domain.Billing.CreateBilling, object> _createBillingFactory,
     IBillingSenderOrchestrator _billingSenderOrchestrator,   
     IMapper mapper
     ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDTO>>

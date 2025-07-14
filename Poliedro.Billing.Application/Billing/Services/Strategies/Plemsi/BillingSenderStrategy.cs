@@ -13,7 +13,7 @@ public class BillingSenderStrategy
     ): IBillingSenderOrchestrator
 {
     public async Task SendInvoicesAsync(
-    IEnumerable<Domain.Billing.CreateBilling> invoices,
+    IEnumerable<object> invoices,
     string provider,
     string typeResolution,
     CancellationToken cancellationToken)

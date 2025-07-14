@@ -7,6 +7,7 @@ using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Strategies.Plemsi;
 using Poliedro.Billing.Application.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 using Poliedro.Billing.Domain.CreditNote.Ports;
@@ -68,20 +69,22 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
 
-            //
-            services.AddTransient<ICreateBillingFactory, BillingPrepareStrategy>();
+            // Factoría y strategies
+            services.AddScoped<ICreateBillingFactory<CreateBilling, object>, BillingPrepareStrategy>();
             services.AddScoped<PrepareBillingFE>();
             services.AddScoped<PrepareBillingPOS>();
-            //
-            services.AddTransient<IBillingSenderFactory, BillingSenderSelector>();
-            services.AddTransient< BillingSenderFE>();
-            services.AddTransient< BillingSenderPOS>();
-            //
-            services.AddTransient<IBillingSenderOrchestrator, BillingSenderStrategy>();
-            //
-            services.AddTransient<IPrepareItemBilling, PrepareItemElectronic>();
-            services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
-            services.AddTransient<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();
+            
+            services.AddScoped<IBillingSenderFactory, BillingSenderSelector>();
+            services.AddScoped< BillingSenderFE>();
+            services.AddScoped< BillingSenderPOS>();
+
+            // Dependencias internas de PrepareBillingFE/POS
+            services.AddScoped<IBillingSenderOrchestrator, BillingSenderStrategy>();
+            services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();
+            services.AddScoped<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
+            services.AddScoped<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();
+            services.AddScoped<IBillingValidateScript, ValidateScriptBilling>();
+            services.AddScoped<ICalculateCheckDigits, CalculateCheckDigitsBilling>();
 
 
 
