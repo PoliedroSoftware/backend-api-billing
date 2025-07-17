@@ -14,14 +14,12 @@ public class PrepareBillingFE(
     IBillingValidateScript _billingValidateScript,
     ICalculateCheckDigits _calculateCheckDigits,
     IConfiguration _config
-    ) : ICreateBilling <CreateBilling, FERetailelectronicEntity>
+    ) : ICreateBilling 
 {
-
-    public async Task<IEnumerable<FERetailelectronicEntity>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
+    public async Task<IEnumerable<object>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
     {
 
         var results = new List<FERetailelectronicEntity>();
-
 
         foreach (var invoice in invoices)
         {
@@ -157,6 +155,6 @@ public class PrepareBillingFE(
             results.Add(Data);
         }
 
-        return results;
+        return results.Cast<object>();
     }
 }

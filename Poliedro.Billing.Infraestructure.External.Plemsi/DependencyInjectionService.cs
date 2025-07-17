@@ -17,7 +17,6 @@ using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Strategies.Plemsi;
@@ -70,7 +69,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
 
             // Factoría y strategies
-            services.AddScoped<ICreateBillingFactory<CreateBilling, object>, BillingPrepareStrategy>();
+            services.AddScoped<ICreateBillingFactory, BillingPrepareStrategy>();
             services.AddScoped<PrepareBillingFE>();
             services.AddScoped<PrepareBillingPOS>();
             

@@ -10,7 +10,7 @@ namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
 public class CreateBillingPosHandler(
     IClientDomainService _clientDomainService,
-    ICreateBillingFactory<Domain.Billing.CreateBilling, object> _createBillingFactory,
+    ICreateBillingFactory _createBillingFactory,
     IBillingSenderOrchestrator _billingSenderOrchestrator,   
     IMapper mapper
     ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDTO>>
@@ -25,12 +25,19 @@ public class CreateBillingPosHandler(
 
         var processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
 
+        // DTOs de entrada a CreateBilling
         var billingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
+
+        // Pasa como object
         var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, cancellationToken);
 
-        await _billingSenderOrchestrator.SendInvoicesAsync(processedInvoices, provider, typeResolution, cancellationToken);
+        // Enviar las facturas procesadas
+          await _billingSenderOrchestrator.SendInvoicesAsync(processedInvoices , provider, typeResolution, cancellationToken);
 
+        // Después haces cast o map a tus DTOs finales
         var billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
+
+
 
         return billingDtos;
     }

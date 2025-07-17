@@ -2,7 +2,7 @@
 using Poliedro.Billing.Domain.Billing.Ports;
 
 namespace Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
-public interface ICreateBillingFactory<TInput, TOutput>
+public interface ICreateBillingFactory
 {
-    Task<ICreateBilling<CreateBilling, TOutput>> GetProcessorAsync(string resolutyonType, string provider);
+    Task<ICreateBilling> GetProcessorAsync(string resolutyonType, string provider);
 }

@@ -1,5 +1,4 @@
-﻿
-namespace Poliedro.Billing.Domain.Billing.Ports;
+﻿namespace Poliedro.Billing.Domain.Billing.Ports;
 
 public interface IBillingSenderOrchestrator
 {

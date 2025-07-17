@@ -12,11 +12,7 @@ public class BillingSenderStrategy
     IMapper mapper
     ): IBillingSenderOrchestrator
 {
-    public async Task SendInvoicesAsync(
-    IEnumerable<object> invoices,
-    string provider,
-    string typeResolution,
-    CancellationToken cancellationToken)
+    public async Task SendInvoicesAsync(IEnumerable<object> invoices,string provider,string typeResolution,CancellationToken cancellationToken)
     {
         switch (provider, typeResolution)
         {
