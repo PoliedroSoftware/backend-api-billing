@@ -1,13 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
-using Poliedro.Billing.Application.Billing.Services.Strategies.Plemsi;
 using Poliedro.Billing.Application.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
-using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 using Poliedro.Billing.Domain.CreditNote.Ports;
@@ -19,7 +16,6 @@ using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Strategies.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
@@ -69,16 +65,15 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
 
             // Factoría y strategies
-            services.AddScoped<ICreateBillingFactory, BillingPrepareStrategy>();
+            services.AddScoped<IGetProcessorBilling, BillingPrepareFactory>();
             services.AddScoped<PrepareBillingFE>();
             services.AddScoped<PrepareBillingPOS>();
             
-            services.AddScoped<IBillingSenderFactory, BillingSenderSelector>();
+
             services.AddScoped< BillingSenderFE>();
             services.AddScoped< BillingSenderPOS>();
 
             // Dependencias internas de PrepareBillingFE/POS
-            services.AddScoped<IBillingSenderOrchestrator, BillingSenderStrategy>();
             services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();
             services.AddScoped<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
             services.AddScoped<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();

@@ -1,11 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
 
-namespace Poliedro.Billing.Application.Billing.Services.Strategies.Plemsi;
+namespace Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 
-public class BillingPrepareStrategy(IServiceProvider _serviceProvider) : ICreateBillingFactory
+public class BillingPrepareFactory(IServiceProvider _serviceProvider) : IGetProcessorBilling
 {
     public Task<ICreateBilling> GetProcessorAsync(string resolutionType, string provider)
     {

@@ -3,7 +3,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selec
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
 
-public class BillingSenderPOS : IBillingSender<PlemiPOSInvoiceDTO>
+public class BillingSenderPOS 
 {
     public async Task SendInvoicesAsync(IEnumerable<PlemiPOSInvoiceDTO> invoices, CancellationToken cancellationToken)
     {
