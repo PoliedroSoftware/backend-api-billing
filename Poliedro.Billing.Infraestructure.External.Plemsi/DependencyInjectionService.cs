@@ -66,12 +66,16 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             // Factoría y strategies
             services.AddScoped<IGetProcessorBilling, BillingPrepareFactory>();
-            services.AddScoped<PrepareBillingFE>();
-            services.AddScoped<PrepareBillingPOS>();
+            services.AddTransient<PrepareBillingFE>();
+            services.AddTransient<PrepareBillingPOS>();
             
 
-            services.AddScoped< BillingSenderFE>();
-            services.AddScoped< BillingSenderPOS>();
+            services.AddTransient<IBillingSender, BillingSenderFE>();
+            services.AddTransient<IBillingSender, BillingSenderPOS>();
+
+            services.AddSingleton<IBillingSenderFactory, BillingSenderFactory>();
+
+
 
             // Dependencias internas de PrepareBillingFE/POS
             services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();

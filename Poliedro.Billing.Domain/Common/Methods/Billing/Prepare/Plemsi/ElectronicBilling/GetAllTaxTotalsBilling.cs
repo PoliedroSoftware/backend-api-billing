@@ -1,6 +1,5 @@
 ﻿using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
-using Poliedro.Billing.Domain.Siigo.Models;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 public class GetAllTaxTotalsBilling : IGetAllTaxTotalsBilling

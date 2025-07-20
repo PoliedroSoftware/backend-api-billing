@@ -1,12 +1,9 @@
-namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
-
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-
-public class BillingSenderPOS 
+namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
+public class BillingSenderPOS : IBillingSender
 {
-    public async Task SendInvoicesAsync(IEnumerable<PlemiPOSInvoiceDTO> invoices, CancellationToken cancellationToken)
+    public Task SendAsync(IEnumerable<object> invoices, CancellationToken cancellationToken)
     {
-       
+        throw new NotImplementedException();
     }
 }

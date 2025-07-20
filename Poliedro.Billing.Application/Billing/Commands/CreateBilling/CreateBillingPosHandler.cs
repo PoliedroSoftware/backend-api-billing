@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
@@ -10,7 +11,7 @@ namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 public class CreateBillingPosHandler(
     IClientDomainService _clientDomainService,
     IGetProcessorBilling _createBillingFactory,
-    IGetSenderBillingResolver _getSenderBillingResolver,
+    IBillingSenderFactory _billingSenderFactory,
     IMapper mapper
     ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDTO>>
 {
@@ -31,14 +32,10 @@ public class CreateBillingPosHandler(
         var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, cancellationToken);
 
         // Obtener el sender correcto
-        var sender = _getSenderBillingResolver.ResolveSenderAsync(provider, typeResolution);
-
-
-
-
+        var sender = _billingSenderFactory.Resolve(provider, typeResolution);
 
         // Enviar las facturas procesadas
-
+        await sender.SendAsync(processedInvoices, cancellationToken);
 
         // Después haces cast o map a tus DTOs finales
         var billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
