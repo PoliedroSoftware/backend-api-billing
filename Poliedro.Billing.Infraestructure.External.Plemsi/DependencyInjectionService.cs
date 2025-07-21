@@ -8,6 +8,7 @@ using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Validate;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
 using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.CustomersId.Ports;
 using Poliedro.Billing.Domain.FERetail.Ports;
@@ -76,8 +77,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             services.AddSingleton<IBillingSenderFactory, BillingSenderFactory>();
 
-            services.AddScoped<IBillingValidateRangeExpiration, BillingValidateNumberDate>();
-
+            services.AddTransient<IBillingResponseApi, BillingResponseApi>();
 
 
             // Dependencias internas de PrepareBillingFE/POS

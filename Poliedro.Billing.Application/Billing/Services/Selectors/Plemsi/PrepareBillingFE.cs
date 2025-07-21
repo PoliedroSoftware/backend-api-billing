@@ -16,13 +16,15 @@ public class PrepareBillingFE(
     IConfiguration _config
     ) : ICreateBilling 
 {
-    public async Task<IEnumerable<object>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
+    public async Task<IEnumerable<object>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, CancellationToken cancellationToken)
     {
 
         var results = new List<FERetailelectronicEntity>();
 
         foreach (var invoice in invoices)
         {
+           
+
             // Calcular totales de items
             if (invoice.ItemElectronicEntity != null)
             {
@@ -49,6 +51,13 @@ public class PrepareBillingFE(
             int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice.CustomerEntity, cancellationToken);
             InvoiceNumber = (InvoiceLast <= 0 || InvoiceLast < InvoiceNumber) ? InvoiceNumber : InvoiceLast + 1;
 
+            bool expirated = InvoiceNumber > FinalRange || DateTime.Now > ExpirationDate;
+            if (expirated)
+            {
+                throw new Exception("La factura está fuera del rango de resolución o ha expirado.");
+            }
+
+
             // Fecha y hora
             DateTime Date = DateTime.Now;
             string FormattedDate = Date.ToString("yyyy-MM-dd");
@@ -74,70 +83,72 @@ public class PrepareBillingFE(
                 checkDigit = _config["CosumerFinal:dv"];
             }
 
-
-            // Crear el objeto final
-            FERetailelectronicEntity Data = new()
+            // Validar Total
+            if (invoice.FinalTotalToPay > 0)
             {
-                date = FormattedDate,
-                time = CurrentTime,
-                prefix = invoice.CustomerEntity.Prefix,
-                number = InvoiceNumber,
-
-                orderReference = new OrderReferenceEntity
+                // Crear el objeto final
+                FERetailelectronicEntity Data = new()
                 {
-                    IdOrder = "COT2022043155"
-                },
+                    date = FormattedDate,
+                    time = CurrentTime,
+                    prefix = invoice.CustomerEntity.Prefix,
+                    number = InvoiceNumber,
 
-                send_email = true,
-                attachment1 = new AttachmentEntity
-                {
-                    FileName = "prueba.xml",
-                    B64Data = "-> lugar para el archivo convertido a base64 string"
-                },
-                attachment2 = new AttachmentEntity
-                {
-                    FileName = "prueba.xml",
-                    B64Data = "-> lugar para el archivo convertido a base64 string"
-                },
+                    orderReference = new OrderReferenceEntity
+                    {
+                        IdOrder = "COT2022043155"
+                    },
 
-                customer = new CustomerEntity
-                {
-                    IdentificationNumber = invoice.CustomerEntity.IdentificationNumber,
-                    Dv = invoice.CustomerEntity.Dv,
-                    Name = invoice.CustomerEntity.Name,
-                    Phone = invoice.CustomerEntity.Phone,
-                    Address = "Cra 4ta #12-56",
-                    Email = invoice.CustomerEntity.Email,
-                    MerchantRegistration = "00000000",
-                    TypeDocumentIdentificationId = (int)DocumentType,
-                    TypeOrganizationId = 1,
-                    TypeLiabilityId = 117,
-                    MunicipalityId = 149,
-                    TypeRegimeId = 1
-                },
+                    send_email = true,
+                    attachment1 = new AttachmentEntity
+                    {
+                        FileName = "prueba.xml",
+                        B64Data = "-> lugar para el archivo convertido a base64 string"
+                    },
+                    attachment2 = new AttachmentEntity
+                    {
+                        FileName = "prueba.xml",
+                        B64Data = "-> lugar para el archivo convertido a base64 string"
+                    },
 
-                payment = new PaymentEntity
-                {
-                    PaymentFormId = 1,
-                    PaymentMethodId = 10,
-                    PaymentDueDate = FormattedDate,
-                    DurationMeasure = "30"
-                },
+                    customer = new CustomerEntity
+                    {
+                        IdentificationNumber = invoice.CustomerEntity.IdentificationNumber,
+                        Dv = invoice.CustomerEntity.Dv,
+                        Name = invoice.CustomerEntity.Name,
+                        Phone = invoice.CustomerEntity.Phone,
+                        Address = "Cra 4ta #12-56",
+                        Email = invoice.CustomerEntity.Email,
+                        MerchantRegistration = "00000000",
+                        TypeDocumentIdentificationId = (int)DocumentType,
+                        TypeOrganizationId = 1,
+                        TypeLiabilityId = 117,
+                        MunicipalityId = 149,
+                        TypeRegimeId = 1
+                    },
 
-                generalAllowances = [],
-                items = invoice.ItemElectronicEntity,
-                resolution = invoice.Resolution,
-                resolutionText = invoice.ResolutionText,
-                head_note = invoice.HeadNote,
-                foot_note = invoice.FootNote,
-                notes = $"Fecha de la factura:{invoice.TransactionDate}",
-                allowanceTotal = 0,
-                invoiceBaseTotal = invoice.InvoiceBaseTotal,
-                invoiceTaxExclusiveTotal = invoice.InvoiceTaxExclusiveTotal,
-                invoiceTaxInclusiveTotal = invoice.InvoiceTaxInclusiveTotal,
-                totalToPay = invoice.TotalToPay,
-                allTaxTotals = invoice.AllTaxTotalEntity,
-                allHoldingsTaxTotals = [
+                    payment = new PaymentEntity
+                    {
+                        PaymentFormId = 1,
+                        PaymentMethodId = 10,
+                        PaymentDueDate = FormattedDate,
+                        DurationMeasure = "30"
+                    },
+
+                    generalAllowances = [],
+                    items = invoice.ItemElectronicEntity,
+                    resolution = invoice.Resolution,
+                    resolutionText = invoice.ResolutionText,
+                    head_note = invoice.HeadNote,
+                    foot_note = invoice.FootNote,
+                    notes = $"Fecha de la factura:{invoice.TransactionDate}",
+                    allowanceTotal = 0,
+                    invoiceBaseTotal = invoice.InvoiceBaseTotal,
+                    invoiceTaxExclusiveTotal = invoice.InvoiceTaxExclusiveTotal,
+                    invoiceTaxInclusiveTotal = invoice.InvoiceTaxInclusiveTotal,
+                    totalToPay = invoice.TotalToPay,
+                    allTaxTotals = invoice.AllTaxTotalEntity,
+                    allHoldingsTaxTotals = [
                     new AllHoldingsTaxTotalEntity
                         {
                             TaxId = 6,
@@ -146,13 +157,17 @@ public class PrepareBillingFE(
                             TaxableAmount = invoice.TotalToPay
                         }],
 
-                customSubtotals = [],
-                finalTotalToPay = invoice.TotalToPay
+                    customSubtotals = [],
+                    finalTotalToPay = invoice.TotalToPay
 
 
-            };
-
-            results.Add(Data);
+                };
+                results.Add(Data);
+            }
+            else
+            {
+                throw new Exception("El total a pagar no puede ser cero o negativo.");
+            }
         }
 
         return results.Cast<object>();

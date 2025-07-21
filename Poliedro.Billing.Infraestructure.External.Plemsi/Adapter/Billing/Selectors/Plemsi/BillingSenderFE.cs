@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using Poliedro.Billing.Domain.FERetail.Entity;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selec
 
 public class BillingSenderFE(IConfiguration config) : IBillingSender
 {
-    public async Task SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResponseFERetailPos> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
         //var FeInvoices = invoices.Cast<PlemiFEInvoiceDTO>().ToList();
 
@@ -17,22 +18,32 @@ public class BillingSenderFE(IConfiguration config) : IBillingSender
         var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
         using var client = new HttpClient();
-
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
 
-        var requestPlemsi = new HttpRequestMessage(HttpMethod.Post, bool.Parse(config["Enviroment:Production"]!) ? config["ApiPlemsi:FEUrl"] : config["ApiPlemsiQa:FEUrl"])
+        var url = bool.Parse(config["Enviroment:Production"]!)
+        ? config["ApiPlemsi:FEUrl"]
+        : config["ApiPlemsiQa:FEUrl"];
+
+        var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = stringContent
         };
 
-        var response = await client.SendAsync(requestPlemsi, cancellationToken);
+        var response = await client.SendAsync(httpRequest, cancellationToken);
+        var content = await response.Content.ReadAsStringAsync();
 
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync();
             throw new Exception($"Error al enviar a PLEMSI: {response.StatusCode} - {content}");
         }
+        var responseApi = JsonConvert.DeserializeObject<ApiResponseFERetailPos>(content);
 
-        await Task.CompletedTask;
+        if (responseApi is null)
+            throw new Exception("No se pudo deserializar la respuesta de PLEMSI.");
+
+        return responseApi;
+
     }
+
+
 }

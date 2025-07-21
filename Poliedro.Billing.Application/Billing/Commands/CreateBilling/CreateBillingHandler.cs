@@ -7,13 +7,13 @@ using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 
-
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
-public class CreateBillingPosHandler(
+public class CreateBillingHandler(
     IClientDomainService _clientDomainService,
     IGetProcessorBilling _createBillingFactory,
     IBillingSenderFactory _billingSenderFactory,
+    IBillingResponseApi _billingResponseApi,
     IMapper mapper
     ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDTO>>
 {
@@ -33,16 +33,11 @@ public class CreateBillingPosHandler(
         DateTime ExpirationDate =  client.Value.DianResolution.ExpirationDate;
         int FinalRange = client.Value.DianResolution.FinalRange;
 
-        // Validar el Current Number y Current Date
-
-
-
-        // obtener el proceso de construcción
+        // obtener el proceso de construcción 
         var processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
 
-       
-        // Obtnemos un o una lista de objetos
-        var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, cancellationToken);
+        // Obtnemos un o una lista de objetos y validación de facturas
+        var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, ExpirationDate, FinalRange, cancellationToken);
 
         // Obtener el sender correcto
         var sender = _billingSenderFactory.Resolve(provider, typeResolution);
@@ -51,7 +46,16 @@ public class CreateBillingPosHandler(
         var InvoiceRequest = new PlemsiInvoiceRequest{ApiKey = request.ApiKey,Invoices = processedInvoices};
 
         // Enviar las facturas procesadas
-        await sender.SendAsync(InvoiceRequest, cancellationToken);
+        var responseApi = await sender.SendAsync(InvoiceRequest, cancellationToken);
+
+        if (responseApi.Success)
+        {
+           await _billingResponseApi.IBillingResponseApi(responseApi, processedInvoices, cancellationToken);
+        }
+        else
+        {
+            throw new Exception($"Error al enviar facturas: {responseApi.Info}");
+        }
 
         // Después haces cast o map a tus DTOs finales
         var billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
