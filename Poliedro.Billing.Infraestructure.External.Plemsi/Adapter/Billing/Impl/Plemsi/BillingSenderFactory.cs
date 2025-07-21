@@ -1,5 +1,4 @@
-﻿using MediatR;
-using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
+﻿using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 

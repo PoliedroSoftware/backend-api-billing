@@ -10,8 +10,10 @@ public class BillingAutoMapper : Profile
 {
     public BillingAutoMapper()
     {
-        CreateMap<CreateBilling, CreateBillingDTO>();
-        CreateMap<FERetailelectronicEntity, PlemiFEInvoiceDTO>();
+        CreateMap<CreateBillingDTO, CreateBilling>();//Input
+        CreateMap<CreateBilling, CreateBillingInputDTO>();//output
+        CreateMap<PlemiFEInvoiceDTO,FERetailelectronicEntity>();
+
         CreateMap<CreateBilling, PlemiPOSInvoiceDTO>();
         CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerDTO>().ReverseMap();
         CreateMap<PayPointInfoEntity, PayPointInfoDTO>().ReverseMap();

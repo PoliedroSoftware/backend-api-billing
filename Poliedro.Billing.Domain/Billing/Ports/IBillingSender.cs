@@ -1,5 +1,7 @@
-﻿namespace Poliedro.Billing.Domain.Billing.Ports;
+﻿using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+
+namespace Poliedro.Billing.Domain.Billing.Ports;
 public interface IBillingSender
 {
-    Task SendAsync(IEnumerable<object> invoices, CancellationToken cancellationToken);
+    Task SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken);
 }

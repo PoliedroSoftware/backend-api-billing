@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
+using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Common.Features;
-using Poliedro.Billing.Domain.Billing;
 
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -20,8 +20,8 @@ public class BillingController(IMediator mediator) : ControllerBase
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error processing the request.")]
     [Produces("application/json")]
     [HttpPost]
-    public async Task<ActionResult<CreateBilling>> CreateBillingCommand(
-        [FromBody] IEnumerable<CreateBilling> invoices, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateBillingCommand(
+        [FromBody] IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
     {
         var token = TokenHelper.ExtractBearerToken(Request);
         if (string.IsNullOrEmpty(token))
