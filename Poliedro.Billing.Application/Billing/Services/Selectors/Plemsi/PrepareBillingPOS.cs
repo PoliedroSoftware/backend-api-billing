@@ -8,7 +8,7 @@ public class PrepareBillingPOS : ICreateBilling //POS
 {
     
 
-    public Task<IEnumerable<object>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, CancellationToken cancellationToken)
+    Task<IEnumerable<(CreateBilling Billing, object Output)>> ICreateBilling.CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

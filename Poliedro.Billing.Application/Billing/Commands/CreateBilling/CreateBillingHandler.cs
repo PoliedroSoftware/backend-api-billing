@@ -6,6 +6,7 @@ using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using System.Diagnostics;
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
@@ -36,21 +37,24 @@ public class CreateBillingHandler(
         // obtener el proceso de construcción 
         var processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
 
-        // Obtnemos un o una lista de objetos y validación de facturas
+        // Obtnemos un o una lista de objeto, tupla y validación de facturas
         var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, ExpirationDate, FinalRange, cancellationToken);
+
+        var billingEntitiesProcessed = processedInvoices.Select(p => p.Billing);
+        var outputEntitiesProcessed = processedInvoices.Select(p => p.Output);
 
         // Obtener el sender correcto
         var sender = _billingSenderFactory.Resolve(provider, typeResolution);
 
         // Objeto para El sender
-        var InvoiceRequest = new PlemsiInvoiceRequest{ApiKey = request.ApiKey,Invoices = processedInvoices};
+        var InvoiceRequest = new PlemsiInvoiceRequest{ApiKey = request.ApiKey,Invoices = outputEntitiesProcessed};
 
         // Enviar las facturas procesadas
         var responseApi = await sender.SendAsync(InvoiceRequest, cancellationToken);
 
         if (responseApi.Success)
         {
-           await _billingResponseApi.IBillingResponseApi(responseApi, processedInvoices, cancellationToken);
+           await _billingResponseApi.IBillingResponseApi(responseApi, billingEntitiesProcessed, cancellationToken);
         }
         else
         {

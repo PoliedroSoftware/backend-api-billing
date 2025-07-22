@@ -1,4 +1,6 @@
-﻿using Poliedro.Billing.Domain.Billing.Ports;
+﻿using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
@@ -7,25 +9,39 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
 
 public class BillingResponseApi(
     IInsertInvoiceFE _insertInvoiceFE,
-    IUpdateCurrentlyNumber _updateCurrentlyNumber
+    IUpdateCurrentlyNumber _updateCurrentlyNumber,
+    IClientDomainService _clientDomainService,
+    IDatabaseUtils _databaseUtils
     ) : IBillingResponseApi
 {
-    public async Task IBillingResponseApi(ApiResponseFERetailPos response, IEnumerable<object> processedInvoices, CancellationToken cancellationToken)
+    public async Task IBillingResponseApi(ApiResponseFERetailPos response, IEnumerable<CreateBilling> processedInvoices, CancellationToken cancellationToken)
     {
+       
         foreach (var item in processedInvoices)
         {
-            //await _insertInvoice.InsertInvoiceSucces(
-            //    item.InvoiceId,
-            //    response.Data.Cude!,
-            //    response.Data.QRCode!,
-            //    //client.ConnectionString,
-            //    //client.ProviderId,
-            //    //client.ClientBillingElectronicId,
-            //    item);
+           var customerInfo = await _clientDomainService.GetByIdAsync(item.CustomerEntity.ApiKey, cancellationToken);
 
-            //await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-            //    new ParametersCurrentlyNumber(item.InvoiceId, DateTime.Now.ToString(), client.ResolutionId),
-            //    cancellationToken);
+            if (customerInfo != null) {
+
+                throw new ArgumentNullException();
+            }
+            var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
+
+            int NumberInvoice = int.Parse(item.Number);
+
+            await _insertInvoiceFE.InsertInvoiceSucces(
+               NumberInvoice,
+               response.Data.Cude!,
+               response.Data.QRCode!,
+               connectionString,
+               customerInfo.Value.ProviderId,
+               customerInfo.Value.DianResolution.ClientBillingElectronicId,
+               item.Number
+               );
+
+            await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
+            new ParametersCurrentlyNumber(NumberInvoice, DateTime.Now.ToString(), customerInfo.Value.ResolutionId),cancellationToken
+            );
         }
 
     }

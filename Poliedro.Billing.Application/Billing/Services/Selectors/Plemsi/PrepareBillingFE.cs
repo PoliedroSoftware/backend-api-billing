@@ -16,10 +16,11 @@ public class PrepareBillingFE(
     IConfiguration _config
     ) : ICreateBilling 
 {
-    public async Task<IEnumerable<object>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, CancellationToken cancellationToken)
+    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, CancellationToken cancellationToken)
     {
 
-        var results = new List<FERetailelectronicEntity>();
+        var results = new List<(CreateBilling Billing, object Output)>();
+
 
         foreach (var invoice in invoices)
         {
@@ -162,7 +163,8 @@ public class PrepareBillingFE(
 
 
                 };
-                results.Add(Data);
+                results.Add((invoice, Data));
+
             }
             else
             {
@@ -170,6 +172,7 @@ public class PrepareBillingFE(
             }
         }
 
-        return results.Cast<object>();
+        return results;
+
     }
 }

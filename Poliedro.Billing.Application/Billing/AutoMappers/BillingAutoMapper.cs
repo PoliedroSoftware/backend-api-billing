@@ -10,8 +10,8 @@ public class BillingAutoMapper : Profile
 {
     public BillingAutoMapper()
     {
-        CreateMap<CreateBillingDTO, CreateBilling>();//Input
-        CreateMap<CreateBilling, CreateBillingInputDTO>();//output
+        CreateMap< CreateBilling, CreateBillingDTO>();//output
+        CreateMap<CreateBillingInputDTO,CreateBilling>();//intput
         CreateMap<PlemiFEInvoiceDTO,FERetailelectronicEntity>();
 
         CreateMap<CreateBilling, PlemiPOSInvoiceDTO>();
