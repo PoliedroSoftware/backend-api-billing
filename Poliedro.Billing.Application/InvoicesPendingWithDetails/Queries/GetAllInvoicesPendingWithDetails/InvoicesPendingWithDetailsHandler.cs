@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using Poliedro.Billing.Application.InvoicesPendingWithDetails.Dtos;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
@@ -12,11 +12,9 @@ public class InvoicesPendingWithDetailsHandler(
     IMapper mapper,
     IDatabaseUtils databaseUtils,
     IInvoicesPendingWithDetailsStrategyFactory _strategyFactory
-    ) : IRequestHandler
-    <InvoicesPendingWithDetailsQuery,
-    IEnumerable<object>>
+    ) : IRequestHandler<InvoicesPendingWithDetailsQuery, IEnumerable<CreateBilling>>
 {
-    public async Task<IEnumerable<object>> Handle(InvoicesPendingWithDetailsQuery request,CancellationToken cancellationToken)
+    public async Task<IEnumerable<CreateBilling>> Handle(InvoicesPendingWithDetailsQuery request,CancellationToken cancellationToken)
     {
         var client = await clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
 
@@ -32,7 +30,7 @@ public class InvoicesPendingWithDetailsHandler(
         cancellationToken,
         request.ApiKey);
 
-        return mapper.Map<IEnumerable<object>>(data);
+        return mapper.Map<IEnumerable<CreateBilling>>(data);
 
 
     }

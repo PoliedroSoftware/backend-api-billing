@@ -1,4 +1,5 @@
 using MySqlConnector;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Ports;
@@ -10,14 +11,14 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWith
 
 public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetailsStrategy
 {
-    public async Task<IEnumerable<object>> GetAllInvoicePendingWithDetails(
+    public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
     ServerEntity server,
     ClientEntity clientItem,
     IDatabaseUtils databaseUtils,
     CancellationToken cancellationToken,
     string apiKey)
     {
-        var invoicesMap = new Dictionary<int, InvoiceFEPendingEntity>();
+        var invoicesMap = new Dictionary<int, CreateBilling>();
         using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
 
         try
@@ -84,9 +85,9 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     if (!addInvoice)
                         continue;
 
-                    var invoiceEntity = new InvoiceFEPendingEntity
+                    var invoiceEntity = new CreateBilling
                     {
-                        Id = invoiceId,
+                        Number = invoiceId.ToString(),
                         Identication = reader["identication"].ToString(),
                         Contact_name = reader["contact_name"].ToString(),
                         Email = reader["email"].ToString(),
@@ -111,9 +112,9 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     invoicesMap.Add(invoiceId, invoiceEntity);
                 }
 
-                var detail = new DetailsInvoiceFEPendingEntity
+                var detail = new CreateBilling
                 {
-                    Id = reader.GetInt32("detail_id"),
+                    ItemElectronicEntity = reader.GetInt32("detail_id"),
                     Transaccion = reader.GetInt32("transaccion"),
                     Code = reader.GetInt32("code"),
                     Type_item_identification_id = reader.GetInt32("type_item_identification_id"),
