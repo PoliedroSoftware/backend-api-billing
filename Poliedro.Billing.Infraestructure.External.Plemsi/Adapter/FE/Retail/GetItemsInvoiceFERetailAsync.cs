@@ -30,7 +30,7 @@ public class GetItemsInvoiceFERetail(IGetItemFE getItem) : IGetItemsInvoiceFERet
                 Description = $"{index.description} {(index.tax_amount > 0 ? $"IVA {index.tax_amount}" : "")}",
 
                 Notes = "",
-                Code = index.code.ToString(),
+                Code = index.code,
                 TypeItemIdentificationId = 1,
                 PriceAmount = index.unit_preci,
                 BaseQuantity = index.invoiced_quantity,

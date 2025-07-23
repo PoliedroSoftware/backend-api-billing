@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
-using Poliedro.Billing.Domain.FERetail.Entity;
 using System.Net.Http.Headers;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
@@ -10,18 +10,18 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.
 public class GetLastInvoiceBillingPlemsiFE(IConfiguration config) : IGetLastInvoiceBilling
 {
     private static readonly HttpClient Client = new();
-    public async Task<int> GetLastInvoiceNumberAsync(CustomerEntity ClientItem, CancellationToken CancellationToken)
+    public async Task<int> GetLastInvoiceNumberAsync(CreateBilling invoice, CancellationToken CancellationToken)
     {
         int MaxNumeroFactura = 1;
         DateTime ToDay = DateTime.Now;
         string FormattedDate = ToDay.ToString("yyyy-MM-dd");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ClientItem.ApiKey);
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", invoice.CustomerEntity.ApiKey);
         string ApiUrl = string.Empty;
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
         string baseUrl;
 
-        if (!Enum.TryParse(ClientItem.MultipleResolution, out MultipleResolution resolution))
+        if (!Enum.TryParse(invoice.CustomerEntity.MultipleResolution, out MultipleResolution resolution))
         {
             resolution = MultipleResolution.Single; 
         }
@@ -41,7 +41,7 @@ public class GetLastInvoiceBillingPlemsiFE(IConfiguration config) : IGetLastInvo
                 break;
         }
 
-        ApiUrl = $"{baseUrl}{ClientItem.Prefix}";
+        ApiUrl = $"{baseUrl}{invoice.Prefix}";
 
         HttpResponseMessage Response = await Client.GetAsync(ApiUrl);
 

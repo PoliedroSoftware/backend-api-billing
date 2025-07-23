@@ -7,10 +7,6 @@ public class CustomerEntity
     [JsonPropertyName("identification_number")]
     public required string IdentificationNumber { get; set; }
 
-    [JsonPropertyName("prefix")]
-    public string? Prefix { get; set; }
-
-
     [JsonPropertyName("multiple_resolution")]
     public string? MultipleResolution { get; set; }
 
@@ -30,22 +26,31 @@ public class CustomerEntity
     public string? Phone { get; set; }
 
     [JsonPropertyName("address")]
-    public required string Address { get; set; }
+    public  string? Address { get; set; }
 
     [JsonPropertyName("email")]
-    public required string Email { get; set; }
+    public  string? Email { get; set; }
 
     [JsonPropertyName("merchant_registration")]
     public string? MerchantRegistration { get; set; }
 
+    [JsonPropertyName("city")]
+    public string? City { get; set; }
+   
+    [JsonPropertyName("state")]
+    public  string? State { get; set; }
+
+    [JsonPropertyName("country")]
+    public  string? Country { get; set; }    
+
     [JsonPropertyName("type_document_identification_id")]
-    public required int TypeDocumentIdentificationId { get; set; }
+    public int? TypeDocumentIdentificationId { get; set; }
 
     [JsonPropertyName("type_organization_id")]
     public int? TypeOrganizationId { get; set; }
 
     [JsonPropertyName("type_liability_id")]
-    public required int TypeLiabilityId { get; set; }
+    public int? TypeLiabilityId { get; set; }
 
     [JsonPropertyName("municipality_id")]
     public int? MunicipalityId { get; set; }
@@ -54,5 +59,5 @@ public class CustomerEntity
     public int? MunicipalityCode { get; set; }
 
     [JsonPropertyName("type_regime_id")]
-    public required int TypeRegimeId { get; set; }
+    public int? TypeRegimeId { get; set; }
 }

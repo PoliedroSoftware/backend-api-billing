@@ -14,10 +14,9 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
     ServerEntity server,
     ClientEntity clientItem,
     IDatabaseUtils databaseUtils,
-    CancellationToken cancellationToken,
-    string apiKey)
+    CancellationToken cancellationToken)
     {
-       
+        var invoicesMap = new Dictionary<int, CreateBilling>();
         using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
 
         try
@@ -59,58 +58,47 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
             command.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
-            var invoicesMap = new Dictionary<int, CreateBilling>();
-
             while (await reader.ReadAsync(cancellationToken))
             {
                 int invoiceId = reader.GetInt32("invoice_id");
 
                 if (!invoicesMap.TryGetValue(invoiceId, out var invoice))
                 {
+                    bool addInvoice = (reader.GetDecimal(5) > 0);
+
+                    if (!addInvoice)
+                        continue;
 
                     invoice = new CreateBilling
                     {
                         Date = reader.GetDateTime("Date"),
                         Time = reader.GetDateTime("Time"),
                         Number = reader["number"].ToString(),
-                        TransactionDate = reader.GetDateTime("Date"),//?
-                        SendEmail = false,
+                        Prefix = reader["prefix"].ToString(),
                         Resolution = reader["Resolution"].ToString(),
                         Notes = reader["note"].ToString(),
                         AllowanceTotal = Convert.ToInt64(reader["allowanceTotal"]),
                         InvoiceBaseTotal = Convert.ToInt64(reader["invoiceBaseTotal"]),
                         InvoiceTaxExclusiveTotal = Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
                         InvoiceTaxInclusiveTotal = Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
-
-
-
-
-                        CustomerEntity = new CustomerEntity
-                        {
-
-                            Prefix = clientItem.Prefix,
-
-
-                        },
-
-
+                        ItemElectronicEntity = new List<ItemElectronicEntity>()
                     };
 
+                    invoicesMap[invoiceId] = invoice;
 
+                }
 
-
-
-                    Id = reader.GetInt32("detail_id"),
-                    Prefix = reader["prefix"].ToString(),
+                var item = new ItemElectronicEntity
+                {
                     Description = reader["description"].ToString(),
-                    Code = reader["code"].ToString(),
-                    BaseQuantity = reader.GetDecimal("base_quantity"),
-                    InvoicedQuantity = reader.GetDecimal("invoiced_quantity"),
-                    PriceAmount = reader.GetDecimal("price_amount"),
-                    Subtotal = reader.GetDecimal("subtotal")
+                    Code = (int?)reader["code"],
+                    BaseQuantity = reader.GetDouble("base_quantity"),
+                    InvoicedQuantity = reader.GetDouble("invoiced_quantity"),
+                    PriceAmount = reader.GetDouble("price_amount"),
+                    Subtotal = reader.GetDouble("subtotal")
                 };
 
-                invoicesMap[invoiceId].DetailsInvoicePendings.Add(detail);
+                invoice.ItemElectronicEntity!.Add(item);
             }
 
             return invoicesMap.Values.ToList();
@@ -120,5 +108,4 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
             throw new Exception("Error connecting to the database", ex);
         }
     }
-
 }

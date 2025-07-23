@@ -3,20 +3,22 @@ namespace Poliedro.Billing.Application.Billing.Dtos;
 public record CustomerBillingDTO
     (
         string IdentificationNumber,
-        string? Prefix,
         string? MultipleResolution,
         string? ApiKey,
         string? Dv,
         int? Profit,
         string Name,
         string? Phone,
-        string Address,
+        string? Address,
         string Email,
         string? MerchantRegistration,
-        int TypeDocumentIdentificationId,
+        string? City,
+        string? State,
+        string? Country,
+        int? TypeDocumentIdentificationId,
         int? TypeOrganizationId,
-        int TypeLiabilityId,
+        int? TypeLiabilityId,
         int? MunicipalityId,
         int? MunicipalityCode,
-        int TypeRegimeId
+        int? TypeRegimeId
     );

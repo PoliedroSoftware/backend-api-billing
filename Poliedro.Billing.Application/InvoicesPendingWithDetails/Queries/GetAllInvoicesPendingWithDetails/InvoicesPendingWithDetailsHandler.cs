@@ -24,8 +24,7 @@ public class InvoicesPendingWithDetailsHandler(
         client.Value.Server,
         client.Value,
         databaseUtils,
-        cancellationToken,
-        request.ApiKey);
+        cancellationToken);
 
         return mapper.Map<IEnumerable<CreateBillingDTO>>(data);
     }

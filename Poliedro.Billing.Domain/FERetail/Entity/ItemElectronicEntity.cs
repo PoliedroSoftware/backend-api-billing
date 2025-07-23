@@ -11,6 +11,9 @@ public class ItemElectronicEntity
     [JsonPropertyName("line_extension_amount")]
     public double LineExtensionAmount { get; set; }
 
+    [JsonPropertyName("transaccion")]
+    public int? Transaccion { get; set; }
+
     [JsonPropertyName("free_of_charge_indicator")]
     public bool FreeOfChargeIndicator { get; set; }
 
@@ -30,7 +33,7 @@ public class ItemElectronicEntity
     public string? Notes { get; set; }
 
     [JsonPropertyName("code")]
-    public string? Code { get; set; }
+    public int? Code { get; set; }
 
     [JsonPropertyName("type_item_identification_id")]
     public int TypeItemIdentificationId { get; set; }
@@ -43,4 +46,16 @@ public class ItemElectronicEntity
 
     [JsonPropertyName("invoiced_quantity")]
     public double InvoicedQuantity { get; set; }
+
+    [JsonPropertyName("percent")]
+    public double Percent { get; set; }
+
+    [JsonPropertyName("tax_amount")]
+    public double TaxAmount { get; set; }
+
+    [JsonPropertyName("unit_price")]
+    public double UnitPrice { get; set; }
+
+    [JsonPropertyName("subtotal")]
+    public double Subtotal { get; set; }
 }

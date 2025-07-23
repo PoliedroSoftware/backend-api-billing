@@ -5,5 +5,5 @@ namespace Poliedro.Billing.Domain.Billing.Ports;
 
 public interface IGetLastInvoiceBilling
 {
-    Task<int> GetLastInvoiceNumberAsync(CustomerEntity clientItem, CancellationToken cancellationToken);
+    Task<int> GetLastInvoiceNumberAsync(CreateBilling clientItem, CancellationToken cancellationToken);
 }

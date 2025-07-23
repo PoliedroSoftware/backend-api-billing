@@ -49,7 +49,7 @@ public class PrepareBillingFE(
 
             // Número de factura
             int InvoiceNumber = int.Parse(invoice.Number[^4..]);
-            int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice.CustomerEntity, cancellationToken);
+            int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice, cancellationToken);
             InvoiceNumber = (InvoiceLast <= 0 || InvoiceLast < InvoiceNumber) ? InvoiceNumber : InvoiceLast + 1;
 
             bool expirated = InvoiceNumber > FinalRange || DateTime.Now > ExpirationDate;
@@ -92,7 +92,7 @@ public class PrepareBillingFE(
                 {
                     date = FormattedDate,
                     time = CurrentTime,
-                    prefix = invoice.CustomerEntity.Prefix,
+                    prefix = invoice.Prefix,
                     number = InvoiceNumber,
 
                     orderReference = new OrderReferenceEntity

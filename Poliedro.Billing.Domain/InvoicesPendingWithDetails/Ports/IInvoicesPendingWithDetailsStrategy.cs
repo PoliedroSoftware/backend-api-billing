@@ -10,7 +10,6 @@ public interface IInvoicesPendingWithDetailsStrategy
             ServerEntity server,
             ClientEntity clientItem,
             IDatabaseUtils databaseUtils,
-            CancellationToken cancellationToken,
-            string ApiKey
+            CancellationToken cancellationToken
         );
 }

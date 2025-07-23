@@ -36,7 +36,7 @@ public class PrepareItemElectronic : IPrepareItemBilling
 
                 Description = $"{item.Description} {(item.TaxTotals?.FirstOrDefault()?.TaxAmount > 0 ? $"IVA {item.TaxTotals?.FirstOrDefault()?.TaxAmount}" : "")}",
                 Notes = "",
-                Code = item.Code.ToString(),
+                Code = item.Code,
                 TypeItemIdentificationId = 1,
                 PriceAmount = item.PriceAmount,
                 BaseQuantity = item.InvoicedQuantity,
