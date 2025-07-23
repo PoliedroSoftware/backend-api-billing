@@ -3,9 +3,11 @@ using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 
-public class InvoicesPendingWithDetailsStrategyFactory(
+public class InvoicesPendingWithDetailsStrategyFactory
+    (
     InvoicesPendingWithDetailsFERepository _feRepo,
-    InvoicesPendingWithDetailsPOSRepository _posRepo) : IInvoicesPendingWithDetailsStrategyFactory
+    InvoicesPendingWithDetailsPOSRepository _posRepo
+    ) : IInvoicesPendingWithDetailsStrategyFactory
 {
 
     public IInvoicesPendingWithDetailsStrategy GetStrategy(ResolutionType resolutionType)

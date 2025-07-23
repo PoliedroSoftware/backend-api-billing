@@ -1,8 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Api.Common.Helpers;
+using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Common.Features;
-using Poliedro.Billing.Application.InvoicesPendingWithDetails.Dtos;
+
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Queries.GetAllInvoicesPendingWithDetails;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -24,12 +25,12 @@ public class InvoicesPendingWithDetailsController(IMediator mediator) : Controll
         Description = "Retrieves pending invoices with details based on Bearer token",
         OperationId = "invoicespendingwithdetails"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Successfully retrieved pending invoices with details", typeof(object))]
+    [SwaggerResponse(StatusCodes.Status200OK, "Successfully retrieved pending invoices with details", typeof(CreateBillingDTO))]
     [SwaggerResponse(StatusCodes.Status401Unauthorized, "Invalid or missing authentication token")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Pending invoices with details not found")]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
 
-    public async Task<ActionResult<object>> GetAllAsync()
+    public async Task<ActionResult<CreateBillingDTO>> GetAllAsync()
     {
         var token = TokenHelper.ExtractBearerToken(Request);
 
@@ -41,10 +42,10 @@ public class InvoicesPendingWithDetailsController(IMediator mediator) : Controll
         if ( !invoicesPendingWithDetails.Any())
         {
             var notFoundResponse = ResponseApiService.Response(
-                statusCode: StatusCodes.Status200OK,
+                statusCode: StatusCodes.Status404NotFound,
                 message: "Pending invoices not found."
             );
-            return Ok(notFoundResponse);
+            return NotFound(notFoundResponse);
 
         }
         return Ok(invoicesPendingWithDetails);
