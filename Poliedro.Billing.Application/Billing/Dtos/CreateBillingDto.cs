@@ -1,10 +1,7 @@
-﻿
-namespace Poliedro.Billing.Application.Billing.Dtos;
-
-public record CreateBillingDTO
-    (
-        DateTime? Date,
-        DateTime? Time,
+﻿namespace Poliedro.Billing.Application.Billing.Dtos;
+public record CreateBillingDTO(
+        DateTime Date,
+        DateTime Time,
         string? SendToEmail,
         SoftwareManufacturerDTO? SoftwareManufacturer,
         PayPointInfoDTO? PayPointInfo,

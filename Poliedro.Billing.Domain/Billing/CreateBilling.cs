@@ -4,8 +4,8 @@ namespace Poliedro.Billing.Domain.Billing;
 
 public class CreateBilling
 {
-    public DateTime? Date { get; set; }
-    public DateTime? Time { get; set; }
+    public DateTime Date { get; set; } 
+    public DateTime Time { get; set; }
     public string? SendToEmail { get; set; }
     public SoftwareManufacturerEntity? SoftwareManufacturer { get; set; }
 
