@@ -1,5 +1,6 @@
 ﻿using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Resolution.Enums;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
@@ -23,9 +24,9 @@ public class BillingSenderFactory : IBillingSenderFactory
     }
 
 
-    public IBillingSender Resolve(string provider, string typeResolution)
+    public IBillingSender Resolve(string provider, ResolutionType typeResolution)
     {
-        if (_senders.TryGetValue((provider, typeResolution), out var sender))
+        if (_senders.TryGetValue((provider, typeResolution.ToString()), out var sender))
             return sender;
 
         throw new InvalidOperationException($"No sender found for {provider}, {typeResolution}");

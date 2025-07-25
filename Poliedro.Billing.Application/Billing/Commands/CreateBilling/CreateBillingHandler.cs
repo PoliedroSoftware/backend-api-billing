@@ -6,6 +6,8 @@ using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.Resolution.Enums;
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
@@ -25,8 +27,8 @@ public class CreateBillingHandler(
         var client = await _clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
 
 
-        //estos datos deben entrar por factura 
-        string typeResolution = client.Value.DianResolution.ResolutionType.ToString();
+        //datos de la persistencia 
+        ResolutionType typeResolution = client.Value.DianResolution.ResolutionType;
         ProviderType providerType = (ProviderType)client.Value.ProviderId;
         string provider = providerType.ToString();
         string Prefix = client.Value.DianResolution.Prefix;
@@ -35,22 +37,22 @@ public class CreateBillingHandler(
         int FinalRange = client.Value.DianResolution.FinalRange;
 
         // obtener el proceso de construcción 
-        var processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
+        ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
 
         // Obtnemos un o una lista de objeto, tupla y validación de facturas
-        var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, ExpirationDate, FinalRange, Prefix, cancellationToken);
+        IEnumerable<(Domain.Billing.CreateBilling Billing, object Output)> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, ExpirationDate, FinalRange, Prefix, cancellationToken);
 
-        var billingEntitiesProcessed = processedInvoices.Select(p => p.Billing);
-        var outputEntitiesProcessed = processedInvoices.Select(p => p.Output);
+        IEnumerable<Domain.Billing.CreateBilling> billingEntitiesProcessed = processedInvoices.Select(p => p.Billing);
+        IEnumerable<object> outputEntitiesProcessed = processedInvoices.Select(p => p.Output);
 
         // Obtener el sender correcto
-        var sender = _billingSenderFactory.Resolve(provider, typeResolution);
+        IBillingSender sender = _billingSenderFactory.Resolve(provider, typeResolution);
 
         // Objeto para El sender
-        var InvoiceRequest = new PlemsiInvoiceRequest{ApiKey = request.ApiKey,Invoices = outputEntitiesProcessed};
+        PlemsiInvoiceRequest InvoiceRequest = new() {ApiKey = request.ApiKey,Invoices = outputEntitiesProcessed};
 
         // Enviar las facturas procesadas
-        var responseApi = await sender.SendAsync(InvoiceRequest, cancellationToken);
+        ApiResponseFERetailPos responseApi = await sender.SendAsync(InvoiceRequest, cancellationToken);
 
         if (responseApi.Success)
         {
@@ -62,7 +64,7 @@ public class CreateBillingHandler(
         }
 
         // Después haces cast o map a tus DTOs finales
-        var billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
+        IEnumerable<CreateBillingDTO> billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
 
 
 
