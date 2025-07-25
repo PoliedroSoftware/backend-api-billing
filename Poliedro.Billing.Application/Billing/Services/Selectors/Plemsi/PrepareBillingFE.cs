@@ -16,7 +16,7 @@ public class PrepareBillingFE(
     IConfiguration _config
     ) : ICreateBilling 
 {
-    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, CancellationToken cancellationToken)
+    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, string Prefix, CancellationToken cancellationToken)
     {
 
         var results = new List<(CreateBilling Billing, object Output)>();
@@ -48,6 +48,7 @@ public class PrepareBillingFE(
             }
 
             // Número de factura
+            invoice.Prefix = Prefix;
             int InvoiceNumber = int.Parse(invoice.Number[^4..]);
             int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice, cancellationToken);
             InvoiceNumber = (InvoiceLast <= 0 || InvoiceLast < InvoiceNumber) ? InvoiceNumber : InvoiceLast + 1;

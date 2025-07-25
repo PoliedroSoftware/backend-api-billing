@@ -6,7 +6,6 @@ using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Enums;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
-using System.Diagnostics;
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 
@@ -26,10 +25,11 @@ public class CreateBillingHandler(
         var client = await _clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
 
 
-        //estos datos deben entrar por factura ?
+        //estos datos deben entrar por factura 
         string typeResolution = client.Value.DianResolution.ResolutionType.ToString();
         ProviderType providerType = (ProviderType)client.Value.ProviderId;
         string provider = providerType.ToString();
+        string Prefix = client.Value.DianResolution.Prefix;
 
         DateTime ExpirationDate =  client.Value.DianResolution.ExpirationDate;
         int FinalRange = client.Value.DianResolution.FinalRange;
@@ -38,7 +38,7 @@ public class CreateBillingHandler(
         var processor = await _createBillingFactory.GetProcessorAsync(typeResolution, provider);
 
         // Obtnemos un o una lista de objeto, tupla y validación de facturas
-        var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, ExpirationDate, FinalRange, cancellationToken);
+        var processedInvoices = await processor.CreateInvoicesAsync(billingEntities, ExpirationDate, FinalRange, Prefix, cancellationToken);
 
         var billingEntitiesProcessed = processedInvoices.Select(p => p.Billing);
         var outputEntitiesProcessed = processedInvoices.Select(p => p.Output);
