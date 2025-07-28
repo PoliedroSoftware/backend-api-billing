@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Common.Features;
-
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Queries.GetAllInvoicesPendingWithDetails;
 using Swashbuckle.AspNetCore.Annotations;
-
 namespace Poliedro.Billing.Api.Controllers.v1.InvoicesPendingWithDetails;
 
 [ApiController]
@@ -30,25 +28,21 @@ public class InvoicesPendingWithDetailsController(IMediator mediator) : Controll
     [SwaggerResponse(StatusCodes.Status404NotFound, "Pending invoices with details not found")]
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
 
-    public async Task<ActionResult<CreateBillingDTO>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<CreateBillingDTO>>> GetAllAsync()
     {
         var token = TokenHelper.ExtractBearerToken(Request);
-
         if (string.IsNullOrEmpty(token))
             return Unauthorized("Authorization header is missing or invalid.");
 
-        var invoicesPendingWithDetails = await mediator.Send(new InvoicesPendingWithDetailsQuery(ApiKey: token));
+         IEnumerable<CreateBillingDTO> invoicesPendingWithDetails = await mediator.Send(new InvoicesPendingWithDetailsQuery(ApiKey: token));
 
-        if ( !invoicesPendingWithDetails.Any())
-        {
-            var notFoundResponse = ResponseApiService.Response(
-                statusCode: StatusCodes.Status404NotFound,
-                message: "Pending invoices not found."
-            );
-            return NotFound(notFoundResponse);
+        var response = ResponseApiService.Response(
+            statusCode: StatusCodes.Status200OK,
+            message: invoicesPendingWithDetails.Any() ? "Successfully retrieved pending invoices with details" : "No pending invoices found",
+            data: invoicesPendingWithDetails
+        );
 
-        }
-        return Ok(invoicesPendingWithDetails);
+        return Ok(response);
     }
 
 }

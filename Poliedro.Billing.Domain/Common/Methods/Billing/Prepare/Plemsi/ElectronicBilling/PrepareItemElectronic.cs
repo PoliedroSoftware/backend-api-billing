@@ -14,7 +14,7 @@ public class PrepareItemElectronic : IPrepareItemBilling
             var itemInvoice = new ItemElectronicEntity
             {
                 UnitMeasureId = 70,
-                LineExtensionAmount = item.PriceAmount * item.InvoicedQuantity,
+                LineExtensionAmount = item.UnitPrice * item.InvoicedQuantity,
                 InvoicedQuantity = item.InvoicedQuantity,
                 FreeOfChargeIndicator = false,
 
@@ -27,7 +27,7 @@ public class PrepareItemElectronic : IPrepareItemBilling
                          TaxId = 1,
                          Percent = item.TaxTotals?.FirstOrDefault()?.Percent ?? 0,
                          TaxAmount = (item.TaxTotals?.FirstOrDefault()?.TaxAmount ?? 0) * item.InvoicedQuantity,
-                         TaxableAmount = item.PriceAmount * item.InvoicedQuantity
+                         TaxableAmount = item.UnitPrice * item.InvoicedQuantity
                 }],
 
 
@@ -38,7 +38,7 @@ public class PrepareItemElectronic : IPrepareItemBilling
                 Notes = "",
                 Code = item.Code,
                 TypeItemIdentificationId = 1,
-                PriceAmount = item.PriceAmount,
+                PriceAmount = item.UnitPrice,
                 BaseQuantity = item.InvoicedQuantity,
             };
             itemsInvoiceResponse.Add(itemInvoice);

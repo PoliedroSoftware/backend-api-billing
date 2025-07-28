@@ -16,6 +16,7 @@ using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
@@ -74,10 +75,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             services.AddTransient<IBillingSender, BillingSenderFE>();
             services.AddTransient<IBillingSender, BillingSenderPOS>();
-
             services.AddSingleton<IBillingSenderFactory, BillingSenderFactory>();
-
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
+
+            services.AddTransient<IBillingGetInfoClient, BillingGetInfoClient>();
 
 
             // Dependencias internas de PrepareBillingFE/POS

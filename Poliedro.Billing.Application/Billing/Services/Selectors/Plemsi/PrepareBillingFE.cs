@@ -2,9 +2,7 @@
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
-
 using Poliedro.Billing.Domain.FERetail.Entity;
-
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
 public class PrepareBillingFE(
@@ -16,7 +14,8 @@ public class PrepareBillingFE(
     IConfiguration _config
     ) : ICreateBilling 
 {
-    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, string Prefix, CancellationToken cancellationToken)
+    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(
+        IEnumerable<CreateBilling> invoices, DateTime ExpirationDate, int FinalRange, string Prefix, string ApiKey, CancellationToken cancellationToken)
     {
 
         var results = new List<(CreateBilling Billing, object Output)>();
@@ -31,8 +30,9 @@ public class PrepareBillingFE(
             {
                 invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(invoice.ItemElectronicEntity);
 
-                double totalToBase = invoice.ItemElectronicEntity.Sum(item => item.LineExtensionAmount);
-                double totalTaxableAmount = invoice.ItemElectronicEntity.Sum(item => item.TaxTotals.Sum(tax => tax.TaxAmount));
+                double totalToBase = invoice.ItemElectronicEntity?.Sum(item => item.LineExtensionAmount) ?? 0;
+                double totalTaxableAmount = invoice.ItemElectronicEntity?.Sum(item => item.TaxTotals?.Sum(tax => tax.TaxAmount)) ?? 0;
+                double totalBaseGravable = invoice.ItemElectronicEntity?.Sum(item => item.TaxTotals?.Sum(tax => tax.TaxableAmount)) ?? 0;
                 double totalToPay = totalToBase + totalTaxableAmount;
 
                 invoice.InvoiceBaseTotal = (double)totalToBase;
@@ -43,12 +43,14 @@ public class PrepareBillingFE(
 
                 List<AllTaxTotalEntity> AllTaxTotals = [];
 
+                if (invoice.ItemElectronicEntity == null) continue;
+               
                 AllTaxTotals = await _getAllTaxTotals.IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
 
             }
-
             // Número de factura
             invoice.Prefix = Prefix;
+            invoice.CustomerEntity.ApiKey = ApiKey;
             int InvoiceNumber = int.Parse(invoice.Number[^4..]);
             int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice, cancellationToken);
             InvoiceNumber = (InvoiceLast <= 0 || InvoiceLast < InvoiceNumber) ? InvoiceNumber : InvoiceLast + 1;
@@ -58,7 +60,6 @@ public class PrepareBillingFE(
             {
                 throw new Exception("La factura está fuera del rango de resolución o ha expirado.");
             }
-
 
             // Fecha y hora
             DateTime Date = DateTime.Now;

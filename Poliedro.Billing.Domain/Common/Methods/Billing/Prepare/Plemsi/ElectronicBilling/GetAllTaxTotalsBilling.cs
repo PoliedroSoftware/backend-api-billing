@@ -10,6 +10,8 @@ public class GetAllTaxTotalsBilling : IGetAllTaxTotalsBilling
 
         foreach (var item in AllTaxTotal)
         {
+            if (item.TaxTotals == null) continue;
+
             foreach (var tax in item.TaxTotals)
             {
                 allTaxTotals.Add(new AllTaxTotalEntity
