@@ -45,8 +45,7 @@ public class CreateBillingHandler(
         ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(InfoClient.TypeResolution, InfoClient.Provider);
 
         // Obtnemos un o una lista de objeto, tupla y validación de facturas
-        IEnumerable<(Domain.Billing.CreateBilling Billing, object Output)> processedInvoices = await processor.CreateInvoicesAsync(
-            billingEntities, InfoClient.ExpirationDate, InfoClient.FinalRange, InfoClient.Prefix, InfoClient.ApiKey, cancellationToken);
+        IEnumerable<(Domain.Billing.CreateBilling Billing, object Output)> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, client,  cancellationToken);
 
         IEnumerable<Domain.Billing.CreateBilling> billingEntitiesProcessed = processedInvoices.Select(p => p.Billing);
         IEnumerable<object> outputEntitiesProcessed = processedInvoices.Select(p => p.Output);
