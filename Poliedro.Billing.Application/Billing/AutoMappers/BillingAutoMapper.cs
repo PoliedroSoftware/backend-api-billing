@@ -1,5 +1,6 @@
 using AutoMapper;
 using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Billing.Dtos.Plemsi;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.FERetail.Entity;
 
@@ -11,7 +12,7 @@ public class BillingAutoMapper : Profile
     {
         CreateMap<CreateBilling, CreateBillingDTO>();//output
         CreateMap<CreateBillingInputDTO,CreateBilling>();//intput
-        CreateMap<FERetailelectronicEntity, SenderPlemsiDTO>(); //output Plemsi
+
 
         CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerDTO>().ReverseMap();
         CreateMap<PayPointInfoEntity, PayPointInfoDTO>().ReverseMap();
@@ -26,5 +27,23 @@ public class BillingAutoMapper : Profile
         CreateMap<WIthHoldingTaxTotalEntity, WIthHoldingTaxTotalDTO>().ReverseMap();
         CreateMap<AllTaxTotalEntity, AllTaxTotalDTO>().ReverseMap();
         CreateMap<AllHoldingsTaxTotalEntity, AllHoldingsTaxTotalDTO>().ReverseMap();
+
+
+
+        CreateMap<FERetailelectronicEntity, SenderRequestDTO>(); //output Plemsi
+        CreateMap<OrderReferenceEntity, OrderReferenceRequestDTO>();
+        CreateMap<AttachmentEntity, AttachmentRequestDTO>();
+        CreateMap<CustomerEntity, CustomerRequestDTO>();
+        CreateMap<PaymentEntity, PaymentRequestDTO>();
+        CreateMap<GeneralAllowanceEntity, GeneralAllowanceRequestDTO>();
+        CreateMap<ItemElectronicEntity, ItemElectronicRequestDTO>();
+        CreateMap<AllowanceChargeEntity, AllowanceChargeRequestDTO>();
+        CreateMap<TaxTotalEntity, TaxTotalRequestDTO>();
+        CreateMap<WIthHoldingTaxTotalEntity, WIthHoldingTaxTotalRequestDTO>();
+        CreateMap<AllTaxTotalEntity, AllTaxTotalRequestDTO>();
+        CreateMap<AllHoldingsTaxTotalEntity, AllHoldingsTaxTotalRequestDTO>();
+        CreateMap<CustomSubtotalEntity, CustomSubtotalRequestDTO>();
+
+
     }
 }

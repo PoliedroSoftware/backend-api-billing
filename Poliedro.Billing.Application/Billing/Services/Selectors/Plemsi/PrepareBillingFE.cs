@@ -167,9 +167,10 @@ public class PrepareBillingFE(
 
 
                 };
-                var dto = _mapper.Map<SenderPlemsiDTO>(Data);
-                results.Add((invoice, dto));
 
+                var dto = _mapper.Map<SenderRequestDTO>(Data); 
+
+                results.Add((invoice, dto));
 
             }
             else
