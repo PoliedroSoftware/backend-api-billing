@@ -11,6 +11,7 @@ public class BillingAutoMapper : Profile
     {
         CreateMap<CreateBilling, CreateBillingDTO>();//output
         CreateMap<CreateBillingInputDTO,CreateBilling>();//intput
+        CreateMap<FERetailelectronicEntity, SenderPlemsiDTO>(); //output Plemsi
 
         CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerDTO>().ReverseMap();
         CreateMap<PayPointInfoEntity, PayPointInfoDTO>().ReverseMap();

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
@@ -11,6 +12,7 @@ public class PrepareBillingFE(
     IGetLastInvoiceBilling _getLastInvoiceBilling,
     IBillingValidateScript _billingValidateScript,
     ICalculateCheckDigits _calculateCheckDigits,
+    IMapper _mapper,
     IConfiguration _config
     ) : ICreateBilling 
 {
@@ -165,7 +167,9 @@ public class PrepareBillingFE(
 
 
                 };
-                results.Add((invoice, Data));
+                var dto = _mapper.Map<SenderPlemsiDTO>(Data);
+                results.Add((invoice, dto));
+
 
             }
             else
