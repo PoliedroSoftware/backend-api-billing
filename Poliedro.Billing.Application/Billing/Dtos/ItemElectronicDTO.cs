@@ -4,6 +4,7 @@ public record ItemElectronicDTO
     (
         int UnitMeasureId,
         double LineExtensionAmount,
+        int? Transaccion,
         bool FreeOfChargeIndicator,
         List<AllowanceChargeDTO>? AllowanceCharges,
         List<TaxTotalDTO>? TaxTotals,
@@ -14,5 +15,9 @@ public record ItemElectronicDTO
         int TypeItemIdentificationId,
         double PriceAmount,
         double BaseQuantity,
-        double InvoicedQuantity
+        double InvoicedQuantity,
+        double Percent,
+        double TaxAmount,
+        double UnitPrice,
+        double Subtotal
     );

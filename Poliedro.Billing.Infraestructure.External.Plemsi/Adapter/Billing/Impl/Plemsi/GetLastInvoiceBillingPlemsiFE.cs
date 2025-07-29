@@ -2,12 +2,18 @@
 using Newtonsoft.Json.Linq;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Common.Enum;
+using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using System.Net.Http.Headers;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
-public class GetLastInvoiceBillingPlemsiFE(IConfiguration config) : IGetLastInvoiceBilling
+public class GetLastInvoiceBillingPlemsiFE(
+    IConfiguration config,
+    IClientDomainService _clientDomainService,
+    IUpdateCurrentlyNumber _updateCurrentlyNumber
+    ) : IGetLastInvoiceBilling
 {
     private static readonly HttpClient Client = new();
     public async Task<int> GetLastInvoiceNumberAsync(CreateBilling invoice, CancellationToken CancellationToken)
@@ -23,7 +29,7 @@ public class GetLastInvoiceBillingPlemsiFE(IConfiguration config) : IGetLastInvo
 
         if (!Enum.TryParse(invoice.CustomerEntity.MultipleResolution, out MultipleResolution resolution))
         {
-            resolution = MultipleResolution.Single; 
+            resolution = MultipleResolution.Single;
         }
 
         switch (resolution)
@@ -73,6 +79,29 @@ public class GetLastInvoiceBillingPlemsiFE(IConfiguration config) : IGetLastInvo
             {
                 return MaxNumeroFactura + 1;
             }
+
+            var Client = await _clientDomainService.GetByIdAsync(invoice.CustomerEntity.ApiKey, CancellationToken);
+
+            int CurrentlyNumber = Client.Value.DianResolution.CurrentlyNumber;
+
+            if (CurrentlyNumber > MaxNumeroFactura)
+            {
+                MaxNumeroFactura = CurrentlyNumber;
+            }
+            else
+            {
+
+                var ParametersCurrentlyNumber = new ParametersCurrentlyNumber(
+                    Invoice: MaxNumeroFactura,
+                    CurrentlyDate: null,
+                    ResolutionId: Client.Value.ResolutionId,
+                    Expirated: false
+                );
+
+
+                await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(ParametersCurrentlyNumber, CancellationToken);
+            }
+
 
         }
         return MaxNumeroFactura;
