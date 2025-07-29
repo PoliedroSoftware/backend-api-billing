@@ -118,8 +118,8 @@ public class PrepareBillingFE(
 
                     customer = new CustomerEntity
                     {
-                        IdentificationNumber = invoice.CustomerEntity.IdentificationNumber,
-                        Dv = invoice.CustomerEntity.Dv,
+                        IdentificationNumber = Identification,
+                        Dv = checkDigit,
                         Name = invoice.CustomerEntity.Name,
                         Phone = invoice.CustomerEntity.Phone,
                         Address = "Cra 4ta #12-56",

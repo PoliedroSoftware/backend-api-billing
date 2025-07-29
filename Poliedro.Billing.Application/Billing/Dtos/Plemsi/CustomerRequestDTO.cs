@@ -1,7 +1,7 @@
 ﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi;
 public record CustomerRequestDTO
 {
-    public string identification_number {  get; init; }
+    public required string identification_number {  get; init; }
     public string? dv {  get; init; }
     public string name { get; init; }
     public string? phone { get; init; }
