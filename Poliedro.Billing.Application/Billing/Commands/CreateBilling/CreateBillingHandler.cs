@@ -1,20 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
-using Poliedro.Billing.Application.Common.Features;
-using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Client.Entities;
-using Poliedro.Billing.Domain.Client.Enums;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
-using Poliedro.Billing.Domain.Common.Results;
-using Poliedro.Billing.Domain.Common.Results.Errors;
 using Poliedro.Billing.Domain.FERetail.Entity;
-using Poliedro.Billing.Domain.Resolution.Enums;
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 

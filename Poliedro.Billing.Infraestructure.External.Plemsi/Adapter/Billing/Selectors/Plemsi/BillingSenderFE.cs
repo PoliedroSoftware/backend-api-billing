@@ -12,7 +12,6 @@ public class BillingSenderFE(IConfiguration config) : IBillingSender
 {
     public async Task<ApiResponseFERetailPos> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
-        //var FeInvoices = invoices.Cast<PlemiFEInvoiceDTO>().ToList();
 
         var jsonContent = JsonConvert.SerializeObject(request.Invoices);
         var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
