@@ -19,6 +19,6 @@ public record CustomerBillingDTO
         int? TypeOrganizationId,
         int? TypeLiabilityId,
         int? MunicipalityId,
-        int? MunicipalityCode,
+        string? MunicipalityCode,
         int? TypeRegimeId
     );

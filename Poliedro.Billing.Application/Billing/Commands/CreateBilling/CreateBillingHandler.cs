@@ -57,15 +57,21 @@ public class CreateBillingHandler(
         PlemsiInvoiceRequest InvoiceRequest = new() {ApiKey = request.ApiKey,Invoices = outputEntitiesProcessed};
 
         // Enviar las facturas procesadas
-        ApiResponseFERetailPos responseApi = await sender.SendAsync(InvoiceRequest, cancellationToken);
+        List<ApiResponseFERetailPos> responseApi = await sender.SendAsync(InvoiceRequest, cancellationToken);
 
-        if (responseApi.Success)
+        bool allSuccessful = responseApi.All(r => r.Success);
+
+        if (allSuccessful)
         {
            await _billingResponseApi.IBillingResponseApi(responseApi, billingEntitiesProcessed, cancellationToken);
         }
         else
         {
-            throw new Exception($"Error al enviar facturas: {responseApi.Info}");
+            var errores = responseApi.Where(r => !r.Success)
+                                     .Select(r => r.Info)
+                                     .ToList();
+
+            throw new Exception($"Algunas facturas fallaron al enviarse a PLEMSI: {string.Join(" | ", errores)}");
         }
 
         // Después haces cast o map a tus DTOs finales

@@ -9,11 +9,11 @@ public record SenderRequestDTO
     public bool send_email { get; init; }
      public AttachmentRequestDTO? attachment1 { get; init; }
      public AttachmentRequestDTO? attachment2 { get; init; }
-     public CustomerRequestDTO customer {  get; init; }
-     public PaymentRequestDTO payment { get; init; }
+     public required CustomerRequestDTO customer {  get; init; }
+     public required PaymentRequestDTO payment { get; init; }
      public List<GeneralAllowanceRequestDTO>? generalAllowances { get; init; }
-     public List<ItemElectronicRequestDTO> items { get; init; }
-     public string resolution { get; init; }
+     public required List<ItemElectronicRequestDTO> items { get; init; }
+     public required string resolution { get; init; }
      public string? resolutionText { get; init; }
      public string? head_note { get; init; }
      public string? foot_note { get; init; }

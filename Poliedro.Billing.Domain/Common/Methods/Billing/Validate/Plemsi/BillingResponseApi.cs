@@ -14,29 +14,32 @@ public class BillingResponseApi(
     IDatabaseUtils _databaseUtils
     ) : IBillingResponseApi
 {
-    public async Task IBillingResponseApi(ApiResponseFERetailPos response, IEnumerable<CreateBilling> processedInvoices, CancellationToken cancellationToken)
+    public async Task IBillingResponseApi(List<ApiResponseFERetailPos> response, IEnumerable<CreateBilling> processedInvoices, CancellationToken cancellationToken)
     {
-       
-        foreach (var item in processedInvoices)
+        var paired = response.Zip(processedInvoices, (resp, invoice) => new { resp, invoice });
+
+
+        foreach (var pair in paired)
         {
-           var customerInfo = await _clientDomainService.GetByIdAsync(item.CustomerEntity.ApiKey, cancellationToken);
+            var customerInfo = await _clientDomainService.GetByIdAsync(pair.invoice.CustomerEntity.ApiKey, cancellationToken);
 
-            if (customerInfo != null) {
-
-                throw new ArgumentNullException();
+            if (customerInfo == null)
+            {
+                throw new ArgumentNullException(nameof(customerInfo));
             }
+
             var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
 
-            int NumberInvoice = int.Parse(item.Number);
+            int NumberInvoice = int.Parse(pair.invoice.Number);
 
             await _insertInvoiceFE.InsertInvoiceSucces(
                NumberInvoice,
-               response.Data.Cude!,
-               response.Data.QRCode!,
+                pair.resp.Data.Cude!,
+                pair.resp.Data.QRCode!,
                connectionString,
                customerInfo.Value.ProviderId,
                customerInfo.Value.DianResolution.ClientBillingElectronicId,
-               item.Number
+               pair.invoice.Number
                );
 
             await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(

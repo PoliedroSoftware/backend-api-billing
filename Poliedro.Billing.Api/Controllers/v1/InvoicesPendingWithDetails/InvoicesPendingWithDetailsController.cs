@@ -36,13 +36,9 @@ public class InvoicesPendingWithDetailsController(IMediator mediator) : Controll
 
          IEnumerable<CreateBillingDTO> invoicesPendingWithDetails = await mediator.Send(new InvoicesPendingWithDetailsQuery(ApiKey: token));
 
-        var response = ResponseApiService.Response(
-            statusCode: StatusCodes.Status200OK,
-            message: invoicesPendingWithDetails.Any() ? "Successfully retrieved pending invoices with details" : "No pending invoices found",
-            data: invoicesPendingWithDetails
-        );
 
-        return Ok(response);
+
+        return Ok(invoicesPendingWithDetails);
     }
 
 }

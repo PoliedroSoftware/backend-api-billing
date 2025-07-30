@@ -12,7 +12,7 @@ public record CustomerRequestDTO
     public int? type_organization_id { get; init; }
     public int? type_liability_id { get; init; }
     public int? municipality_id { get; init; }
-    public int? municipality_code { get; init; }
+    public string? municipality_code { get; init; }
     public int? type_regime_id { get; init; }
 }
     

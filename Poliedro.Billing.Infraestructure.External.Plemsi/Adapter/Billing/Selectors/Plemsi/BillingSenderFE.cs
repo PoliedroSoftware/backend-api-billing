@@ -10,40 +10,44 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selec
 
 public class BillingSenderFE(IConfiguration config) : IBillingSender
 {
-    public async Task<ApiResponseFERetailPos> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
+    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
-        //var FeInvoices = invoices.Cast<PlemiFEInvoiceDTO>().ToList();
+        var responses = new List<ApiResponseFERetailPos>();
 
-        var jsonContent = JsonConvert.SerializeObject(request.Invoices);
-        var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
-
-        var url = bool.Parse(config["Enviroment:Production"]!)
-        ? config["ApiPlemsi:FEUrl"]
-        : config["ApiPlemsiQa:FEUrl"];
-
-        var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+        foreach (var invoice in request.Invoices)
         {
-            Content = stringContent
-        };
 
-        var response = await client.SendAsync(httpRequest, cancellationToken);
-        var content = await response.Content.ReadAsStringAsync();
+            var jsonContent = JsonConvert.SerializeObject(request.Invoices);
+            var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new Exception($"Error al enviar a PLEMSI: {response.StatusCode} - {content}");
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
+
+            var url = bool.Parse(config["Enviroment:Production"]!)
+            ? config["ApiPlemsi:FEUrl"]
+            : config["ApiPlemsiQa:FEUrl"];
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = stringContent
+            };
+
+            var response = await client.SendAsync(httpRequest, cancellationToken);
+            var content = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Error al enviar a PLEMSI: {response.StatusCode} - {content}");
+            }
+
+            var responseApi = JsonConvert.DeserializeObject<ApiResponseFERetailPos>(content);
+            if (responseApi is null)
+                throw new Exception("No se pudo deserializar la respuesta de PLEMSI.");
+
+            responses.Add(responseApi);
         }
-        var responseApi = JsonConvert.DeserializeObject<ApiResponseFERetailPos>(content);
-
-        if (responseApi is null)
-            throw new Exception("No se pudo deserializar la respuesta de PLEMSI.");
-
-        return responseApi;
+        return responses;
 
     }
-
 
 }
