@@ -9,7 +9,7 @@ public record ItemElectronicRequestDTO
      public List<WIthHoldingTaxTotalRequestDTO>? with_holding_tax_total { get; init; }
      public string? description { get; init; }
      public string? notes { get; init; }
-     public int? code { get; init; }
+     public string? code { get; init; }
      public int type_item_identification_id { get; init; }
      public double price_amount { get; init; }
      public double base_quantity { get; init; }
