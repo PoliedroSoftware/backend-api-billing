@@ -71,11 +71,11 @@ public class CreateBillingHandler(
                                      .Select(r => r.Info)
                                      .ToList();
 
-            throw new Exception($"Algunas facturas fallaron al enviarse a PLEMSI: {string.Join(" | ", errores)}");
+            throw new Exception($"Algunas facturas fallaron al enviarse: {string.Join(" | ", errores)}");
         }
 
         // Después haces cast o map a tus DTOs finales
-        IEnumerable<CreateBillingDTO> billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(processedInvoices);
+        IEnumerable<CreateBillingDTO> billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(billingEntitiesProcessed);
 
 
 

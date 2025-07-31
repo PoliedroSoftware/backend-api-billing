@@ -20,8 +20,7 @@ public class BillingController(IMediator mediator) : ControllerBase
     [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error processing the request.")]
     [Produces("application/json")]
     [HttpPost]
-    public async Task<IActionResult> CreateBillingCommand(
-        [FromBody][Required] IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateBillingCommand([FromBody][Required] IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
     {
         var token = TokenHelper.ExtractBearerToken(Request);
         if (string.IsNullOrEmpty(token))
