@@ -41,7 +41,7 @@ public class BillingController(IMediator mediator) : ControllerBase
 
         var response = ResponseApiService.Response(
                 statusCode: StatusCodes.Status200OK,
-                message: "Invoices processed successfully.",
+                message: "Invoice processing result.",
                 data: result
         );
         return Ok(response);

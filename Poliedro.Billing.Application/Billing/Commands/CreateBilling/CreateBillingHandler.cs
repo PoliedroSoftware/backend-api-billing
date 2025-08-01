@@ -25,9 +25,9 @@ public class CreateBillingHandler(
     IBillingResponseApi _billingResponseApi,
     IBillingGetInfoClient _billingGetInfoClient,
     IMapper mapper
-    ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingDTO>>
+    ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingResultDTO>>
 {
-    public async Task<IEnumerable<CreateBillingDTO>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<CreateBillingResultDTO>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
     {
         // DTOs de entrada a CreateBilling
         var billingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
@@ -74,11 +74,22 @@ public class CreateBillingHandler(
             throw new Exception($"Algunas facturas fallaron al enviarse: {string.Join(" | ", errores)}");
         }
 
-        // Después haces cast o map a tus DTOs finales
-        IEnumerable<CreateBillingDTO> billingDtos = mapper.Map<IEnumerable<CreateBillingDTO>>(billingEntitiesProcessed);
+        var billingResults = new List<CreateBillingResultDTO>();
+
+        for (int i = 0; i < billingEntitiesProcessed.Count(); i++)
+        {
+            var result = responseApi[i];
+
+            billingResults.Add(new CreateBillingResultDTO
+            {
+                Status = result.Success,
+                Message = result.Success ? "Factura procesada exitosamente" : result.Info,
+                Data = null // Aquí puedes incluir info útil, como número de factura si aplica
+            });
+        }
 
 
+        return billingResults;
 
-        return billingDtos;
     }
 }
