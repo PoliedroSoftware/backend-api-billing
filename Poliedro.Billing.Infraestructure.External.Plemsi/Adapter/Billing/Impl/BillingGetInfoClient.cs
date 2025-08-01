@@ -20,6 +20,12 @@ public class BillingGetInfoClient : IBillingGetInfoClient
             Prefix = clientEntity.DianResolution.Prefix,
             ExpirationDate = clientEntity.DianResolution.ExpirationDate,
             FinalRange = clientEntity.DianResolution.FinalRange,
+            ResolucionNumber = clientEntity.DianResolution.ResolutionNumber,
+            Descripcion = clientEntity.DianResolution.Description,
+            CurrentlyNumber = clientEntity.DianResolution.CurrentlyNumber,
+            MultipleResolution = clientEntity.MultipleResolution,
+            ResolutionId = clientEntity.ResolutionId
+
         };
 
         return Task.FromResult(billingInfoClient);

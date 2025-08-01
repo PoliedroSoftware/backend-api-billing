@@ -2,7 +2,6 @@
 using Newtonsoft.Json.Linq;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using System.Net.Http.Headers;
@@ -11,23 +10,22 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.
 
 public class GetLastInvoiceBillingPlemsiFE(
     IConfiguration config,
-    IClientDomainService _clientDomainService,
     IUpdateCurrentlyNumber _updateCurrentlyNumber
     ) : IGetLastInvoiceBilling
 {
     private static readonly HttpClient Client = new();
-    public async Task<int> GetLastInvoiceNumberAsync(CreateBilling invoice, CancellationToken CancellationToken)
+    public async Task<int> GetLastInvoiceNumberAsync(BillingInfoClient clientInfo, CancellationToken CancellationToken)
     {
         int MaxNumeroFactura = 1;
         DateTime ToDay = DateTime.Now;
         string FormattedDate = ToDay.ToString("yyyy-MM-dd");
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", invoice.CustomerEntity.ApiKey);
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientInfo.ApiKey);
         string ApiUrl = string.Empty;
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
         string baseUrl;
 
-        if (!Enum.TryParse(invoice.CustomerEntity.MultipleResolution, out MultipleResolution resolution))
+        if (!Enum.TryParse(clientInfo.MultipleResolution.ToString(), out MultipleResolution resolution))
         {
             resolution = MultipleResolution.Single;
         }
@@ -47,7 +45,7 @@ public class GetLastInvoiceBillingPlemsiFE(
                 break;
         }
 
-        ApiUrl = $"{baseUrl}{invoice.Prefix}";
+        ApiUrl = $"{baseUrl}{clientInfo.Prefix}";
 
         HttpResponseMessage Response = await Client.GetAsync(ApiUrl);
 
@@ -80,9 +78,7 @@ public class GetLastInvoiceBillingPlemsiFE(
                 return MaxNumeroFactura + 1;
             }
 
-            var Client = await _clientDomainService.GetByIdAsync(invoice.CustomerEntity.ApiKey, CancellationToken);
-
-            int CurrentlyNumber = Client.Value.DianResolution.CurrentlyNumber;
+            int CurrentlyNumber = clientInfo.CurrentlyNumber;
 
             if (CurrentlyNumber > MaxNumeroFactura)
             {
@@ -94,7 +90,7 @@ public class GetLastInvoiceBillingPlemsiFE(
                 var ParametersCurrentlyNumber = new ParametersCurrentlyNumber(
                     Invoice: MaxNumeroFactura,
                     CurrentlyDate: null,
-                    ResolutionId: Client.Value.ResolutionId,
+                    ResolutionId: clientInfo.ResolutionId,
                     Expirated: false
                 );
 

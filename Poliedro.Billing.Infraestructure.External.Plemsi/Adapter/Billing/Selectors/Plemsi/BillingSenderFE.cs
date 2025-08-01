@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 using Poliedro.Billing.Domain.FERetail.Entity;
@@ -8,15 +9,25 @@ using System.Text;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 
-public class BillingSenderFE(IConfiguration config) : IBillingSender
+public class BillingSenderFE(
+    IConfiguration config,
+    IGetLastInvoiceBilling _getLastInvoiceBilling
+    ) : IBillingSender
 {
-    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
+    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient ClientInfo, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
 
         foreach (var invoice in request.Invoices)
         {
+            SenderRequestDTO senderRequestDTO = invoice as SenderRequestDTO;
 
+            int LastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(ClientInfo, cancellationToken);
+
+            if(senderRequestDTO.number < LastNumber)
+            {
+                senderRequestDTO.number = LastNumber;
+            }
             var jsonContent = JsonConvert.SerializeObject(invoice);
             var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 

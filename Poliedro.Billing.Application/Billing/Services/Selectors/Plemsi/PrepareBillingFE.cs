@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Entity;
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
@@ -18,7 +17,7 @@ public class PrepareBillingFE(
     ) : ICreateBilling 
 {
     public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(
-        IEnumerable<CreateBilling> invoices, ClientEntity clientEntity, CancellationToken cancellationToken)
+        IEnumerable<CreateBilling> invoices, BillingInfoClient clientInfo, CancellationToken cancellationToken)
     {
 
         var results = new List<(CreateBilling Billing, object Output)>();
@@ -52,13 +51,13 @@ public class PrepareBillingFE(
 
             }
             // Número de factura
-            invoice.Prefix = clientEntity.DianResolution.Prefix;
-            invoice.CustomerEntity.ApiKey = clientEntity.ApiKey;
+            invoice.Prefix = clientInfo.Prefix;
+            invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
             int InvoiceNumber = int.Parse(invoice.Number[^4..]);
-            int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(invoice, cancellationToken);
+            int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
             InvoiceNumber = (InvoiceLast <= 0 || InvoiceLast < InvoiceNumber) ? InvoiceNumber : InvoiceLast + 1;
 
-            bool expirated = InvoiceNumber > clientEntity.DianResolution.FinalRange || DateTime.Now > clientEntity.DianResolution.ExpirationDate;
+            bool expirated = InvoiceNumber > clientInfo.FinalRange || DateTime.Now > clientInfo.ExpirationDate;
             if (expirated)
             {
                 throw new Exception("La factura está fuera del rango de resolución o ha expirado.");
@@ -144,8 +143,8 @@ public class PrepareBillingFE(
 
                     generalAllowances = [],
                     items = invoice.ItemElectronicEntity,
-                    resolution = clientEntity.DianResolution.ResolutionNumber,
-                    resolutionText = clientEntity.DianResolution.Description,
+                    resolution = clientInfo.ResolucionNumber,
+                    resolutionText = clientInfo.Descripcion,
                     head_note = invoice.Number,
                     foot_note = invoice.Number,
                     notes = $"Fecha de la factura:{invoice.TransactionDate}",

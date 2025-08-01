@@ -75,7 +75,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             services.AddTransient<IBillingSender, BillingSenderFE>();
             services.AddTransient<IBillingSender, BillingSenderPOS>();
-            services.AddSingleton<IBillingSenderFactory, BillingSenderFactory>();
+            services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
 
             services.AddTransient<IBillingGetInfoClient, BillingGetInfoClient>();

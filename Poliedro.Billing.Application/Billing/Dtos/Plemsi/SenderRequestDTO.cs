@@ -4,7 +4,7 @@ public record SenderRequestDTO
     public string date { get; init; }
     public string time {  get; init; }
     public string prefix { get; init; }
-    public int number {  get; init; }
+    public int number {  get; set; }
     public OrderReferenceRequestDTO? orderReference { get; init; }
     public bool send_email { get; init; }
      public AttachmentRequestDTO? attachment1 { get; init; }
