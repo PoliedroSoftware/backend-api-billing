@@ -3,14 +3,12 @@ using Newtonsoft.Json.Linq;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
-using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using System.Net.Http.Headers;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
 public class GetLastInvoiceBillingPlemsiFE(
-    IConfiguration config,
-    IUpdateCurrentlyNumber _updateCurrentlyNumber
+    IConfiguration config
     ) : IGetLastInvoiceBilling
 {
     private static readonly HttpClient Client = new();
@@ -77,28 +75,6 @@ public class GetLastInvoiceBillingPlemsiFE(
             {
                 return MaxNumeroFactura + 1;
             }
-
-            int CurrentlyNumber = clientInfo.CurrentlyNumber;
-
-            if (CurrentlyNumber > MaxNumeroFactura)
-            {
-                MaxNumeroFactura = CurrentlyNumber;
-            }
-            else
-            {
-
-                var ParametersCurrentlyNumber = new ParametersCurrentlyNumber(
-                    Invoice: MaxNumeroFactura,
-                    CurrentlyDate: null,
-                    ResolutionId: clientInfo.ResolutionId,
-                    Expirated: false
-                );
-
-
-                await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(ParametersCurrentlyNumber, CancellationToken);
-            }
-
-
         }
         return MaxNumeroFactura;
 

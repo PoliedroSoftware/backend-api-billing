@@ -22,11 +22,21 @@ public class PrepareBillingFE(
 
         var results = new List<(CreateBilling Billing, object Output)>();
 
+        // Obtener el ultimo numero
+        int lastInvoiceNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
+
+        
+        bool expirated = lastInvoiceNumber + invoices.Count() > clientInfo.FinalRange || DateTime.Now > clientInfo.ExpirationDate;
+        if (expirated)
+        {
+            throw new Exception("El rango de numeración ha sido superado o la resolución ha expirado.");
+        }
+
+        // Inicializar contador de facturas
+        int invoiceCounter = lastInvoiceNumber;
 
         foreach (var invoice in invoices)
         {
-           
-
             // Calcular totales de items
             if (invoice.ItemElectronicEntity != null)
             {
@@ -50,18 +60,11 @@ public class PrepareBillingFE(
                 invoice.AllTaxTotalEntity = await _getAllTaxTotals.IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
 
             }
-            // Número de factura
+           
             invoice.Prefix = clientInfo.Prefix;
             invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
-            int InvoiceNumber = int.Parse(invoice.Number[^4..]);
-            int InvoiceLast = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
-            InvoiceNumber = (InvoiceLast <= 0 || InvoiceLast < InvoiceNumber) ? InvoiceNumber : InvoiceLast + 1;
-
-            bool expirated = InvoiceNumber > clientInfo.FinalRange || DateTime.Now > clientInfo.ExpirationDate;
-            if (expirated)
-            {
-                throw new Exception("La factura está fuera del rango de resolución o ha expirado.");
-            }
+            // Usar el contador local
+            int InvoiceNumber = invoiceCounter++;
 
             // Fecha y hora
             DateTime Date = DateTime.Now;
