@@ -24,27 +24,91 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
         {
             await connection.OpenAsync(cancellationToken);
 
-            string query = @"
-                SELECT 
-                    v.id AS invoice_id,
-                    v.identication,
-                    v.contact_name,
-                    v.email,
-                    v.mobile,
-                    v.city,
-                    v.state,
-                    v.country,
-                    v.invoice,
-                    v.payment_status,
-                    v.transaction_date,
-                    v.allowanceTotal,
-                    v.invoiceBaseTotal,
-                    v.invoiceTaxExclusiveTotal,
-                    v.invoiceTaxInclusiveTotal,
-                    v.totalToPay,
-                    v.send_dian,
+            // 1) Query sólo facturas
+            string invoicesQuery = @"
+            SELECT 
+                v.id AS invoice_id,
+                v.identication,
+                v.contact_name,
+                v.email,
+                v.mobile,
+                v.city,
+                v.state,
+                v.country,
+                v.invoice,
+                v.payment_status,
+                v.transaction_date,
+                v.allowanceTotal,
+                v.invoiceBaseTotal,
+                v.invoiceTaxExclusiveTotal,
+                v.invoiceTaxInclusiveTotal,
+                v.totalToPay,
+                v.send_dian
+            FROM v_invoice v
+            LEFT JOIN invoice_success i ON v.invoice = i.verify
+            WHERE i.verify IS NULL
+              AND v.transaction_date >= @date
+              AND v.totalToPay <> 0"
+                + ((Automatic)clientItem.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
+                + " ORDER BY v.id ASC";
 
-                    d.id AS detail_id,
+            using (var cmdInvoices = new MySqlCommand(invoicesQuery, connection))
+            {
+                cmdInvoices.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
+
+                using var reader = await cmdInvoices.ExecuteReaderAsync(cancellationToken);
+                while (await reader.ReadAsync(cancellationToken))
+                {
+                    int invoiceId = reader.GetInt32("invoice_id");
+
+                    var invoice = new CreateBilling
+                    {
+                        Number = reader["invoice"]?.ToString(),
+                        //Payment_status = reader["payment_status"]?.ToString(),
+                        TransactionDate = reader.IsDBNull(reader.GetOrdinal("transaction_date"))
+                            ? DateTime.MinValue
+                            : reader.GetDateTime("transaction_date"),
+                        AllowanceTotal = reader.IsDBNull(reader.GetOrdinal("allowanceTotal")) ? 0L : Convert.ToInt64(reader["allowanceTotal"]),
+                        InvoiceBaseTotal = reader.IsDBNull(reader.GetOrdinal("invoiceBaseTotal")) ? 0L : Convert.ToInt64(reader["invoiceBaseTotal"]),
+                        InvoiceTaxExclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxExclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
+                        InvoiceTaxInclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxInclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
+                        TotalToPay = reader.IsDBNull(reader.GetOrdinal("totalToPay")) ? 0L : Convert.ToInt64(reader["totalToPay"]),
+
+                        CustomerEntity = new CustomerEntity
+                        {
+                            IdentificationNumber = reader["identication"]?.ToString(),
+                            Name = reader["contact_name"]?.ToString(),
+                            Email = reader["email"]?.ToString(),
+                            Phone = reader["mobile"]?.ToString(),
+                            City = reader["city"]?.ToString(),
+                            State = reader["state"]?.ToString(),
+                            Country = reader["country"]?.ToString()
+                        },
+
+                        ItemElectronicEntity = new List<ItemElectronicEntity>()
+                    };
+
+                    invoicesMap[invoiceId] = invoice;
+                }
+            }
+
+            // Si no hay facturas, devolvemos vacío
+            if (invoicesMap.Count == 0)
+                return invoicesMap.Values.ToList();
+
+            // 2) Obtener detalles para las facturas encontradas en bloques (por si hay muchos ids)
+            var invoiceIds = invoicesMap.Keys.ToList();
+            const int chunkSize = 1000; // ajustar según sea necesario
+            for (int i = 0; i < invoiceIds.Count; i += chunkSize)
+            {
+                var chunk = invoiceIds.Skip(i).Take(chunkSize).ToList();
+
+                // Construir la lista de parámetros para el IN
+                var paramNames = chunk.Select((id, idx) => $"@id{idx}").ToList();
+                string inClause = string.Join(", ", paramNames);
+
+                string detailsQuery = $@"
+                SELECT 
                     d.transaccion,
                     d.code,
                     d.type_item_identification_id,
@@ -57,80 +121,45 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     d.percent,
                     d.tax_amount,
                     d.unit_price
-                FROM v_invoice v
-                LEFT JOIN invoice_success i ON v.invoice = i.verify
-                INNER JOIN v_invoice_detail d ON v.invoice = d.transaccion
-                WHERE i.verify IS NULL
-                AND v.transaction_date >= @date "
-                + ((Automatic)clientItem.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
-                + " ORDER BY v.id ASC";
+                FROM v_invoice_detail d
+                WHERE d.transaccion IN ({inClause})
+                ORDER BY d.transaccion, d.id ASC"; // opcional ORDER BY
 
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
-            using var reader = await command.ExecuteReaderAsync(cancellationToken);
-
-            while (await reader.ReadAsync(cancellationToken))
-            {
-                int invoiceId = reader.GetInt32("invoice_id");
-
-                if (!invoicesMap.TryGetValue(invoiceId, out var invoice))
+                using var cmdDetails = new MySqlCommand(detailsQuery, connection);
+                for (int j = 0; j < chunk.Count; j++)
                 {
-                    bool addInvoice = ((Automatic)clientItem.Automatic == Automatic.No &&
-                                        Convert.ToInt32(reader["send_dian"]) == (int)Automatic.Yes)
-                                      || ((Automatic)clientItem.Automatic == Automatic.Yes &&
-                                          Convert.ToInt64(reader["totalToPay"]) > 0);
-
-                    if (!addInvoice)
-                        continue;
-
-                    invoice = new CreateBilling
-                    {
-                        Number = reader["invoice"].ToString(),
-                        //Payment_status = reader["payment_status"].ToString(),
-                        TransactionDate = reader["transaction_date"].Equals(DBNull.Value) ? DateTime.MinValue : Convert.ToDateTime(reader["transaction_date"]),
-                        AllowanceTotal = Convert.ToInt64(reader["allowanceTotal"]),
-                        InvoiceBaseTotal = Convert.ToInt64(reader["invoiceBaseTotal"]),
-                        InvoiceTaxExclusiveTotal = Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
-                        InvoiceTaxInclusiveTotal = Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
-                        TotalToPay = Convert.ToInt64(reader["totalToPay"]),
-
-
-                        CustomerEntity = new CustomerEntity
-                        {
-                            IdentificationNumber = reader["identication"].ToString(),
-                            Name = reader["contact_name"].ToString(),
-                            Email = reader["email"].ToString(),
-                            Phone = reader["mobile"].ToString(),
-                            City = reader["city"].ToString(),
-                            State = reader["state"].ToString(),
-                            Country = reader["country"].ToString()
-                        },
-
-                        ItemElectronicEntity = new List<ItemElectronicEntity>()
-
-                    };
-
-                    invoicesMap[invoiceId] = invoice;
+                    cmdDetails.Parameters.AddWithValue(paramNames[j], chunk[j]);
                 }
 
-               var item = new ItemElectronicEntity
-               {
-                    Transaccion = reader.GetInt32("transaccion"),
-                    Code = reader.GetInt32("code"),
-                    TypeItemIdentificationId = reader.GetInt32("type_item_identification_id"),
-                    Description = reader["description"].ToString(),
-                    UnitMeasureId = reader.GetInt32("unit_measure_id"),
-                    BaseQuantity = reader.GetDouble("base_quantity"),
-                    InvoicedQuantity = reader.GetDouble("invoiced_quantity"),
-                    PriceAmount = reader.GetDouble("price_amount"),
-                    LineExtensionAmount = reader.GetDouble("line_extension_amount"),
-                    Percent = reader.GetDouble("percent"),
-                    TaxAmount = reader.GetDouble("tax_amount"),
-                    UnitPrice = reader.GetDouble("unit_price")
-                };
+                using var readerDetails = await cmdDetails.ExecuteReaderAsync(cancellationToken);
+                while (await readerDetails.ReadAsync(cancellationToken))
+                {
+                    int transaccion = readerDetails.GetInt32("transaccion");
 
-                invoice.ItemElectronicEntity!.Add(item);
+                    if (!invoicesMap.TryGetValue(transaccion, out var invoice))
+                    {
+                        // Si por alguna razón no existe la factura, la ignoramos
+                        continue;
+                    }
 
+                    var item = new ItemElectronicEntity
+                    {
+                        Transaccion = readerDetails.IsDBNull(readerDetails.GetOrdinal("transaccion")) ? 0 : readerDetails.GetInt32("transaccion"),
+                        Code = readerDetails.IsDBNull(readerDetails.GetOrdinal("code")) ? 0 : readerDetails.GetInt32("code"),
+                        TypeItemIdentificationId = readerDetails.IsDBNull(readerDetails.GetOrdinal("type_item_identification_id")) ? 0 : readerDetails.GetInt32("type_item_identification_id"),
+                        Description = readerDetails["description"]?.ToString(),
+                        UnitMeasureId = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_measure_id")) ? 0 : readerDetails.GetInt32("unit_measure_id"),
+                        BaseQuantity = readerDetails.IsDBNull(readerDetails.GetOrdinal("base_quantity")) ? 0.0 : readerDetails.GetDouble("base_quantity"),
+                        InvoicedQuantity = readerDetails.IsDBNull(readerDetails.GetOrdinal("invoiced_quantity")) ? 0.0 : readerDetails.GetDouble("invoiced_quantity"),
+                        PriceAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("price_amount")) ? 0.0 : readerDetails.GetDouble("price_amount"),
+                        LineExtensionAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_extension_amount")) ? 0.0 : readerDetails.GetDouble("line_extension_amount"),
+                        Percent = readerDetails.IsDBNull(readerDetails.GetOrdinal("percent")) ? 0.0 : readerDetails.GetDouble("percent"),
+                        TaxAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_amount")) ? 0.0 : readerDetails.GetDouble("tax_amount"),
+                        UnitPrice = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price")) ? 0.0 : readerDetails.GetDouble("unit_price")
+                    };
+
+                    invoice.ItemElectronicEntity!.Add(item);
+                }
             }
 
             return invoicesMap.Values.ToList();
@@ -140,5 +169,6 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
             throw new Exception("Error connecting to the database", ex);
         }
     }
+
 
 }
