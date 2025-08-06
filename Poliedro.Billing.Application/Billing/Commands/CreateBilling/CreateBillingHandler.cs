@@ -25,7 +25,7 @@ public class CreateBillingHandler(
         var clientResult = await _clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
 
         if (!clientResult.IsSuccess || clientResult.Value is null)
-            throw new Exception("No Found Client Billing");
+        Console.WriteLine($"No Found Client Billing");
 
         ClientEntity client = clientResult.Value;
         //datos de la persistencia 
@@ -60,8 +60,7 @@ public class CreateBillingHandler(
             var errores = responseApi.Where(r => !r.Success)
                                      .Select(r => r.Info)
                                      .ToList();
-
-            throw new Exception($"Algunas facturas fallaron al enviarse: {string.Join(" | ", errores)}");
+            Console.WriteLine($"Algunas facturas fallaron al enviarse: {string.Join(" | ", errores)}");
         }
 
         var billingResults = new List<CreateBillingResultDTO>();

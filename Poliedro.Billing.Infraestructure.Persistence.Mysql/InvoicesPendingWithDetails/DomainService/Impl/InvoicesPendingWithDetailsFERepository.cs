@@ -23,8 +23,6 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
         try
         {
             await connection.OpenAsync(cancellationToken);
-
-            // 1) Query sólo facturas
             string invoicesQuery = @"
             SELECT 
                 v.id AS invoice_id,
@@ -64,7 +62,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     var invoice = new CreateBilling
                     {
                         Number = reader["invoice"]?.ToString(),
-                        //Payment_status = reader["payment_status"]?.ToString(),
+                    
                         TransactionDate = reader.IsDBNull(reader.GetOrdinal("transaction_date"))
                             ? DateTime.MinValue
                             : reader.GetDateTime("transaction_date"),
@@ -92,18 +90,18 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 }
             }
 
-            // Si no hay facturas, devolvemos vacío
+           
             if (invoicesMap.Count == 0)
                 return invoicesMap.Values.ToList();
 
-            // 2) Obtener detalles para las facturas encontradas en bloques (por si hay muchos ids)
+       
             var invoiceIds = invoicesMap.Keys.ToList();
-            const int chunkSize = 1000; // ajustar según sea necesario
+            const int chunkSize = 1000;
             for (int i = 0; i < invoiceIds.Count; i += chunkSize)
             {
                 var chunk = invoiceIds.Skip(i).Take(chunkSize).ToList();
 
-                // Construir la lista de parámetros para el IN
+              
                 var paramNames = chunk.Select((id, idx) => $"@id{idx}").ToList();
                 string inClause = string.Join(", ", paramNames);
 
@@ -123,7 +121,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     d.unit_price
                 FROM v_invoice_detail d
                 WHERE d.transaccion IN ({inClause})
-                ORDER BY d.transaccion, d.id ASC"; // opcional ORDER BY
+                ORDER BY d.transaccion, d.id ASC"; 
 
                 using var cmdDetails = new MySqlCommand(detailsQuery, connection);
                 for (int j = 0; j < chunk.Count; j++)
@@ -138,7 +136,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
 
                     if (!invoicesMap.TryGetValue(transaccion, out var invoice))
                     {
-                        // Si por alguna razón no existe la factura, la ignoramos
+                        
                         continue;
                     }
 
