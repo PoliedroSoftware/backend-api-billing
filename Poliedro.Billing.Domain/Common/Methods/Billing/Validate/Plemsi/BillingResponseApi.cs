@@ -30,7 +30,7 @@ public class BillingResponseApi(
 
             var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
 
-            int NumberInvoice = int.Parse(pair.invoice.Number);
+            int NumberInvoice = int.Parse(pair.invoice.Numeration);
 
             await _insertInvoiceFE.InsertInvoiceSucces(
                NumberInvoice,
