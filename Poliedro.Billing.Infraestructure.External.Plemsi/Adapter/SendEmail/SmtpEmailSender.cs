@@ -5,6 +5,7 @@ using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Microsoft.Extensions.Logging;
 
+
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 
 public class SmtpEmailSender(IConfiguration _config,
