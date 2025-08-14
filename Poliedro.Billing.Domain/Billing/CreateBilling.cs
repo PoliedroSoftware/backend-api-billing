@@ -11,6 +11,7 @@ public class CreateBilling
 
     public PayPointInfoEntity? PayPointInfo { get; set; }
     public required string Number { get; set; }
+    public string? Numeration { get; set; } 
     public string? Prefix { get; set; }
     public DateTime? TransactionDate { get; set; }
     public OrderReferenceEntity? OrderReference { get; set; }

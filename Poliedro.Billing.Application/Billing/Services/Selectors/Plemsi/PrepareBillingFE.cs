@@ -79,7 +79,7 @@ public class PrepareBillingFE(
                 invoice.AllTaxTotalEntity = await _getAllTaxTotals.IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
                 invoice.Prefix = clientInfo.Prefix;
                 invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
-                invoice.Number = InvoiceNumber.ToString();
+                invoice.Numeration = InvoiceNumber.ToString();
 
 
 
