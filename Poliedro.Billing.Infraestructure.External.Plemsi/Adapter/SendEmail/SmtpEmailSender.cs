@@ -3,8 +3,8 @@ using System.Net.Mail;
 using System.Net;
 using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Application.SendEmail.Ports;
-using Poliedro.Billing.Domain.SendEmail.Ports;
 using Microsoft.Extensions.Logging;
+
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 

@@ -1,23 +1,22 @@
 ﻿
 using MySqlConnector;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Client.Entities;
-using Poliedro.Billing.Domain.Common.Enum;
+using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
-using Poliedro.Billing.Domain.InvoicePendingWithDetails.Ports;
-using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Entities;
+using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetailsStrategy
 {
-    public async Task<IEnumerable<object>> GetAllInvoicePendingWithDetails(
+    public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
     ServerEntity server,
     ClientEntity clientItem,
     IDatabaseUtils databaseUtils,
-    CancellationToken cancellationToken,
-    string apiKey)
+    CancellationToken cancellationToken)
     {
-        var invoicesMap = new Dictionary<int, InvoicePOSPendingEntity>();
+        var invoicesMap = new Dictionary<int, CreateBilling>();
         using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
 
         try
@@ -57,53 +56,49 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
 
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
-
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
             while (await reader.ReadAsync(cancellationToken))
             {
                 int invoiceId = reader.GetInt32("invoice_id");
 
-                if (!invoicesMap.ContainsKey(invoiceId))
+                if (!invoicesMap.TryGetValue(invoiceId, out var invoice))
                 {
                     bool addInvoice = (reader.GetDecimal(5) > 0);
 
                     if (!addInvoice)
                         continue;
 
-                    var invoiceEntity = new InvoicePOSPendingEntity
+                    invoice = new CreateBilling
                     {
-                        Id = invoiceId,
                         Date = reader.GetDateTime("Date"),
-                        Time = reader.GetTimeSpan("Time"),
-                        Resolution = reader["Resolution"].ToString(),
-                        Prefix = reader["prefix"].ToString(),
+                        Time = reader.GetDateTime("Time"),
                         Number = reader["number"].ToString(),
-                        ResolutionType = reader["resolutionType"].ToString(),
-                        Note = reader["note"].ToString(),
+                        Prefix = reader["prefix"].ToString(),
+                        Resolution = reader["Resolution"].ToString(),
+                        Notes = reader["note"].ToString(),
                         AllowanceTotal = Convert.ToInt64(reader["allowanceTotal"]),
                         InvoiceBaseTotal = Convert.ToInt64(reader["invoiceBaseTotal"]),
                         InvoiceTaxExclusiveTotal = Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
                         InvoiceTaxInclusiveTotal = Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
-                        TotalToPay = Convert.ToInt64(reader["totalToPay"]),
-                        DetailsInvoicePendings = new List<DetailsInvoicePOSPendingEntity>()
+                        ItemElectronicEntity = new List<ItemElectronicEntity>()
                     };
 
-                    invoicesMap.Add(invoiceId, invoiceEntity);
+                    invoicesMap[invoiceId] = invoice;
+
                 }
 
-                var detail = new DetailsInvoicePOSPendingEntity
+                var item = new ItemElectronicEntity
                 {
-                    Id = reader.GetInt32("detail_id"),
                     Description = reader["description"].ToString(),
-                    Code = reader["code"].ToString(),
-                    BaseQuantity = reader.GetDecimal("base_quantity"),
-                    InvoicedQuantity = reader.GetDecimal("invoiced_quantity"),
-                    PriceAmount = reader.GetDecimal("price_amount"),
-                    Subtotal = reader.GetDecimal("subtotal")
+                    Code = (int?)reader["code"],
+                    BaseQuantity = reader.GetDouble("base_quantity"),
+                    InvoicedQuantity = reader.GetDouble("invoiced_quantity"),
+                    PriceAmount = reader.GetDouble("price_amount"),
+                    Subtotal = reader.GetDouble("subtotal")
                 };
 
-                invoicesMap[invoiceId].DetailsInvoicePendings.Add(detail);
+                invoice.ItemElectronicEntity!.Add(item);
             }
 
             return invoicesMap.Values.ToList();
@@ -113,7 +108,4 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
             throw new Exception("Error connecting to the database", ex);
         }
     }
-
-
-
 }

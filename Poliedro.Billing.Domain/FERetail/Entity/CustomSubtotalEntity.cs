@@ -6,9 +6,9 @@ public class CustomSubtotalEntity
 {
 
     [JsonPropertyName("concept")]
-    public string? concept { get; set; }
+    public string? Concept { get; set; }
 
     [JsonPropertyName("amount")]
-    public double amount { get; set; }
+    public double Amount { get; set; }
 
 }

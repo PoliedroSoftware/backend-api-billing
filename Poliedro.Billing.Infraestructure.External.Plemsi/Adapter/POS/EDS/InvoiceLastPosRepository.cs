@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using Poliedro.Billing.Domain.BillingPos.Ports;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.Entities;
 using System.Net.Http.Headers;
 

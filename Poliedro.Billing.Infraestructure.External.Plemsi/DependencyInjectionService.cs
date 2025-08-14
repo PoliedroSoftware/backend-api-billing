@@ -1,27 +1,35 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Poliedro.Billing.Domain.BillingPos.Ports;
+using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
+using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+using Poliedro.Billing.Application.SendEmail;
+using Poliedro.Billing.Application.SendEmail.Ports;
+using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Validate;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
 using Poliedro.Billing.Domain.CreditNote.Ports;
-using Poliedro.Billing.Domain.FERetail.Ports;
-using Poliedro.Billing.Domain.Ports;
-using Poliedro.Billing.Domain.SendEmail.Ports;
-using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.CustomersId.Ports;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
+using Poliedro.Billing.Domain.FERetail.Ports;
+using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
+using Poliedro.Billing.Domain.Ports;
+using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.GetInvoice;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendMessage;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SuccessInvoice;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.UpdateCurrentlyNumber;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
-using Poliedro.Billing.Application.SendEmail.Ports;
-using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
-using Poliedro.Billing.Infrastructure.GetInvoice.Adapters;
 
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi
@@ -58,6 +66,32 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<ICustomersIdRepository, CustomersIdRepository>();
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
+
+            // Factoría y strategies
+            services.AddScoped<IGetProcessorBilling, BillingPrepareFactory>();
+            services.AddTransient<PrepareBillingFE>();
+            services.AddTransient<PrepareBillingPOS>();
+            
+
+            services.AddTransient<IBillingSender, BillingSenderFE>();
+            services.AddTransient<IBillingSender, BillingSenderPOS>();
+            services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
+            services.AddTransient<IBillingResponseApi, BillingResponseApi>();
+
+            services.AddTransient<IBillingGetInfoClient, BillingGetInfoClient>();
+
+
+            // Dependencias internas de PrepareBillingFE/POS
+            services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();
+            services.AddScoped<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
+            services.AddScoped<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();
+            services.AddScoped<IBillingValidateScript, ValidateScriptBilling>();
+            services.AddScoped<ICalculateCheckDigits, CalculateCheckDigitsBilling>();
+
+
+
+
+
             services.AddTransient<EmailErrorHandler>();
             return services;
         }

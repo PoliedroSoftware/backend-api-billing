@@ -1,5 +1,5 @@
-﻿using Poliedro.Billing.Domain.BillingPos;
-using Poliedro.Billing.Domain.BillingPos.Ports;
+﻿using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
 {

@@ -1,30 +1,29 @@
 using MySqlConnector;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Enum;
+using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
-using Poliedro.Billing.Domain.InvoicePendingWithDetails.Ports;
-using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Entities;
+using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 
 public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetailsStrategy
 {
-    public async Task<IEnumerable<object>> GetAllInvoicePendingWithDetails(
+    public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
     ServerEntity server,
     ClientEntity clientItem,
     IDatabaseUtils databaseUtils,
-    CancellationToken cancellationToken,
-    string apiKey)
+    CancellationToken cancellationToken)
     {
-        var invoicesMap = new Dictionary<int, InvoiceFEPendingEntity>();
+        var invoicesMap = new Dictionary<int, CreateBilling>();
         using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
 
         try
         {
             await connection.OpenAsync(cancellationToken);
-
-            string query = @"
+            string invoicesQuery = @"
             SELECT 
                 v.id AS invoice_id,
                 v.identication,
@@ -42,93 +41,123 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 v.invoiceTaxExclusiveTotal,
                 v.invoiceTaxInclusiveTotal,
                 v.totalToPay,
-                v.send_dian,
-
-                d.id AS detail_id,
-                d.transaccion,
-                d.code,
-                d.type_item_identification_id,
-                d.description,
-                d.unit_measure_id,
-                d.base_quantity,
-                d.invoiced_quantity,
-                d.price_amount,
-                d.line_extension_amount,
-                d.percent,
-                d.tax_amount,
-                d.unit_price
+                v.send_dian
             FROM v_invoice v
             LEFT JOIN invoice_success i ON v.invoice = i.verify
-            INNER JOIN v_invoice_detail d ON v.invoice = d.transaccion
             WHERE i.verify IS NULL
-            AND v.transaction_date >= @date "
+              AND v.transaction_date >= @date
+              AND v.totalToPay <> 0"
                 + ((Automatic)clientItem.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
                 + " ORDER BY v.id ASC";
 
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
-
-            using var reader = await command.ExecuteReaderAsync(cancellationToken);
-
-            while (await reader.ReadAsync(cancellationToken))
+            using (var cmdInvoices = new MySqlCommand(invoicesQuery, connection))
             {
-                int invoiceId = reader.GetInt32("invoice_id");
+                cmdInvoices.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
 
-                if (!invoicesMap.ContainsKey(invoiceId))
+                using var reader = await cmdInvoices.ExecuteReaderAsync(cancellationToken);
+                while (await reader.ReadAsync(cancellationToken))
                 {
-                    bool addInvoice = ((Automatic)clientItem.Automatic == Automatic.No &&
-                                        Convert.ToInt32(reader["send_dian"]) == (int)Automatic.Yes)
-                                      || ((Automatic)clientItem.Automatic == Automatic.Yes &&
-                                          Convert.ToInt64(reader["totalToPay"]) > 0);
+                    int invoiceId = reader.GetInt32("invoice_id");
 
-                    if (!addInvoice)
-                        continue;
-
-                    var invoiceEntity = new InvoiceFEPendingEntity
+                    var invoice = new CreateBilling
                     {
-                        Id = invoiceId,
-                        Identication = reader["identication"].ToString(),
-                        Contact_name = reader["contact_name"].ToString(),
-                        Email = reader["email"].ToString(),
-                        Mobile = reader["mobile"].ToString(),
-                        City = reader["city"].ToString(),
-                        State = reader["state"].ToString(),
-                        Country = reader["country"].ToString(),
-                        Invoice = reader["invoice"].ToString(),
-                        Payment_status = reader["payment_status"].ToString(),
-                        Transaction_date = reader["transaction_date"] == DBNull.Value
-                            ? ""
-                            : Convert.ToDateTime(reader["transaction_date"]).ToString("yyyy-MM-dd"),
-                        AllowanceTotal = Convert.ToInt64(reader["allowanceTotal"]),
-                        InvoiceBaseTotal = Convert.ToInt64(reader["invoiceBaseTotal"]),
-                        InvoiceTaxExclusiveTotal = Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
-                        InvoiceTaxInclusiveTotal = Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
-                        TotalToPay = Convert.ToInt64(reader["totalToPay"]),
-                        SendDian = Convert.ToInt32(reader["send_dian"]),
-                        DetailsInvoicePendings = new List<DetailsInvoiceFEPendingEntity>()
+                        Number = reader["invoice"]?.ToString(),
+                    
+                        TransactionDate = reader.IsDBNull(reader.GetOrdinal("transaction_date"))
+                            ? DateTime.MinValue
+                            : reader.GetDateTime("transaction_date"),
+                        AllowanceTotal = reader.IsDBNull(reader.GetOrdinal("allowanceTotal")) ? 0L : Convert.ToInt64(reader["allowanceTotal"]),
+                        InvoiceBaseTotal = reader.IsDBNull(reader.GetOrdinal("invoiceBaseTotal")) ? 0L : Convert.ToInt64(reader["invoiceBaseTotal"]),
+                        InvoiceTaxExclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxExclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
+                        InvoiceTaxInclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxInclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
+                        TotalToPay = reader.IsDBNull(reader.GetOrdinal("totalToPay")) ? 0L : Convert.ToInt64(reader["totalToPay"]),
+
+                        CustomerEntity = new CustomerEntity
+                        {
+                            IdentificationNumber = reader["identication"]?.ToString(),
+                            Name = reader["contact_name"]?.ToString(),
+                            Email = reader["email"]?.ToString(),
+                            Phone = reader["mobile"]?.ToString(),
+                            City = reader["city"]?.ToString(),
+                            State = reader["state"]?.ToString(),
+                            Country = reader["country"]?.ToString()
+                        },
+
+                        ItemElectronicEntity = new List<ItemElectronicEntity>()
                     };
 
-                    invoicesMap.Add(invoiceId, invoiceEntity);
+                    invoicesMap[invoiceId] = invoice;
+                }
+            }
+
+           
+            if (invoicesMap.Count == 0)
+                return invoicesMap.Values.ToList();
+
+       
+            var invoiceIds = invoicesMap.Keys.ToList();
+            const int chunkSize = 1000;
+            for (int i = 0; i < invoiceIds.Count; i += chunkSize)
+            {
+                var chunk = invoiceIds.Skip(i).Take(chunkSize).ToList();
+
+              
+                var paramNames = chunk.Select((id, idx) => $"@id{idx}").ToList();
+                string inClause = string.Join(", ", paramNames);
+
+                string detailsQuery = $@"
+                SELECT 
+                    d.transaccion,
+                    d.code,
+                    d.type_item_identification_id,
+                    d.description,
+                    d.unit_measure_id,
+                    d.base_quantity,
+                    d.invoiced_quantity,
+                    d.price_amount,
+                    d.line_extension_amount,
+                    d.percent,
+                    d.tax_amount,
+                    d.unit_price
+                FROM v_invoice_detail d
+                WHERE d.transaccion IN ({inClause})
+                ORDER BY d.transaccion, d.id ASC"; 
+
+                using var cmdDetails = new MySqlCommand(detailsQuery, connection);
+                for (int j = 0; j < chunk.Count; j++)
+                {
+                    cmdDetails.Parameters.AddWithValue(paramNames[j], chunk[j]);
                 }
 
-                var detail = new DetailsInvoiceFEPendingEntity
+                using var readerDetails = await cmdDetails.ExecuteReaderAsync(cancellationToken);
+                while (await readerDetails.ReadAsync(cancellationToken))
                 {
-                    Id = reader.GetInt32("detail_id"),
-                    Transaccion = reader.GetInt32("transaccion"),
-                    Code = reader.GetInt32("code"),
-                    Type_item_identification_id = reader.GetInt32("type_item_identification_id"),
-                    Description = reader["description"].ToString(),
-                    Unit_measure_id = reader.GetInt32("unit_measure_id"),
-                    Base_quantity = reader.GetDouble("base_quantity"),
-                    Invoiced_quantity = reader.GetDouble("invoiced_quantity"),
-                    Price_amount = reader.GetDouble("price_amount"),
-                    Line_extension_amount = reader.GetDouble("line_extension_amount"),
-                    Percent = reader.GetDouble("percent"),
-                    Tax_amount = reader.GetDouble("tax_amount"),
-                    Unit_preci = reader.GetDouble("unit_price")
-                };
+                    int transaccion = readerDetails.GetInt32("transaccion");
 
-                invoicesMap[invoiceId].DetailsInvoicePendings.Add(detail);
+                    if (!invoicesMap.TryGetValue(transaccion, out var invoice))
+                    {
+                        
+                        continue;
+                    }
+
+                    var item = new ItemElectronicEntity
+                    {
+                        Transaccion = readerDetails.IsDBNull(readerDetails.GetOrdinal("transaccion")) ? 0 : readerDetails.GetInt32("transaccion"),
+                        Code = readerDetails.IsDBNull(readerDetails.GetOrdinal("code")) ? 0 : readerDetails.GetInt32("code"),
+                        TypeItemIdentificationId = readerDetails.IsDBNull(readerDetails.GetOrdinal("type_item_identification_id")) ? 0 : readerDetails.GetInt32("type_item_identification_id"),
+                        Description = readerDetails["description"]?.ToString(),
+                        UnitMeasureId = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_measure_id")) ? 0 : readerDetails.GetInt32("unit_measure_id"),
+                        BaseQuantity = readerDetails.IsDBNull(readerDetails.GetOrdinal("base_quantity")) ? 0.0 : readerDetails.GetDouble("base_quantity"),
+                        InvoicedQuantity = readerDetails.IsDBNull(readerDetails.GetOrdinal("invoiced_quantity")) ? 0.0 : readerDetails.GetDouble("invoiced_quantity"),
+                        PriceAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("price_amount")) ? 0.0 : readerDetails.GetDouble("price_amount"),
+                        LineExtensionAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_extension_amount")) ? 0.0 : readerDetails.GetDouble("line_extension_amount"),
+                        Percent = readerDetails.IsDBNull(readerDetails.GetOrdinal("percent")) ? 0.0 : readerDetails.GetDouble("percent"),
+                        TaxAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_amount")) ? 0.0 : readerDetails.GetDouble("tax_amount"),
+                        UnitPrice = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price")) ? 0.0 : readerDetails.GetDouble("unit_price")
+                    };
+
+                    invoice.ItemElectronicEntity!.Add(item);
+                }
             }
 
             return invoicesMap.Values.ToList();
@@ -138,7 +167,6 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
             throw new Exception("Error connecting to the database", ex);
         }
     }
-
 
 
 }

@@ -2,13 +2,13 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Poliedro.Billing.Application.Helper.EmailBuilder;
 using Poliedro.Billing.Application.SendEmail.Dtos;
-using Poliedro.Billing.Domain.BillingPos;
-using Poliedro.Billing.Domain.BillingPos.Ports;
+using Poliedro.Billing.Application.SendEmail.Ports;
+using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 using Poliedro.Billing.Domain.Resolution.Enums;
-using Poliedro.Billing.Domain.SendEmail.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using System.Net.Http.Headers;
 using System.Text;
@@ -74,11 +74,11 @@ public class BillingPosService(
                         },
                         payPointInfo = new PayPointInfoEntity
                         {
-                            code = "000001",
-                            address = "Direccion Principal",
-                            cashierName = "Cajero de Turno",
-                            payPointType = "Caja Auxiliar",
-                            saleCode = "V2398123",
+                            Code = "000001",
+                            Address = "Direccion Principal",
+                            CashierName = "Cajero de Turno",
+                            PayPointType = "Caja Auxiliar",
+                            SaleCode = "V2398123",
                         },
                         invoiceBaseTotal = item.InvoiceBaseTotal.ToString(),
                         invoiceTaxExclusiveTotal = item.InvoiceTaxExclusiveTotal.ToString(),

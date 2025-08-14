@@ -1,4 +1,4 @@
-using Poliedro.Billing.Domain.BillingPos.Ports;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.FERetail.Ports;
 

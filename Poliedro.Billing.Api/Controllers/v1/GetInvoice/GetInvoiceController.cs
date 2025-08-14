@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Application.Common.Features;
-using Poliedro.Billing.Application.GetInvoice.Queries.GetByIdGetInvoice;
+using Poliedro.Billing.Application.GetInvoice.Queries;
 
 namespace Poliedro.Billing.Api.Controllers.v1.GetInvoice
 {

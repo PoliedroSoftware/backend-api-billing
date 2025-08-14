@@ -1,0 +1,9 @@
+﻿
+using Poliedro.Billing.Domain.Client.Entities;
+
+namespace Poliedro.Billing.Domain.Billing.Ports;
+
+public interface IInvoicePos
+{
+    Task<IEnumerable<InvoiceEntity>> GetInvoicesAsync(string connectionString, CancellationToken cancellationToken, ClientEntity client);
+}

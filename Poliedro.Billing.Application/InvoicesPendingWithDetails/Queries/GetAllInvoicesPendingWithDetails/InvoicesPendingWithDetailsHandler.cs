@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using Poliedro.Billing.Application.InvoicesPendingWithDetails.Dtos;
+using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
@@ -12,28 +12,20 @@ public class InvoicesPendingWithDetailsHandler(
     IMapper mapper,
     IDatabaseUtils databaseUtils,
     IInvoicesPendingWithDetailsStrategyFactory _strategyFactory
-    ) : IRequestHandler
-    <InvoicesPendingWithDetailsQuery,
-    IEnumerable<object>>
+    ) : IRequestHandler<InvoicesPendingWithDetailsQuery, IEnumerable<CreateBillingDTO>> 
 {
-    public async Task<IEnumerable<object>> Handle(InvoicesPendingWithDetailsQuery request,CancellationToken cancellationToken)
+    public async Task<IEnumerable<CreateBillingDTO>> Handle(InvoicesPendingWithDetailsQuery request,CancellationToken cancellationToken)
     {
         var client = await clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
 
-        if (client == null) throw new KeyNotFoundException("Cliente no encontrado.");
-
         var repository = _strategyFactory.GetStrategy((Domain.InvoicesPendingWithDetails.Enums.ResolutionType)client.Value.DianResolution.ResolutionType);
-
 
         var data = await repository.GetAllInvoicePendingWithDetails(
         client.Value.Server,
         client.Value,
         databaseUtils,
-        cancellationToken,
-        request.ApiKey);
+        cancellationToken);
 
-        return mapper.Map<IEnumerable<object>>(data);
-
-
+        return mapper.Map<IEnumerable<CreateBillingDTO>>(data);
     }
 }

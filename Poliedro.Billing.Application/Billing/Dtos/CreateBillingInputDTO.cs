@@ -1,0 +1,33 @@
+﻿namespace Poliedro.Billing.Application.Billing.Dtos;
+public record CreateBillingInputDTO(
+        DateTime Date,
+        DateTime Time,
+        string? SendToEmail,
+        SoftwareManufacturerDTO? SoftwareManufacturer,
+        PayPointInfoDTO? PayPointInfo,
+        string Number,
+        string? Prefix,
+        DateTime? TransactionDate,
+        OrderReferenceDTO? OrderReference,
+        bool? SendEmail,
+        AttachmentDTO? Attachment1,
+        AttachmentDTO? Attachment2,
+        CustomerBillingDTO? CustomerEntity,
+        PaymentDTO? PaymentEntity,
+        List<GeneralAllowanceDTO>? GeneralAllowanceEntity,
+        List<ItemElectronicDTO>? ItemElectronicEntity,
+        string? Resolution,
+        string? ResolutionText,
+        string? HeadNote,
+        string? FootNote,
+        string? Notes,
+        double AllowanceTotal,
+        double InvoiceBaseTotal,
+        double InvoiceTaxExclusiveTotal,
+        double InvoiceTaxInclusiveTotal,
+        double TotalToPay,
+        List<AllTaxTotalDTO>? AllTaxTotalEntity,
+        List<AllHoldingsTaxTotalDTO>? AllHoldingsTaxTotalEntity,
+        double FinalTotalToPay
+
+    );

@@ -1,82 +1,51 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Poliedro.Billing.Api.Common.Extensions;
-using Poliedro.Billing.Application.BillingPos.Commands.CreateBillingPos;
+using Microsoft.IdentityModel.Tokens;
+using Poliedro.Billing.Api.Common.Helpers;
+using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
+using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Common.Features;
 using Swashbuckle.AspNetCore.Annotations;
-
+using System.ComponentModel.DataAnnotations;
 namespace Poliedro.Billing.Api.Controllers.v1.Billing;
 
 [Route("api/v1/billing")]
 [ApiController]
-public class BillingController(IMediator mediator, IMockPendingInvoiceService mockPendingInvoiceService) : ControllerBase
+public class BillingController(IMediator mediator) : ControllerBase
 {
     [SwaggerOperation(Summary = "Create new Billing")]
-    [SwaggerResponse(StatusCodes.Status200OK, "The operation was successful.", typeof(CreateBillingPosCommand))]
-    [SwaggerResponse(StatusCodes.Status400BadRequest, "Incorrect request parameters.", typeof(ProblemDetails))]
-    [SwaggerResponse(StatusCodes.Status401Unauthorized, "The request lacks valid authentication credentials.", typeof(ProblemDetails))]
-    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error processing the request.", typeof(ProblemDetails))]
+    [SwaggerResponse(StatusCodes.Status200OK, "The operation was successful.")]
+    [SwaggerResponse(StatusCodes.Status400BadRequest, "Incorrect request parameters.")]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "The request lacks valid authentication credentials.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Error processing the request.")]
+    [Produces("application/json")]
     [HttpPost]
-    public async Task<IResult> Create(
-        [FromBody] CreateBillingPosCommand createBillingCommand)
+    public async Task<IActionResult> CreateBillingCommand([FromBody][Required] IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(createBillingCommand);
-        return result.Match(onSuccess => TypedResults.Ok());
-    }
+        var token = TokenHelper.ExtractBearerToken(Request);
+        if (string.IsNullOrEmpty(token))
+            return Unauthorized("Authorization header is missing or invalid.");
 
-    [SwaggerOperation(Summary = "Get mock pending invoices")]
-    [SwaggerResponse(StatusCodes.Status200OK, "List of mock invoices", typeof(List<PendingInvoice>))]
-    [HttpGet("mock-pending-invoices")]
-    public IActionResult GetMockPendingInvoices()
-    {
-        var invoices = mockPendingInvoiceService.GenerateMockInvoices();
-        return Ok(invoices);
-    }
-}
-public interface IMockPendingInvoiceService
-{
-    List<PendingInvoice> GenerateMockInvoices(int count = 1000);
-}
-public class PendingInvoice
-{
-    public DateTime Date { get; set; }
-    public int InvoiceNumber { get; set; }
-    public string Client { get; set; }
-    public decimal Amount { get; set; }
-}
-public class MockBillingService : IMockPendingInvoiceService
-{
-    private static readonly Random _random = new();
-    private static readonly List<string> _clients = new()
-    {
-        "John Doe", "Jane Smith", "Michael Johnson", "Emily Davis",
-        "David Wilson", "Sarah Brown", "James Anderson", "Jessica Martinez",
-        "Robert Taylor", "Laura Thomas"
-    };
-
-    public List<PendingInvoice> GenerateMockInvoices(int count = 1000)
-    {
-        List<PendingInvoice> invoices = new();
-        DateTime startDate = DateTime.Now.AddYears(-1);
-        DateTime endDate = DateTime.Now;
-
-        for (int i = 0; i < count; i++)
+        if (invoices.IsNullOrEmpty())
         {
-            invoices.Add(new PendingInvoice
-            {
-                Date = RandomDate(startDate, endDate),
-                InvoiceNumber = _random.Next(100000, 999999),
-                Client = _clients[_random.Next(_clients.Count)],
-                Amount = Math.Round((decimal)(_random.NextDouble() * (5000 - 50) + 50), 2)
-            });
+            var emptyResponse = ResponseApiService.Response(
+                statusCode: StatusCodes.Status200OK,
+                message: "No invoices.",
+                data: invoices
+            );
+            return Ok(emptyResponse);
         }
+        var command = new CreateBillingCommand(invoices, token);
 
-        return invoices;
-    }
+        var result = await mediator.Send(command, cancellationToken);
 
-    private static DateTime RandomDate(DateTime start, DateTime end)
-    {
-        int range = (end - start).Days;
-        return start.AddDays(_random.Next(range));
+        var response = ResponseApiService.Response(
+                statusCode: StatusCodes.Status200OK,
+                message: "Invoice processing result.",
+                data: result
+        );
+        return Ok(response);
     }
 }
+
 

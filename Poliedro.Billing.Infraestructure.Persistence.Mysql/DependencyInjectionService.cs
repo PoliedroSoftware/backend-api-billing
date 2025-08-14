@@ -4,12 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.NotifyResolution.Services;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.InvoiceDetailElectronic.Ports;
-using Poliedro.Billing.Domain.InvoicePendingWithDetails.Ports;
+using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.InvoicePos.DomainService;
 using Poliedro.Billing.Domain.InvoicePos.DomainService.Impl;
 using Poliedro.Billing.Domain.InvoicePos.Ports;
-using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
-using Poliedro.Billing.Domain.NotifyResolution.Ports;
 using Poliedro.Billing.Domain.NotifyResolution.Services;
 using Poliedro.Billing.Domain.PdfInvoice.Service;
 using Poliedro.Billing.Domain.PedingInvoice.DomainPedingInvoice;
@@ -26,6 +24,8 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDeta
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
+using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 
 
 
@@ -64,6 +64,11 @@ public static class DependencyInjectionService
         services.AddTransient<InvoicesPendingWithDetailsPOSRepository>();
         services.AddTransient<IInvoicesPendingWithDetailsStrategyFactory, InvoicesPendingWithDetailsStrategyFactory>();
 
+        
+        services.AddTransient<IPrepareItemBilling, PrepareItemElectronic>();
+        services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
+
+        //services.AddTransient<IGetLastInvoiceBilling>();
 
 
         return services;

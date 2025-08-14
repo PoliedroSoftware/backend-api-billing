@@ -32,7 +32,7 @@ builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 
-builder.Services.AddScoped<IMockPendingInvoiceService, MockBillingService>();
+//builder.Services.AddScoped<IMockPendingInvoiceService, MockBillingService>();
 builder.Services.AddHttpClient<ICreditNoteDomainService, CreditNoteDomainService>(client =>
 {
     client.BaseAddress = new Uri("http://159.89.239.32:5009"); 
