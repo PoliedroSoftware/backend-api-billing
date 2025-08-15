@@ -28,11 +28,9 @@ namespace WorkerServiceBilling
                         var clientDomainService = scope.ServiceProvider.GetRequiredService<IClientDomainService>();
                         var clients = await clientDomainService.GetAllAsync(cancellationToken);
                         var billingService = scope.ServiceProvider.GetRequiredService<IBillingService>();
-                        var retailService = scope.ServiceProvider.GetRequiredService<IFERetailService>();
-
+                      
                         if (clients.Value is not null)
                         {
-                            var retail = await retailService.CreateElectronicInvoicesAsync(clients.Value!, cancellationToken);
                             var eds = await billingService.CreateInvoicesPosAsync(clients.Value!, cancellationToken);
 
                         }
