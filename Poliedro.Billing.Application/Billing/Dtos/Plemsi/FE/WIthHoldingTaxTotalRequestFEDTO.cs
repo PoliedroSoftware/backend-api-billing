@@ -1,5 +1,5 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-public record WIthHoldingTaxTotalRequestDTO
+﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.FE;
+public record WIthHoldingTaxTotalRequestFEDTO
 {
     public int tax_id { get; init; }
     public int percent {  get; init; }

@@ -1,5 +1,5 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-public record GeneralAllowanceRequestDTO
+﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.FE;
+public record GeneralAllowanceRequestFEDTO
 {
      public string? allowance_charge_reason {  get; init; }
      public double? allowance_percent { get; init; }

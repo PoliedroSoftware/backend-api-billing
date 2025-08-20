@@ -1,5 +1,5 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-public record CustomerRequestDTO
+﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.FE;
+public record CustomerRequestFEDTO
 {
     public required string identification_number {  get; init; }
     public string? dv {  get; init; }

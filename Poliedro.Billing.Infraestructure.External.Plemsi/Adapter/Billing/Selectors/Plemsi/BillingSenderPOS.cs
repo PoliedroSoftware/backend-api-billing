@@ -8,6 +8,13 @@ public class BillingSenderPOS : IBillingSender
 {
     public Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient clientInfo, CancellationToken cancellationToken)
     {
+        var responses = new List<ApiResponseFERetailPos>();
+
+        foreach (var invoice in request.Invoices)
+        {
+
+        }
+
         throw new NotImplementedException();
     }
 }

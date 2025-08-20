@@ -1,5 +1,5 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-public record TaxTotalRequestDTO
+﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.FE;
+public record TaxTotalRequestFEDTO
 {
     public int tax_id { get; init; }
     public double percent { get; init; }

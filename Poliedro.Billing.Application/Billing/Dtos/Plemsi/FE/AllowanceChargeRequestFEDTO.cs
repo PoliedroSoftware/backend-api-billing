@@ -1,5 +1,5 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi;
-public record AllowanceChargeRequestDTO
+﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.FE;
+public record AllowanceChargeRequestFEDTO
 {
     public bool charge_indicator {  get; init; }
     public string? allowance_charge_reason { get; init; }

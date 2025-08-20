@@ -21,7 +21,7 @@ public class BillingSenderFE(
         {
             try
             {
-                SenderRequestDTO? senderRequestDTO = invoice as SenderRequestDTO;
+                SenderRequestFEDTO? senderRequestDTO = invoice as SenderRequestFEDTO;
 
                 int LastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(ClientInfo, cancellationToken);
 
