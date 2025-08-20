@@ -11,7 +11,7 @@ public class InvoicePosEntity
     public required string prefix { get; set; }
     public string head_note { get; set; }
     public string foot_note { get; set; }
-    public  PayPointInfoPosEntity payPointInfo { get; set; }
+    public PayPointInfoPosEntity payPointInfo { get; set; }
     public PaymentPosEntity payment { get; set; }
     public required string invoiceBaseTotal { get; set; }
     public required string invoiceTaxExclusiveTotal { get; set; }
@@ -19,9 +19,5 @@ public class InvoicePosEntity
     public string totalToPay { get; set; }
     public List<TaxTotalPosEntity> allTaxTotals { get; set; }
     public List<ItemFERetailEntity> items { get; set; }
-    public List<TaxItemPosEntity> tax_totals { get; set; }
-
-
-
 
 }
