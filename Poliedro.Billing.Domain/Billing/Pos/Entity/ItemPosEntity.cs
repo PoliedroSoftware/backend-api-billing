@@ -1,7 +1,7 @@
 ﻿
 
 namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
-public class ItemPosRetailEntity
+public class ItemPosEntity
 {
    
     public int unit_measure_id { get; set; }

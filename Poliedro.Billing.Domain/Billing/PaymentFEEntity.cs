@@ -2,7 +2,7 @@
 
 namespace Poliedro.Billing.Domain.Billing;
 
-public class PaymentPosEntity
+public class PaymentFEEntity
 {
     [JsonPropertyName("payment_form_id")]
     public int payment_form_id { get; set; }

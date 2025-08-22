@@ -1,7 +1,9 @@
 using AutoMapper;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Billing.Dtos.Plemsi.FE;
+using Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
 using Poliedro.Billing.Domain.Billing;
+using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using Poliedro.Billing.Domain.FERetail.Entity;
 
 namespace Poliedro.Billing.Application.Billing.AutoMappers;
@@ -23,10 +25,11 @@ public class BillingAutoMapper : Profile
         CreateMap<GeneralAllowanceEntity, GeneralAllowanceDTO>().ReverseMap();
         CreateMap<ItemElectronicEntity, ItemElectronicDTO>().ReverseMap();
         CreateMap<AllowanceChargeEntity, AllowanceChargeDTO>().ReverseMap();
-        CreateMap<TaxTotalEntity, TaxTotalDTO>().ReverseMap();
+        CreateMap<Domain.FERetail.Entity.TaxTotalEntity, TaxTotalDTO>().ReverseMap();
         CreateMap<WIthHoldingTaxTotalEntity, WIthHoldingTaxTotalDTO>().ReverseMap();
         CreateMap<AllTaxTotalEntity, AllTaxTotalDTO>().ReverseMap();
         CreateMap<AllHoldingsTaxTotalEntity, AllHoldingsTaxTotalDTO>().ReverseMap();
+       
 
 
 
@@ -98,7 +101,7 @@ public class BillingAutoMapper : Profile
             .ForMember(dest => dest.multiplier_factor_numeric, opt => opt.MapFrom(src => src.MultiplierFactorNumeric))
             .ForMember(dest => dest.amount, opt => opt.MapFrom(src => src.Amount))
             .ForMember(dest => dest.base_amount, opt => opt.MapFrom(src => src.BaseAmount));
-        CreateMap<TaxTotalEntity, TaxTotalRequestFEDTO>()
+        CreateMap<Domain.FERetail.Entity.TaxTotalEntity, TaxTotalRequestFEDTO>()
             .ForMember(dest => dest.tax_id, opt => opt.MapFrom(src => src.TaxId))
             .ForMember(dest => dest.percent, opt => opt.MapFrom(src => src.Percent))
             .ForMember(dest => dest.tax_amount, opt => opt.MapFrom(src => src.TaxAmount))
@@ -121,6 +124,73 @@ public class BillingAutoMapper : Profile
         CreateMap<CustomSubtotalEntity, CustomSubtotalRequestFEDTO>()
             .ForMember(dest => dest.concept, opt => opt.MapFrom(src => src.Concept))
             .ForMember(dest => dest.amount, opt => opt.MapFrom(src => src.Amount));
+
+        //************************************************************ Pos ***************************************************************
+
+
+        CreateMap<InvoicePosEntity, InvoiceRequestPosDto>()
+            .ForMember(dest => dest.number, opt => opt.MapFrom(src => src.number))
+            .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.date))
+            .ForMember(dest => dest.time, opt => opt.MapFrom(src => src.time))
+            .ForMember(dest => dest.softwareManufacturer, opt => opt.MapFrom(src => src.softwareManufacturer))
+            .ForMember(dest => dest.sendToEmail, opt => opt.MapFrom(src => src.sendToEmail))
+            .ForMember(dest => dest.resolution, opt => opt.MapFrom(src => src.resolution))
+            .ForMember(dest => dest.prefix, opt => opt.MapFrom(src => src.prefix))
+            .ForMember(dest => dest.head_note, opt => opt.MapFrom(src => src.head_note))
+            .ForMember(dest => dest.foot_note, opt => opt.MapFrom(src => src.foot_note))
+            .ForMember(dest => dest.payPointInfo, opt => opt.MapFrom(src => src.payPointInfo))
+            .ForMember(dest => dest.payment, opt => opt.MapFrom(src => src.payment))
+            .ForMember(dest => dest.invoiceBaseTotal, opt => opt.MapFrom(src => src.invoiceBaseTotal))
+            .ForMember(dest => dest.invoiceTaxExclusiveTotal, opt => opt.MapFrom(src => src.invoiceTaxExclusiveTotal))
+            .ForMember(dest => dest.invoiceTaxInclusiveTotal, opt => opt.MapFrom(src => src.invoiceTaxInclusiveTotal))
+            .ForMember(dest => dest.totalToPay, opt => opt.MapFrom(src => src.totalToPay))
+            .ForMember(dest => dest.allTaxTotals, opt => opt.MapFrom(src => src.allTaxTotals))
+            .ForMember(dest => dest.items, opt => opt.MapFrom(src => src.items));
+
+
+        CreateMap<ItemPosEntity, ItemRequestPosDto>()
+
+            .ForMember(dest => dest.unit_measure_id, opt => opt.MapFrom(src => src.unit_measure_id))
+            .ForMember(dest => dest.invoiced_quantity, opt => opt.MapFrom(src => src.invoiced_quantity))
+            .ForMember(dest => dest.line_extension_amount, opt => opt.MapFrom(src => src.line_extension_amount))
+            .ForMember(dest => dest.free_of_charge_indicator, opt => opt.MapFrom(src => src.free_of_charge_indicator))
+            .ForMember(dest => dest.tax_totals, opt => opt.MapFrom(src => src.tax_totals))
+            .ForMember(dest => dest.description, opt => opt.MapFrom(src => src.description))
+            .ForMember(dest => dest.notes, opt => opt.MapFrom(src => src.notes))
+            .ForMember(dest => dest.code, opt => opt.MapFrom(src => src.code))
+            .ForMember(dest => dest.type_item_identification_id, opt => opt.MapFrom(src => src.type_item_identification_id))
+            .ForMember(dest => dest.price_amount, opt => opt.MapFrom(src => src.price_amount))
+            .ForMember(dest => dest.base_quantity, opt => opt.MapFrom(src => src.base_quantity));
+
+        CreateMap<PaymentPosEntity, PaymentRequestPosDto>()
+            .ForMember(dest => dest.payment_form_id, opt => opt.MapFrom(src => src.payment_form_id))
+            .ForMember(dest => dest.payment_method_id, opt => opt.MapFrom(src => src.payment_method_id))
+            .ForMember(dest => dest.payment_due_date, opt => opt.MapFrom(src => src.payment_due_date))
+            .ForMember(dest => dest.duration_measure, opt => opt.MapFrom(src => src.duration_measure));
+
+        CreateMap<PayPointInfoPosEntity, PayPointInfoRequestPosDto>()
+            .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Code))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+            .ForMember(dest => dest.CashierName, opt => opt.MapFrom(src => src.CashierName))
+            .ForMember(dest => dest.PayPointType, opt => opt.MapFrom(src => src.PayPointType))
+            .ForMember(dest => dest.SaleCode, opt => opt.MapFrom(src => src.SaleCode));
+
+        CreateMap<SoftwareManufacturerPosEntity, SoftwareManufacturerRequestPosDto>()
+            .ForMember(dest => dest.ownerName, opt => opt.MapFrom(src => src.ownerName))
+            .ForMember(dest => dest.softwareName, opt => opt.MapFrom(src => src.softwareName))
+            .ForMember(dest => dest.companyName, opt => opt.MapFrom(src => src.companyName));
+
+        CreateMap<TaxItemPosEntity, TaxItemRequestPosDto>()
+            .ForMember(dest => dest.tax_id, opt => opt.MapFrom(src => src.tax_id))
+            .ForMember(dest => dest.tax_amount, opt => opt.MapFrom(src => src.tax_amount))
+            .ForMember(dest => dest.percent, opt => opt.MapFrom(src => src.percent))
+            .ForMember(dest => dest.taxable_amount, opt => opt.MapFrom(src => src.taxable_amount));
+
+        CreateMap<TaxTotalPosEntity, TaxTotalRequestPosDto>()
+            .ForMember(dest => dest.tax_id, opt => opt.MapFrom(src => src.tax_id))
+            .ForMember(dest => dest.tax_amount, opt => opt.MapFrom(src => src.tax_amount))
+            .ForMember(dest => dest.percent, opt => opt.MapFrom(src => src.percent))
+            .ForMember(dest => dest.taxable_amount, opt => opt.MapFrom(src => src.taxable_amount));
 
     }
 }
