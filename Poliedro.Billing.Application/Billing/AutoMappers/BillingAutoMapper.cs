@@ -5,6 +5,7 @@ using Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using TaxTotalEntity = Poliedro.Billing.Domain.FERetail.Entity.TaxTotalEntity;
 
 namespace Poliedro.Billing.Application.Billing.AutoMappers;
 
@@ -25,7 +26,7 @@ public class BillingAutoMapper : Profile
         CreateMap<GeneralAllowanceEntity, GeneralAllowanceDTO>().ReverseMap();
         CreateMap<ItemElectronicEntity, ItemElectronicDTO>().ReverseMap();
         CreateMap<AllowanceChargeEntity, AllowanceChargeDTO>().ReverseMap();
-        CreateMap<Domain.FERetail.Entity.TaxTotalEntity, TaxTotalDTO>().ReverseMap();
+        CreateMap<TaxTotalEntity, TaxTotalDTO>().ReverseMap();
         CreateMap<WIthHoldingTaxTotalEntity, WIthHoldingTaxTotalDTO>().ReverseMap();
         CreateMap<AllTaxTotalEntity, AllTaxTotalDTO>().ReverseMap();
         CreateMap<AllHoldingsTaxTotalEntity, AllHoldingsTaxTotalDTO>().ReverseMap();
@@ -101,7 +102,7 @@ public class BillingAutoMapper : Profile
             .ForMember(dest => dest.multiplier_factor_numeric, opt => opt.MapFrom(src => src.MultiplierFactorNumeric))
             .ForMember(dest => dest.amount, opt => opt.MapFrom(src => src.Amount))
             .ForMember(dest => dest.base_amount, opt => opt.MapFrom(src => src.BaseAmount));
-        CreateMap<Domain.FERetail.Entity.TaxTotalEntity, TaxTotalRequestFEDTO>()
+        CreateMap<TaxTotalEntity, TaxTotalRequestFEDTO>()
             .ForMember(dest => dest.tax_id, opt => opt.MapFrom(src => src.TaxId))
             .ForMember(dest => dest.percent, opt => opt.MapFrom(src => src.Percent))
             .ForMember(dest => dest.tax_amount, opt => opt.MapFrom(src => src.TaxAmount))
@@ -128,7 +129,7 @@ public class BillingAutoMapper : Profile
         //************************************************************ Pos ***************************************************************
 
 
-        CreateMap<InvoicePosEntity, InvoiceRequestPosDto>()
+        CreateMap<InvoiceBillingPosEntity, InvoiceRequestPosDto>()
             .ForMember(dest => dest.number, opt => opt.MapFrom(src => src.number))
             .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.date))
             .ForMember(dest => dest.time, opt => opt.MapFrom(src => src.time))

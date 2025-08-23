@@ -1,6 +1,5 @@
-﻿
-namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
-public class InvoicePosEntity
+﻿namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
+public class InvoiceBillingPosEntity
 {
     public int number { get; set; }
     public required string date { get; set; }

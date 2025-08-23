@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using Poliedro.Billing.Domain.FERetail.Entity;
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 public class PrepareBillingPOS(
