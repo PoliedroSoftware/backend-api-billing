@@ -5,6 +5,7 @@ using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
@@ -45,7 +46,7 @@ public class BillingPosService(
                 {
                     invoice = 0;
                     int InvoiceNumber = int.Parse(item.Number[^6..]);
-                    invoice = await invoiceLastRepository.GetInvoiceLastAsync(connectionString, clientItem, cancellationToken);
+                    //invoice = await invoiceLastRepository.GetInvoiceLastAsync(connectionString, clientItem, cancellationToken);
                     if (invoice == 0) return billingResponse;
                     DateTime date = DateTime.Now;
                     string formattedDate = date.ToString("yyyy-MM-dd");
@@ -74,11 +75,11 @@ public class BillingPosService(
                         },
                         payPointInfo = new PayPointInfoEntity
                         {
-                            Code = "000001",
-                            Address = "Direccion Principal",
-                            CashierName = "Cajero de Turno",
-                            PayPointType = "Caja Auxiliar",
-                            SaleCode = "V2398123",
+                            code = "000001",
+                            address = "Direccion Principal",
+                            cashierName = "Cajero de Turno",
+                            payPointType = "Caja Auxiliar",
+                            saleCode = "V2398123",
                         },
                         invoiceBaseTotal = item.InvoiceBaseTotal.ToString(),
                         invoiceTaxExclusiveTotal = item.InvoiceTaxExclusiveTotal.ToString(),

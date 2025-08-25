@@ -2,7 +2,7 @@
 
 namespace Poliedro.Billing.Domain.Billing;
 
-public class TaxTotalPosEntity
+public class TaxTotalEntity
 {
     [JsonPropertyName("tax_id")]
     public int tax_id { get; set; }

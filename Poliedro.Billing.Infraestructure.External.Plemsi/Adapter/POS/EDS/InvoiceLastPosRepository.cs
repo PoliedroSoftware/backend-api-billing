@@ -1,7 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.Entities;
+using Poliedro.Billing.Domain.Common.Enum;
 using System.Net.Http.Headers;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
@@ -10,14 +11,39 @@ public class InvoiceLastPosRepository(IConfiguration config): IInvoiceLastPos
 {
     private static readonly HttpClient client = new();
 
-    public async Task<int> GetInvoiceLastAsync(string connectionString, ClientEntity clientEntity, CancellationToken cancellationToken)
+    public async Task<int> GetInvoiceLastAsync(BillingInfoClient clientInfo, CancellationToken cancellationToken)
     {
         int maxNumeroFactura = 1;
         DateTime today = DateTime.Now;
         string formattedDate = today.ToString("yyyy-MM-dd");
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientEntity.ApiKey);
-        var url = bool.Parse(config["Enviroment:Production"]!) ? config["ApiPlemsi:PosLastInvoiceUrl"] : config["ApiPlemsiQa:PosLastInvoiceUrl"];
-        string apiUrl = $"{url}{clientEntity.DianResolution.Prefix}";
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientInfo.ApiKey);
+
+        var isProduction = bool.Parse(config["Enviroment:Production"]!);
+        string baseUrl;
+
+        if (!Enum.TryParse(clientInfo.MultipleResolution.ToString(), out MultipleResolution resolution))
+        {
+            resolution = MultipleResolution.Single;
+        }
+
+        switch (resolution)
+        {
+            case MultipleResolution.Multiple:
+                baseUrl = isProduction
+                    ? config["ApiPlemsi:PosLastInvoiceUrlMultipleResolution"]
+                    : config["ApiPlemsiQa:PosLastInvoiceUrlMultipleResolution"];
+                break;
+
+            default:
+                baseUrl = isProduction
+                    ? config["ApiPlemsi:PosLastInvoiceUrl"]
+                    : config["ApiPlemsiQa:PosLastInvoiceUrl"];
+                break;
+        }
+
+
+        string apiUrl = $"{baseUrl}{clientInfo.Prefix}";
+
         HttpResponseMessage response = await client.GetAsync(apiUrl);
         if (response.IsSuccessStatusCode)
         {
@@ -53,4 +79,6 @@ public class InvoiceLastPosRepository(IConfiguration config): IInvoiceLastPos
         }
         return maxNumeroFactura;
     }
+
+
 }

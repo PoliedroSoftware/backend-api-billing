@@ -172,7 +172,7 @@ public class PrepareBillingFE(
                     customSubtotals = [],
                     finalTotalToPay = invoice.TotalToPay
                 };
-                var dto = _mapper.Map<SenderRequestDTO>(Data);
+                var dto = _mapper.Map<SenderRequestFEDTO>(Data);
 
                 results.Add((invoice, dto));
             }

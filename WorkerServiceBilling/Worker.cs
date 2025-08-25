@@ -1,6 +1,5 @@
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
-using Poliedro.Billing.Domain.FERetail.Ports;
 
 namespace WorkerServiceBilling
 {
@@ -19,28 +18,28 @@ namespace WorkerServiceBilling
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                if (_logger.IsEnabled(LogLevel.Information))
-                {
-                    using (var scope = _serviceProvider.CreateScope()) 
-                    {
-                        var clientDomainService = scope.ServiceProvider.GetRequiredService<IClientDomainService>();
-                        var clients = await clientDomainService.GetAllAsync(cancellationToken);
-                        var billingService = scope.ServiceProvider.GetRequiredService<IBillingService>();
+            //while (!cancellationToken.IsCancellationRequested)
+            //{
+            //    if (_logger.IsEnabled(LogLevel.Information))
+            //    {
+            //        using (var scope = _serviceProvider.CreateScope()) 
+            //        {
+            //            var clientDomainService = scope.ServiceProvider.GetRequiredService<IClientDomainService>();
+            //            var clients = await clientDomainService.GetAllAsync(cancellationToken);
+            //            var billingService = scope.ServiceProvider.GetRequiredService<IBillingService>();
                       
-                        if (clients.Value is not null)
-                        {
-                            var eds = await billingService.CreateInvoicesPosAsync(clients.Value!, cancellationToken);
+            //            if (clients.Value is not null)
+            //            {
+                           
 
-                        }
+            //            }
 
-                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                    }
-                }
+            //            _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+            //        }
+            //    }
 
-                await Task.Delay(90000, cancellationToken); 
-            }
+            //    await Task.Delay(90000, cancellationToken); 
+            //}
         }
     }
 }

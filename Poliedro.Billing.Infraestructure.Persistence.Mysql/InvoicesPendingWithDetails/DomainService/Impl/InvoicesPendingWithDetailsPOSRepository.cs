@@ -52,7 +52,7 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
             WHERE i.verify IS NULL
             AND v.date >= @date
             AND resolutionType= 'POS'
-            ORDER BY v.number DESC";
+            ORDER BY v.number ASC";
 
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
@@ -64,7 +64,8 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
 
                 if (!invoicesMap.TryGetValue(invoiceId, out var invoice))
                 {
-                    bool addInvoice = (reader.GetDecimal(5) > 0);
+                    bool addInvoice = !string.IsNullOrEmpty(reader.GetString("number"));
+
 
                     if (!addInvoice)
                         continue;
@@ -72,7 +73,7 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
                     invoice = new CreateBilling
                     {
                         Date = reader.GetDateTime("Date"),
-                        Time = reader.GetDateTime("Time"),
+                        //Time = reader.GetTimeSpan("Time"),
                         Number = reader["number"].ToString(),
                         Prefix = reader["prefix"].ToString(),
                         Resolution = reader["Resolution"].ToString(),
@@ -81,6 +82,7 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
                         InvoiceBaseTotal = Convert.ToInt64(reader["invoiceBaseTotal"]),
                         InvoiceTaxExclusiveTotal = Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
                         InvoiceTaxInclusiveTotal = Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
+                        TotalToPay = reader.IsDBNull(reader.GetOrdinal("totalToPay")) ? 0L : Convert.ToInt64(reader["totalToPay"]),
                         ItemElectronicEntity = new List<ItemElectronicEntity>()
                     };
 
@@ -91,7 +93,7 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
                 var item = new ItemElectronicEntity
                 {
                     Description = reader["description"].ToString(),
-                    Code = (int?)reader["code"],
+                    Code = int.TryParse(reader["code"]?.ToString(), out var codeValue) ? codeValue : (int?)null,
                     BaseQuantity = reader.GetDouble("base_quantity"),
                     InvoicedQuantity = reader.GetDouble("invoiced_quantity"),
                     PriceAmount = reader.GetDouble("price_amount"),

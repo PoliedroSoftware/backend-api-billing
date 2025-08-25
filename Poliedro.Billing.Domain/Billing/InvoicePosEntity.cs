@@ -1,4 +1,5 @@
 ﻿
+using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using System.Text.Json.Serialization;
 
 namespace Poliedro.Billing.Domain.Billing;

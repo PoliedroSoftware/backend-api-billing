@@ -5,7 +5,7 @@ namespace Poliedro.Billing.Domain.FERetail.Entity;
 public class CustomerEntity
 {
     [JsonPropertyName("identification_number")]
-    public required string IdentificationNumber { get; set; }
+    public  string? IdentificationNumber { get; set; }
 
     [JsonPropertyName("multiple_resolution")]
     public string? MultipleResolution { get; set; }
@@ -20,7 +20,7 @@ public class CustomerEntity
     public int? Profit { get; set; }
 
     [JsonPropertyName("name")]
-    public required string Name { get; set; }
+    public  string? Name { get; set; }
 
     [JsonPropertyName("phone")]
     public string? Phone { get; set; }

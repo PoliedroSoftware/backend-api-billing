@@ -25,7 +25,8 @@ public class BillingResponseApi(
 
             if (customerInfo == null)
             {
-                throw new ArgumentNullException(nameof(customerInfo));
+                Console.WriteLine($"Error Insert Invoice Success", customerInfo);
+                continue;
             }
 
             var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
@@ -37,7 +38,7 @@ public class BillingResponseApi(
                 pair.resp.Data.Cude!,
                 pair.resp.Data.QRCode!,
                connectionString,
-               customerInfo.Value.ProviderId,
+               customerInfo.Value.ProviderId!,
                customerInfo.Value.DianResolution.ClientBillingElectronicId,
                pair.invoice.Number
                );
