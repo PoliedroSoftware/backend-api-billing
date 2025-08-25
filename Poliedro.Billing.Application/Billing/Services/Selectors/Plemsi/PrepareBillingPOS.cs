@@ -6,7 +6,7 @@ using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using Poliedro.Billing.Domain.FERetail.Entity;
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 public class PrepareBillingPOS(
-    IGetLastInvoiceBilling _getLastInvoiceBilling,
+    IInvoiceLastPos _getLastInvoiceBilling,
     IMapper _mapper
     ) : ICreateBilling
 {
@@ -18,7 +18,7 @@ public class PrepareBillingPOS(
 
         try
         {
-            lastInvoiceNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
+            lastInvoiceNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(clientInfo, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -35,10 +35,28 @@ public class PrepareBillingPOS(
 
         int invoiceCounter = lastInvoiceNumber;
 
+
         foreach (var invoice in invoices)
         {
             try
             {
+                int InvoiceNumber = invoiceCounter++;
+                invoice.Numeration = InvoiceNumber.ToString();
+                invoice.Number = invoice.Resolution;
+                invoice.Prefix = clientInfo.Prefix;
+                if (invoice.CustomerEntity == null)
+                {
+                    invoice.CustomerEntity = new CustomerEntity();
+                }
+                invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
+               
+
+
+
+                string FormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
+                string CurrentTime = DateTime.Now.ToString("HH:mm:ss");
+                List<ItemFERetailEntity> itemsInvoiceResponse = new();
+
                 if (invoice.ItemElectronicEntity == null || !invoice.ItemElectronicEntity.Any())
                 {
                     Console.WriteLine($"Factura {invoice.Number}: sin items.");
@@ -53,10 +71,6 @@ public class PrepareBillingPOS(
 
                 if (invoice.ItemElectronicEntity == null) continue;
 
-                int InvoiceNumber = int.Parse(invoice.Number[^6..]);
-                string FormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
-                string CurrentTime = DateTime.Now.ToString("HH:mm:ss");
-                List<ItemFERetailEntity> itemsInvoiceResponse = new();
 
                 foreach (ItemElectronicEntity item in invoice.ItemElectronicEntity)
                 {
@@ -85,7 +99,7 @@ public class PrepareBillingPOS(
 
                 InvoicePosEntity Data = new()
                 {
-                    number = invoiceCounter,
+                    number = InvoiceNumber,
                     date = FormattedDate,
                     time = CurrentTime,
                     softwareManufacturer = new SoftwareManufacturerEntity

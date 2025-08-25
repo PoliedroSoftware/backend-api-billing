@@ -156,11 +156,11 @@ public class BillingAutoMapper : Profile
             .ForMember(dest => dest.duration_measure, opt => opt.MapFrom(src => src.duration_measure));
 
         CreateMap<PayPointInfoEntity, PayPointInfoRequestPosDto>()
-            .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.code))
-            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.address))
-            .ForMember(dest => dest.CashierName, opt => opt.MapFrom(src => src.cashierName))
-            .ForMember(dest => dest.PayPointType, opt => opt.MapFrom(src => src.payPointType))
-            .ForMember(dest => dest.SaleCode, opt => opt.MapFrom(src => src.saleCode));
+            .ForMember(dest => dest.code, opt => opt.MapFrom(src => src.code))
+            .ForMember(dest => dest.address, opt => opt.MapFrom(src => src.address))
+            .ForMember(dest => dest.cashierName, opt => opt.MapFrom(src => src.cashierName))
+            .ForMember(dest => dest.payPointType, opt => opt.MapFrom(src => src.payPointType))
+            .ForMember(dest => dest.saleCode, opt => opt.MapFrom(src => src.saleCode));
 
         CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerRequestPosDto>()
             .ForMember(dest => dest.ownerName, opt => opt.MapFrom(src => src.ownerName))

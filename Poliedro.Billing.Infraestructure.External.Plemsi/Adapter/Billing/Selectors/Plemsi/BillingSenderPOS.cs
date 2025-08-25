@@ -12,7 +12,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selec
 
 public class BillingSenderPOS(
     IConfiguration config,
-    IGetLastInvoiceBilling _getLastInvoiceBilling
+    IInvoiceLastPos _getLastInvoiceBilling
     ) : IBillingSender
 
 {
@@ -26,7 +26,7 @@ public class BillingSenderPOS(
             {
                 InvoiceRequestPosDto? invoiceRequestDto = invoice as InvoiceRequestPosDto;  
 
-                int lastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
+                int lastNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(clientInfo, cancellationToken);
 
                 if (invoiceRequestDto.number < lastNumber)
                 {
@@ -40,7 +40,7 @@ public class BillingSenderPOS(
                 using var client = new HttpClient();
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
 
-                var url = bool.Parse(config["Environment:Production"]!)
+                var url = bool.Parse(config["Enviroment:Production"]!)
                     ? config["ApiPlemsi:PosUrl"]
                     : config["ApiPlemsiQa:PosUrl"];
 

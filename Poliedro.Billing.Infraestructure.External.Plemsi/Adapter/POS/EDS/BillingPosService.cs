@@ -46,7 +46,7 @@ public class BillingPosService(
                 {
                     invoice = 0;
                     int InvoiceNumber = int.Parse(item.Number[^6..]);
-                    invoice = await invoiceLastRepository.GetInvoiceLastAsync(connectionString, clientItem, cancellationToken);
+                    //invoice = await invoiceLastRepository.GetInvoiceLastAsync(connectionString, clientItem, cancellationToken);
                     if (invoice == 0) return billingResponse;
                     DateTime date = DateTime.Now;
                     string formattedDate = date.ToString("yyyy-MM-dd");

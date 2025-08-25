@@ -1,9 +1,9 @@
 ﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
 public record PayPointInfoRequestPosDto
 {
-    public string Code { get; init; }
-    public string Address { get; init; }
-    public string CashierName { get; init; }
-    public string PayPointType { get; init; }
-    public string SaleCode { get; init; }
+    public string code { get; init; }
+    public string address { get; init; }
+    public string cashierName { get; init; }
+    public string payPointType { get; init; }
+    public string saleCode { get; init; }
 }
