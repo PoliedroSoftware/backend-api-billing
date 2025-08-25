@@ -16,8 +16,6 @@ public class BillingSenderPOS(
     ) : IBillingSender
 
 {
-    
-
     public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient clientInfo, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
@@ -32,11 +30,11 @@ public class BillingSenderPOS(
 
                 if (invoiceRequestDto.number < lastNumber)
                 {
-                    //invoiceRequestDto.number = lastNumber;
+                    invoiceRequestDto.number = lastNumber;
                     
                 }
 
-                var jsonContent = JsonConvert.SerializeObject(invoice);
+                var jsonContent = JsonConvert.SerializeObject(invoiceRequestDto);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 using var client = new HttpClient();

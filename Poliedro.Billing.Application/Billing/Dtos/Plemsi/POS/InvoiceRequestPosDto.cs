@@ -1,7 +1,7 @@
 ﻿namespace Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
 public record InvoiceRequestPosDto
 {
-    public int number { get; init; }
+    public int number { get; set; }
     public required string date { get; init; }
     public required string time { get; init; }
     public SoftwareManufacturerRequestPosDto softwareManufacturer { get; init; }

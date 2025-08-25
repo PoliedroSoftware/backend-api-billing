@@ -3,9 +3,9 @@ namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
 public class PayPointInfoPosEntity
 {
     
-    public string Code { get; set; }
-    public string Address { get; set; }
-    public string CashierName { get; set; }
-    public string PayPointType { get; set; }
-    public string SaleCode { get; set; }
+    public string code { get; set; }
+    public string address { get; set; }
+    public string cashierName { get; set; }
+    public string payPointType { get; set; }
+    public string saleCode { get; set; }
 }

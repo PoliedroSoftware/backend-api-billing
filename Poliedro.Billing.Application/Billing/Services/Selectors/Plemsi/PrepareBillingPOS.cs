@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Billing.Pos.Entity;
@@ -84,7 +85,7 @@ public class PrepareBillingPOS(
 
                 InvoicePosEntity Data = new()
                 {
-                    number = InvoiceNumber,
+                    number = invoiceCounter,
                     date = FormattedDate,
                     time = CurrentTime,
                     softwareManufacturer = new SoftwareManufacturerEntity
@@ -107,11 +108,11 @@ public class PrepareBillingPOS(
                     },
                     payPointInfo =  new PayPointInfoEntity
                     {
-                        Code = "000001",
-                        Address = "Direccion Principal",
-                        CashierName = "Cajero de Turno",
-                        PayPointType = "Caja Auxiliar",
-                        SaleCode = "V2398123",
+                        code = "000001",
+                        address = "Direccion Principal",
+                        cashierName = "Cajero de Turno",
+                        payPointType = "Caja Auxiliar",
+                        saleCode = "V2398123",
                     },
                     invoiceBaseTotal = invoice.InvoiceBaseTotal.ToString(),
                     invoiceTaxExclusiveTotal = invoice.InvoiceTaxExclusiveTotal.ToString(),
@@ -120,7 +121,7 @@ public class PrepareBillingPOS(
                     allTaxTotals = [],
                     items = itemsInvoiceResponse
                 };
-                var dto = _mapper.Map<SenderRequestFEDTO>(Data);
+                var dto = _mapper.Map<InvoiceRequestPosDto>(Data);
 
                 results.Add((invoice, dto));
 
