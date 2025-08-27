@@ -29,6 +29,13 @@ public class BillingResponseApi(
                 continue;
             }
 
+            if (!pair.resp.Success)
+            {
+                // Saltar persistencia si la respuesta no fue exitosa
+                Console.WriteLine($"Factura {pair.invoice.Number} no persistida por error: {pair.resp.Info}");
+                continue;
+            }
+
             var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
 
             int NumberInvoice = int.Parse(pair.invoice.Numeration);

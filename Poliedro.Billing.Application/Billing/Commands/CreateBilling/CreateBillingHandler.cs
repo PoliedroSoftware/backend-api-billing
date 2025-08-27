@@ -49,18 +49,25 @@ public class CreateBillingHandler(
         // Enviar las facturas procesadas
         List<ApiResponseFERetailPos> responseApi = await sender.SendAsync(InvoiceRequest, InfoClient, cancellationToken);
 
-        bool allSuccessful = responseApi.All(r => r.Success);
+        // Persistir por factura exitosa en lugar de esperar que todas sean exitosas
+        var pairedResponses = responseApi.Zip(billingEntitiesProcessed, (resp, invoice) => new { resp, invoice }).ToList();
 
-        if (allSuccessful)
+        var successfulPairs = pairedResponses.Where(p => p.resp.Success).ToList();
+        if (successfulPairs.Any())
         {
-           await _billingResponseApi.IBillingResponseApi(responseApi, billingEntitiesProcessed, cancellationToken);
+            await _billingResponseApi.IBillingResponseApi(
+                successfulPairs.Select(p => p.resp).ToList(),
+                successfulPairs.Select(p => p.invoice),
+                cancellationToken
+            );
         }
-        else
+
+        var failedInfos = pairedResponses.Where(p => !p.resp.Success)
+                                         .Select(p => p.resp.Info)
+                                         .ToList();
+        if (failedInfos.Any())
         {
-            var errores = responseApi.Where(r => !r.Success)
-                                     .Select(r => r.Info)
-                                     .ToList();
-            Console.WriteLine($"Algunas facturas fallaron al enviarse: {string.Join(" | ", errores)}");
+            Console.WriteLine($"Algunas facturas fallaron al enviarse: {string.Join(" | ", failedInfos)}");
         }
 
         var billingResults = new List<CreateBillingResultDTO>();
