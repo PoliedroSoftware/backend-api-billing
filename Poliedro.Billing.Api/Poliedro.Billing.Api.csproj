@@ -33,7 +33,6 @@
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.TNS\Poliedro.Billing.Infraestructure.External.TNS.csproj" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.Siigo\Poliedro.Billing.Infraestructure.External.Siigo.csproj" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.Persistence.Mysql\Poliedro.Billing.Infraestructure.Persistence.Mysql.csproj" />
-    <ProjectReference Include="..\WorkerServiceBilling\WorkerServiceBilling.csproj" />
   </ItemGroup>
 
 </Project>
