@@ -1,11 +1,11 @@
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+using HealthChecks.UI.Client;
 using MediatR;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Poliedro.Billing.Api;
 using Poliedro.Billing.Api.Common.Configurations;
-using Poliedro.Billing.Api.Controllers.v1.Billing;
 using Poliedro.Billing.Application;
 using Poliedro.Billing.Application.Common.Behaviors;
 using Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote;
@@ -17,12 +17,6 @@ using Poliedro.Billing.Infraestructure.External.Siigo;
 using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
-using WorkerServiceBilling;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -99,8 +93,6 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
-builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateCreditNoteCommandValidator>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
