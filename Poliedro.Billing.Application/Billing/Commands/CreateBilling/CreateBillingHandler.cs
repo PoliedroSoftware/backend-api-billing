@@ -43,40 +43,44 @@ public class CreateBillingHandler(
         // Obtener el sender correcto
         IBillingSender sender = _billingSenderFactory.Resolve(InfoClient.Provider, InfoClient.TypeResolution);
 
-        // Objeto para El sender
-        PlemsiInvoiceRequest InvoiceRequest = new() {ApiKey = request.ApiKey, Invoices = outputEntitiesProcessed};
-
-        // Enviar las facturas procesadas
-        List<ApiResponseFERetailPos> responseApi = await sender.SendAsync(InvoiceRequest, InfoClient, cancellationToken);
-
-        bool allSuccessful = responseApi.All(r => r.Success);
-
-        if (allSuccessful)
-        {
-           await _billingResponseApi.IBillingResponseApi(responseApi, billingEntitiesProcessed, cancellationToken);
-        }
-        else
-        {
-            var errores = responseApi.Where(r => !r.Success)
-                                     .Select(r => r.Info)
-                                     .ToList();
-            Console.WriteLine($"Algunas facturas fallaron al enviarse: {string.Join(" | ", errores)}");
-        }
-
         var billingResults = new List<CreateBillingResultDTO>();
 
-        for (int i = 0; i < billingEntitiesProcessed.Count(); i++)
+        
+        foreach (var processed in processedInvoices)
         {
-            var result = responseApi[i];
-
-            billingResults.Add(new CreateBillingResultDTO
+            var invoiceRequest = new PlemsiInvoiceRequest
             {
-                Status = result.Success,
-                Message = result.Success ? "Factura procesada exitosamente" : result.Info,
-                Data = null 
-            });
-        }
+                ApiKey = request.ApiKey,
+                Invoices = new List<object> { processed.Output } 
+            };
 
+            var responses = await sender.SendAsync(invoiceRequest, InfoClient, cancellationToken);
+            var result = responses.FirstOrDefault();
+
+            if (result is not null)
+            {
+                if (result.Success)
+                {
+                   
+                    await _billingResponseApi.IBillingResponseApi(
+                        new List<ApiResponseFERetailPos> { result },
+                        new List<Domain.Billing.CreateBilling> { processed.Billing },
+                        cancellationToken
+                    );
+                }
+                else
+                {
+                    Console.WriteLine($"Factura fallida: {result.Info}");
+                }
+
+                billingResults.Add(new CreateBillingResultDTO
+                {
+                    Status = result.Success,
+                    Message = result.Success ? "Factura procesada exitosamente" : result.Info,
+                    Data = null
+                });
+            }
+        }
 
         return billingResults;
 
