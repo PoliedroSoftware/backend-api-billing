@@ -69,21 +69,44 @@ public class CreateBillingHandler(
         {
             Console.WriteLine($"Algunas facturas fallaron al enviarse: {string.Join(" | ", failedInfos)}");
         }
-
         var billingResults = new List<CreateBillingResultDTO>();
 
-        for (int i = 0; i < billingEntitiesProcessed.Count(); i++)
+        
+        foreach (var processed in processedInvoices)
         {
-            var result = responseApi[i];
-
-            billingResults.Add(new CreateBillingResultDTO
+            var invoiceRequest = new PlemsiInvoiceRequest
             {
-                Status = result.Success,
-                Message = result.Success ? "Factura procesada exitosamente" : result.Info,
-                Data = null 
-            });
-        }
+                ApiKey = request.ApiKey,
+                Invoices = new List<object> { processed.Output } 
+            };
 
+            var responses = await sender.SendAsync(invoiceRequest, InfoClient, cancellationToken);
+            var result = responses.FirstOrDefault();
+
+            if (result is not null)
+            {
+                if (result.Success)
+                {
+                   
+                    await _billingResponseApi.IBillingResponseApi(
+                        new List<ApiResponseFERetailPos> { result },
+                        new List<Domain.Billing.CreateBilling> { processed.Billing },
+                        cancellationToken
+                    );
+                }
+                else
+                {
+                    Console.WriteLine($"Factura fallida: {result.Info}");
+                }
+
+                billingResults.Add(new CreateBillingResultDTO
+                {
+                    Status = result.Success,
+                    Message = result.Success ? "Factura procesada exitosamente" : result.Info,
+                    Data = null
+                });
+            }
+        }
 
         return billingResults;
 

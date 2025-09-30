@@ -1,5 +1,6 @@
 ﻿using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using System;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 
@@ -24,10 +25,10 @@ public class PrepareItemElectronic : IPrepareItemBilling
 
                 TaxTotals = [
                      new TaxTotalEntity {
-                         TaxId = 1,
-                         Percent = item.TaxTotals?.FirstOrDefault()?.Percent ?? 0,
-                         TaxAmount = (item.TaxTotals?.FirstOrDefault()?.TaxAmount ?? 0) * item.InvoicedQuantity,
-                         TaxableAmount = item.UnitPrice * item.InvoicedQuantity
+                        TaxId = 1,
+                        Percent = item.Percent,
+                        TaxAmount = item.TaxAmount * item.InvoicedQuantity,
+                        TaxableAmount = item.UnitPrice * item.InvoicedQuantity
                 }],
 
 
