@@ -43,6 +43,32 @@ public class CreateBillingHandler(
         // Obtener el sender correcto
         IBillingSender sender = _billingSenderFactory.Resolve(InfoClient.Provider, InfoClient.TypeResolution);
 
+        // Objeto para El sender
+        PlemsiInvoiceRequest InvoiceRequest = new() {ApiKey = request.ApiKey, Invoices = outputEntitiesProcessed};
+
+        // Enviar las facturas procesadas
+        List<ApiResponseFERetailPos> responseApi = await sender.SendAsync(InvoiceRequest, InfoClient, cancellationToken);
+
+        // Persistir por factura exitosa en lugar de esperar que todas sean exitosas
+        var pairedResponses = responseApi.Zip(billingEntitiesProcessed, (resp, invoice) => new { resp, invoice }).ToList();
+
+        var successfulPairs = pairedResponses.Where(p => p.resp.Success).ToList();
+        if (successfulPairs.Any())
+        {
+            await _billingResponseApi.IBillingResponseApi(
+                successfulPairs.Select(p => p.resp).ToList(),
+                successfulPairs.Select(p => p.invoice),
+                cancellationToken
+            );
+        }
+
+        var failedInfos = pairedResponses.Where(p => !p.resp.Success)
+                                         .Select(p => p.resp.Info)
+                                         .ToList();
+        if (failedInfos.Any())
+        {
+            Console.WriteLine($"Algunas facturas fallaron al enviarse: {string.Join(" | ", failedInfos)}");
+        }
         var billingResults = new List<CreateBillingResultDTO>();
 
         
