@@ -10,6 +10,7 @@ public class ItemElectronicEntity
 
     [JsonPropertyName("line_extension_amount")]
     public double LineExtensionAmount { get; set; }
+    public double LineDiscountAmount { get; set; }
 
     [JsonPropertyName("transaccion")]
     public int? Transaccion { get; set; }

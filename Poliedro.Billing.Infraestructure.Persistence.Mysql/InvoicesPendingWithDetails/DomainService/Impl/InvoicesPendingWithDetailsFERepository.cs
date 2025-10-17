@@ -36,6 +36,9 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 v.invoice,
                 v.payment_status,
                 v.transaction_date,
+                v.total_before_tax,
+                v.discount_amount_by_invoice,
+                v.discount_type,
                 v.allowanceTotal,
                 v.invoiceBaseTotal,
                 v.invoiceTaxExclusiveTotal,
@@ -66,6 +69,10 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                         TransactionDate = reader.IsDBNull(reader.GetOrdinal("transaction_date"))
                             ? DateTime.MinValue
                             : reader.GetDateTime("transaction_date"),
+
+                        TotalBeforeTax = reader.IsDBNull(reader.GetOrdinal("total_before_tax")) ? 0L : Convert.ToInt64(reader["total_before_tax"]),
+                        DiscountAmountByInvoice = reader.IsDBNull(reader.GetOrdinal("discount_amount_by_invoice")) ? 0L : Convert.ToInt64(reader["discount_amount_by_invoice"]),
+                        DiscountType = reader["discount_type"]?.ToString(),
                         AllowanceTotal = reader.IsDBNull(reader.GetOrdinal("allowanceTotal")) ? 0L : Convert.ToInt64(reader["allowanceTotal"]),
                         InvoiceBaseTotal = reader.IsDBNull(reader.GetOrdinal("invoiceBaseTotal")) ? 0L : Convert.ToInt64(reader["invoiceBaseTotal"]),
                         InvoiceTaxExclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxExclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
@@ -116,6 +123,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     d.invoiced_quantity,
                     d.price_amount,
                     d.line_extension_amount,
+                    d.line_discount_amount,
                     d.percent,
                     d.tax_amount,
                     d.unit_price
@@ -151,6 +159,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                         InvoicedQuantity = readerDetails.IsDBNull(readerDetails.GetOrdinal("invoiced_quantity")) ? 0.0 : readerDetails.GetDouble("invoiced_quantity"),
                         PriceAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("price_amount")) ? 0.0 : readerDetails.GetDouble("price_amount"),
                         LineExtensionAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_extension_amount")) ? 0.0 : readerDetails.GetDouble("line_extension_amount"),
+                        LineDiscountAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_discount_amount")) ? 0.0 : readerDetails.GetDouble("line_discount_amount"),
                         Percent = readerDetails.IsDBNull(readerDetails.GetOrdinal("percent")) ? 0.0 : readerDetails.GetDouble("percent"),
                         TaxAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_amount")) ? 0.0 : readerDetails.GetDouble("tax_amount"),
                         UnitPrice = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price")) ? 0.0 : readerDetails.GetDouble("unit_price")
