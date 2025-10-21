@@ -56,7 +56,7 @@ public class PrepareBillingFE(
                 double totalToBase = invoice.ItemElectronicEntity?.Sum(item => item.LineExtensionAmount) ?? 0;
                 double totalTaxableAmount = invoice.ItemElectronicEntity?.Sum(item => item.TaxTotals?.Sum(tax => tax.TaxAmount)) ?? 0;
                 double totalBaseGravable = invoice.ItemElectronicEntity?.Sum(item => item.TaxTotals?.Sum(tax => tax.TaxableAmount)) ?? 0;
-                double totalToPay = totalToBase + totalTaxableAmount;
+                double totalToPay = totalToBase;
 
                 if (totalToPay <= 0)
                 {
@@ -65,7 +65,7 @@ public class PrepareBillingFE(
                 }
 
                 invoice.InvoiceBaseTotal = totalToBase;
-                invoice.InvoiceTaxExclusiveTotal = totalToBase;
+                invoice.InvoiceTaxExclusiveTotal = totalBaseGravable;
                 invoice.InvoiceTaxInclusiveTotal = totalToPay;
                 invoice.TotalToPay = totalToPay;
                 invoice.FinalTotalToPay = totalToPay;

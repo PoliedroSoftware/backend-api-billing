@@ -11,13 +11,13 @@ public class ItemElectronicEntity
     [JsonPropertyName("line_extension_amount")]
     public double LineExtensionAmount { get; set; }
     
-    public double LineDiscountAmount { get; set; }
+    public double? LineDiscountAmount { get; set; } 
     
     [JsonPropertyName("line_discount_type")]
     public string? LineDiscountType { get; set; }
 
     [JsonPropertyName("unit_price_before_discount")]
-    public double UnitPriceBeforeDiscount { get; set; }
+    public double? UnitPriceBeforeDiscount { get; set; }
 
     [JsonPropertyName("transaccion")]
     public int? Transaccion { get; set; }
@@ -54,8 +54,6 @@ public class ItemElectronicEntity
 
     [JsonPropertyName("invoiced_quantity")]
     public double InvoicedQuantity { get; set; }
-    
-
 
     [JsonPropertyName("percent")]
     public double Percent { get; set; }

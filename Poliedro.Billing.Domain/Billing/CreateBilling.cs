@@ -4,11 +4,10 @@ namespace Poliedro.Billing.Domain.Billing;
 
 public class CreateBilling
 {
-    public DateTime Date { get; set; } 
+    public DateTime Date { get; set; }
     public DateTime Time { get; set; }
     public string? SendToEmail { get; set; }
     public SoftwareManufacturerEntity? SoftwareManufacturer { get; set; }
-
     public PayPointInfoEntity? PayPointInfo { get; set; }
     public required string Number { get; set; }
     public string? Numeration { get; set; } 
@@ -21,7 +20,6 @@ public class CreateBilling
     public CustomerEntity? CustomerEntity { get; set; }
     public PaymentFEEntity? PaymentEntity { get; set; }
     public List<GeneralAllowanceEntity>? GeneralAllowanceEntity { get; set; }
-
     public List<ItemElectronicEntity>? ItemElectronicEntity { get; set; }
     public string? Resolution { get; set; }
     public string? ResolutionText { get; set; }
