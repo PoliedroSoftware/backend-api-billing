@@ -123,7 +123,9 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     d.invoiced_quantity,
                     d.price_amount,
                     d.line_extension_amount,
+                    d.unit_price_before_discount,
                     d.line_discount_amount,
+                    d.line_discount_type,
                     d.percent,
                     d.tax_amount,
                     d.unit_price
@@ -159,7 +161,9 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                         InvoicedQuantity = readerDetails.IsDBNull(readerDetails.GetOrdinal("invoiced_quantity")) ? 0.0 : readerDetails.GetDouble("invoiced_quantity"),
                         PriceAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("price_amount")) ? 0.0 : readerDetails.GetDouble("price_amount"),
                         LineExtensionAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_extension_amount")) ? 0.0 : readerDetails.GetDouble("line_extension_amount"),
+                        UnitPriceBeforeDiscount = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price_before_discount")) ? 0.0 : readerDetails.GetDouble("unit_price_before_discount"),
                         LineDiscountAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_discount_amount")) ? 0.0 : readerDetails.GetDouble("line_discount_amount"),
+                        LineDiscountType = readerDetails["line_discount_type"]?.ToString(),
                         Percent = readerDetails.IsDBNull(readerDetails.GetOrdinal("percent")) ? 0.0 : readerDetails.GetDouble("percent"),
                         TaxAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_amount")) ? 0.0 : readerDetails.GetDouble("tax_amount"),
                         UnitPrice = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price")) ? 0.0 : readerDetails.GetDouble("unit_price")

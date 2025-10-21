@@ -18,7 +18,7 @@ public class PrepareItemElectronic : IPrepareItemBilling
                 LineExtensionAmount = item.UnitPrice * item.InvoicedQuantity,
                 InvoicedQuantity = item.InvoicedQuantity,
                 FreeOfChargeIndicator = false,
-
+               
 
                 AllowanceCharges = [],
 
@@ -41,6 +41,10 @@ public class PrepareItemElectronic : IPrepareItemBilling
                 TypeItemIdentificationId = 1,
                 PriceAmount = item.UnitPrice,
                 BaseQuantity = item.InvoicedQuantity,
+                UnitPriceBeforeDiscount = item.UnitPrice,
+                LineDiscountAmount = item.LineDiscountAmount,
+                LineDiscountType = item.LineDiscountType
+
             };
             itemsInvoiceResponse.Add(itemInvoice);
 
