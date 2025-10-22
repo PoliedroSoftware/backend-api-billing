@@ -27,7 +27,7 @@ public class CreateBilling
     public string? FootNote { get; set; }
     public string? Notes { get; set; }
     public decimal? TotalBeforeTax { get; set; }
-    public decimal? DiscountAmountByInvoice { get; set; }
+    public double? DiscountAmountByInvoice { get; set; }
     public string? DiscountType { get; set; }
     public double AllowanceTotal { get; set; }
     public double InvoiceBaseTotal { get; set; }

@@ -53,22 +53,34 @@ public class PrepareBillingFE(
 
                 invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(invoice.ItemElectronicEntity);
 
-                double totalToBase = invoice.ItemElectronicEntity?.Sum(item => item.LineExtensionAmount) ?? 0;
-                double totalTaxableAmount = invoice.ItemElectronicEntity?.Sum(item => item.TaxTotals?.Sum(tax => tax.TaxAmount)) ?? 0;
-                double totalBaseGravable = invoice.ItemElectronicEntity?.Sum(item => item.TaxTotals?.Sum(tax => tax.TaxableAmount)) ?? 0;
-                double totalToPay = totalToBase;
+                double totalToBase = invoice.ItemElectronicEntity?.Sum(i => i.LineExtensionAmount) ?? 0;
+                double totalDiscounts = invoice.ItemElectronicEntity?.Sum(i => i.LineDiscountAmount) ?? 0;
+                double totalTaxes = invoice.ItemElectronicEntity?.Sum(i => i.TaxTotals?.Sum(t => t.TaxAmount) ?? 0) ?? 0;
+                double totalToPay = totalToBase + totalTaxes;
 
+                
+                if (invoice.DiscountAmountByInvoice > 0)
+                {
+                    totalToPay -= (double)invoice.DiscountAmountByInvoice;
+                    totalDiscounts += (double)invoice.DiscountAmountByInvoice; 
+                }
+
+                
                 if (totalToPay <= 0)
                 {
-                    Console.WriteLine($"Factura {invoice.Number}: total a pagar {totalToPay} invalido.");
+                    Console.WriteLine($"Factura {invoice.Number}: total a pagar {totalToPay} inválido.");
                     continue;
                 }
 
-                invoice.InvoiceBaseTotal = totalToBase;
-                invoice.InvoiceTaxExclusiveTotal = totalBaseGravable;
-                invoice.InvoiceTaxInclusiveTotal = totalToPay;
-                invoice.TotalToPay = totalToPay;
-                invoice.FinalTotalToPay = totalToPay;
+                
+                invoice.TotalBeforeTax = (decimal?)(totalToBase + totalDiscounts);
+                invoice.InvoiceBaseTotal = totalToBase;                           
+                invoice.InvoiceTaxInclusiveTotal = totalToBase + totalTaxes;     
+                invoice.TotalToPay = totalToPay;                                   
+                invoice.FinalTotalToPay = totalToPay;                              
+                invoice.AllowanceTotal = totalDiscounts;                           
+
+
 
                 if (invoice.ItemElectronicEntity == null) continue;
 

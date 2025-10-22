@@ -95,7 +95,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
         return await context.ClientBillingElectronic
             .Include(c => c.DianResolution)
             .Include(c => c.Server)
-            .Where(c => c.Active == true)
+            .Where(c => c.Active == false)
             .FirstAsync(c => c.ApiKey == Apikey);
     }
 }
