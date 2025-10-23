@@ -51,56 +51,60 @@ public class PrepareBillingFE(
                     continue;
                 }
 
+                // Procesar ítems
                 invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(invoice.ItemElectronicEntity);
 
-                double totalToBase = invoice.ItemElectronicEntity?.Sum(i => i.LineExtensionAmount) ?? 0;
-                double totalDiscounts = invoice.ItemElectronicEntity?.Sum(i => i.LineDiscountAmount) ?? 0;
-                double totalTaxes = invoice.ItemElectronicEntity?.Sum(i => i.TaxTotals?.Sum(t => t.TaxAmount) ?? 0) ?? 0;
-                double totalToPay = totalToBase + totalTaxes;
+                // Calcular totales reales
+                double totalBruto = invoice.ItemElectronicEntity?.Sum(i => i.UnitPrice * i.InvoicedQuantity) ?? 0; // base sin descuento
+                double totalDescuentos = invoice.ItemElectronicEntity?.Sum(i => i.LineDiscountAmount) ?? 0;
+                double totalImpuestos = invoice.ItemElectronicEntity?.Sum(i => i.TaxTotals?.Sum(t => t.TaxAmount) ?? 0) ?? 0;
 
-                
+                // Agregar descuento global si aplica
                 if (invoice.DiscountAmountByInvoice > 0)
                 {
-                    totalToPay -= (double)invoice.DiscountAmountByInvoice;
-                    totalDiscounts += (double)invoice.DiscountAmountByInvoice; 
+                    totalDescuentos += (double)invoice.DiscountAmountByInvoice;
                 }
 
-                
-                if (totalToPay <= 0)
+                // Base después del descuento
+                double baseNeta = totalBruto - totalDescuentos;
+
+                // Total a pagar (Regla FAU14 + coherencia FAU08)
+                double totalPagar = baseNeta + totalImpuestos;
+
+                if (totalPagar <= 0)
                 {
-                    Console.WriteLine($"Factura {invoice.Number}: total a pagar {totalToPay} inválido.");
+                    Console.WriteLine($"Factura {invoice.Number}: total a pagar {totalPagar} inválido.");
                     continue;
                 }
 
-                
-                invoice.TotalBeforeTax = (decimal?)(totalToBase + totalDiscounts);
-                invoice.InvoiceBaseTotal = totalToBase;                           
-                invoice.InvoiceTaxInclusiveTotal = totalToBase + totalTaxes;     
-                invoice.TotalToPay = totalToPay;                                   
-                invoice.FinalTotalToPay = totalToPay;                              
-                invoice.AllowanceTotal = totalDiscounts;                           
+                // Asignar coherentemente los totales
+                invoice.InvoiceBaseTotal = totalBruto;                      // Total antes de descuento
+                invoice.AllowanceTotal = totalDescuentos;                   // Total descuentos
+                invoice.InvoiceTaxExclusiveTotal = baseNeta;                // Base neta (antes de impuestos)
+                invoice.InvoiceTaxInclusiveTotal = baseNeta + totalImpuestos;
+                invoice.TotalBeforeTax = (decimal?)baseNeta;
+                invoice.TotalToPay = totalPagar;
+                invoice.FinalTotalToPay = totalPagar;
 
 
-
-                if (invoice.ItemElectronicEntity == null) continue;
-
-                int InvoiceNumber = invoiceCounter++;
-                string FormattedDate = DateTime.Now.ToString("yyyy-MM-dd");
-                string CurrentTime = DateTime.Now.ToString("HH:mm:ss");
-
+                // Calcular impuestos totales
                 invoice.AllTaxTotalEntity = await _getAllTaxTotals.IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
+
+                // Generar número de factura
+                int invoiceNumber = invoiceCounter++;
+                string formattedDate = DateTime.Now.ToString("yyyy-MM-dd");
+                string currentTime = DateTime.Now.ToString("HH:mm:ss");
+
                 invoice.Prefix = clientInfo.Prefix;
                 invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
-                invoice.Numeration = InvoiceNumber.ToString();
+                invoice.Numeration = invoiceNumber.ToString();
 
+                // Validar tipo de documento y dígito de verificación
+                DocumentType documentType = await _billingValidateScript.ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
+                string identification = invoice.CustomerEntity.IdentificationNumber.Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
+                string checkDigit = await _calculateCheckDigits.CalculateCheckDigit(identification, cancellationToken);
 
-
-                DocumentType DocumentType = await _billingValidateScript.ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
-
-                string Identification = invoice.CustomerEntity.IdentificationNumber.Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
-                string checkDigit = await _calculateCheckDigits.CalculateCheckDigit(Identification, cancellationToken);
-
-                if (DocumentType == DocumentType.NIT)
+                if (documentType == DocumentType.NIT)
                 {
                     invoice.CustomerEntity.IdentificationNumber = invoice.CustomerEntity.IdentificationNumber.Replace("-", "");
                     if (invoice.CustomerEntity.IdentificationNumber.Length > 0)
@@ -111,35 +115,26 @@ public class PrepareBillingFE(
 
                 if (checkDigit == "error")
                 {
-                    Identification = _config["CosumerFinal:identification"];
+                    identification = _config["CosumerFinal:identification"];
                     checkDigit = _config["CosumerFinal:dv"];
                 }
 
-                FERetailelectronicEntity Data = new()
+                // Construcción de la entidad electrónica
+                FERetailelectronicEntity data = new()
                 {
-                    date = FormattedDate,
-                    time = CurrentTime,
+                    date = formattedDate,
+                    time = currentTime,
                     prefix = invoice.Prefix,
-                    number = InvoiceNumber,
+                    number = invoiceNumber,
 
-                    orderReference = new OrderReferenceEntity
-                    {
-                        IdOrder = "COT2022043155"
-                    },
+                    orderReference = new OrderReferenceEntity { IdOrder = "COT2022043155" },
                     send_email = true,
-                    attachment1 = new AttachmentEntity
-                    {
-                        FileName = "prueba.xml",
-                        B64Data = "-> lugar para el archivo convertido a base64 string"
-                    },
-                    attachment2 = new AttachmentEntity
-                    {
-                        FileName = "prueba.xml",
-                        B64Data = "-> lugar para el archivo convertido a base64 string"
-                    },
+                    attachment1 = new AttachmentEntity { FileName = "prueba.xml", B64Data = "-> lugar para el archivo convertido a base64 string" },
+                    attachment2 = new AttachmentEntity { FileName = "prueba.xml", B64Data = "-> lugar para el archivo convertido a base64 string" },
+
                     customer = new CustomerEntity
                     {
-                        IdentificationNumber = Identification,
+                        IdentificationNumber = identification,
                         Dv = checkDigit,
                         Name = invoice.CustomerEntity.Name,
                         Phone = invoice.CustomerEntity.Phone,
@@ -147,19 +142,21 @@ public class PrepareBillingFE(
                         Email = invoice.CustomerEntity.Email,
                         MerchantRegistration = "00000000",
                         MunicipalityCode = "11001",
-                        TypeDocumentIdentificationId = (int)DocumentType,
+                        TypeDocumentIdentificationId = (int)documentType,
                         TypeOrganizationId = 1,
                         TypeLiabilityId = 117,
                         MunicipalityId = 149,
                         TypeRegimeId = 1
                     },
+
                     payment = new PaymentEntity
                     {
                         PaymentFormId = 1,
                         PaymentMethodId = 10,
-                        PaymentDueDate = FormattedDate,
+                        PaymentDueDate = formattedDate,
                         DurationMeasure = "30"
                     },
+
                     generalAllowances = [],
                     items = invoice.ItemElectronicEntity,
                     resolution = clientInfo.ResolucionNumber,
@@ -167,25 +164,31 @@ public class PrepareBillingFE(
                     head_note = invoice.Number,
                     foot_note = invoice.Number,
                     notes = $"Fecha de la factura:{invoice.TransactionDate}",
-                    allowanceTotal = 0,
-                    invoiceBaseTotal = invoice.InvoiceBaseTotal,
-                    invoiceTaxExclusiveTotal = invoice.InvoiceTaxExclusiveTotal,
-                    invoiceTaxInclusiveTotal = invoice.InvoiceTaxInclusiveTotal,
-                    totalToPay = invoice.TotalToPay,
+
+               
+
+                    allowanceTotal = totalDescuentos,               // 👈 Total descuentos reales
+                    invoiceBaseTotal = totalBruto,                  // Total antes de descuentos
+                    invoiceTaxExclusiveTotal = baseNeta,            // Base neta
+                    invoiceTaxInclusiveTotal = baseNeta + totalImpuestos,
+                    totalToPay = totalPagar,
+                   
+
                     allTaxTotals = invoice.AllTaxTotalEntity,
                     allHoldingsTaxTotals = [
-                    new AllHoldingsTaxTotalEntity
-                        {
-                            TaxId = 6,
-                            TaxAmount = 0,
-                            Percent = 0,
-                            TaxableAmount = invoice.TotalToPay
-                        }],
+                        new AllHoldingsTaxTotalEntity
+                {
+                    TaxId = 6,
+                    TaxAmount = 0,
+                    Percent = 0,
+                    TaxableAmount = totalPagar
+                }
+                    ],
                     customSubtotals = [],
-                    finalTotalToPay = invoice.TotalToPay
+                    finalTotalToPay = totalPagar
                 };
-                var dto = _mapper.Map<SenderRequestFEDTO>(Data);
 
+                var dto = _mapper.Map<SenderRequestFEDTO>(data);
                 results.Add((invoice, dto));
             }
             catch (Exception ex)
@@ -193,6 +196,8 @@ public class PrepareBillingFE(
                 Console.WriteLine($"Error procesando factura {invoice.Number}: {ex.Message}");
             }
         }
+
+
         return results;
     }
 }
