@@ -87,6 +87,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddScoped<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();
             services.AddScoped<IBillingValidateScript, ValidateScriptBilling>();
             services.AddScoped<ICalculateCheckDigits, CalculateCheckDigitsBilling>();
+            services.AddScoped<IAllowanceChargesBilling, GetAllowanceChargesBilling>();
 
 
 

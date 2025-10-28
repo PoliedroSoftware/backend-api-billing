@@ -4,6 +4,7 @@ using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using System.Text.Json.Serialization;
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 
 public class PrepareBillingFE(
@@ -12,6 +13,7 @@ public class PrepareBillingFE(
     IGetLastInvoiceBilling _getLastInvoiceBilling,
     IBillingValidateScript _billingValidateScript,
     ICalculateCheckDigits _calculateCheckDigits,
+    IAllowanceChargesBilling _allowanceChargesBilling,
     IMapper _mapper,
     IConfiguration _config
     ) : ICreateBilling
@@ -55,7 +57,7 @@ public class PrepareBillingFE(
                 invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(invoice.ItemElectronicEntity);
 
                 // Calcular totales reales
-                double totalBruto = invoice.ItemElectronicEntity?.Sum(i => i.UnitPrice * i.InvoicedQuantity) ?? 0; // base sin descuento
+                double totalBruto = invoice.ItemElectronicEntity?.Sum(i => i.PriceAmount * i.InvoicedQuantity) ?? 0; // base sin descuento
                 double totalDescuentos = invoice.ItemElectronicEntity?.Sum(i => i.LineDiscountAmount) ?? 0;
                 double totalImpuestos = invoice.ItemElectronicEntity?.Sum(i => i.TaxTotals?.Sum(t => t.TaxAmount) ?? 0) ?? 0;
 
@@ -80,11 +82,15 @@ public class PrepareBillingFE(
                 // Asignar coherentemente los totales
                 invoice.InvoiceBaseTotal = totalBruto;                      // Total antes de descuento
                 invoice.AllowanceTotal = totalDescuentos;                   // Total descuentos
-                invoice.InvoiceTaxExclusiveTotal = baseNeta;                // Base neta (antes de impuestos)
-                invoice.InvoiceTaxInclusiveTotal = baseNeta + totalImpuestos;
+                invoice.InvoiceTaxExclusiveTotal = totalBruto;                // Base neta (antes de impuestos)
+                invoice.InvoiceTaxInclusiveTotal = totalBruto + totalImpuestos;
                 invoice.TotalBeforeTax = (decimal?)baseNeta;
                 invoice.TotalToPay = totalPagar;
                 invoice.FinalTotalToPay = totalPagar;
+
+                //Calcular descuentos
+                double DiscountPercent = (totalDescuentos / totalBruto) * 100;
+                double RoundedDiscountPercent =  Math.Round(DiscountPercent,2);
 
 
                 // Calcular impuestos totales
@@ -157,7 +163,16 @@ public class PrepareBillingFE(
                         DurationMeasure = "30"
                     },
 
-                    generalAllowances = [],
+                    generalAllowances = [
+                        new GeneralAllowanceEntity
+                        {
+                            AllowanceChargeReason = "Descuento Comercial",
+                            AllowancePercent = RoundedDiscountPercent,
+                            Amount = (decimal)totalDescuentos,
+                            BaseAmount = (decimal)totalBruto
+                        }
+                        ],
+
                     items = invoice.ItemElectronicEntity,
                     resolution = clientInfo.ResolucionNumber,
                     resolutionText = clientInfo.Descripcion,
@@ -169,20 +184,21 @@ public class PrepareBillingFE(
 
                     allowanceTotal = totalDescuentos,               // 👈 Total descuentos reales
                     invoiceBaseTotal = totalBruto,                  // Total antes de descuentos
-                    invoiceTaxExclusiveTotal = baseNeta,            // Base neta
-                    invoiceTaxInclusiveTotal = baseNeta + totalImpuestos,
+                    invoiceTaxExclusiveTotal = invoice.InvoiceTaxExclusiveTotal,            
+                    invoiceTaxInclusiveTotal = invoice.InvoiceTaxInclusiveTotal,
                     totalToPay = totalPagar,
                    
 
                     allTaxTotals = invoice.AllTaxTotalEntity,
-                    allHoldingsTaxTotals = [
+
+                    allHoldingsTaxTotals = [ 
                         new AllHoldingsTaxTotalEntity
-                {
-                    TaxId = 6,
-                    TaxAmount = 0,
-                    Percent = 0,
-                    TaxableAmount = totalPagar
-                }
+                        {
+                            TaxId = 6,
+                            TaxAmount = 0,
+                            Percent = 0,
+                            TaxableAmount = totalPagar
+                        }
                     ],
                     customSubtotals = [],
                     finalTotalToPay = totalPagar
