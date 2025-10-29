@@ -1,80 +1,83 @@
 ﻿using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
-
-public class PrepareItemElectronic(
-) : IPrepareItemBilling
+namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling
 {
-    public async Task<List<ItemElectronicEntity>> PrepareItemBillingAsync(List<ItemElectronicEntity> items)
+    // PrepareItemElectronic.cs
+    public class PrepareItemElectronic : IPrepareItemBilling
     {
-        List<ItemElectronicEntity> itemsInvoiceResponse = [];
-
-        foreach (ItemElectronicEntity item in items)
+        public async Task<List<ItemElectronicEntity>> PrepareItemBillingAsync(List<ItemElectronicEntity> items)
         {
-            // Subtotal ANTES de descuento (este es el LineExtensionAmount según DIAN)
-            double subtotal = item.UnitPrice * item.InvoicedQuantity;
+            var itemsInvoiceResponse = new List<ItemElectronicEntity>();
 
-            // Descuento aplicado
-            double discount = (double)(item.LineDiscountAmount > 0 ? item.LineDiscountAmount : 0);
-
-            // Base DESPUÉS del descuento (para calcular impuestos)
-            double baseAfterDiscount = subtotal - discount;
-
-            // Impuesto sobre la base después del descuento
-            double taxAmount = baseAfterDiscount * (item.Percent / 100);
-
-            // Calcular el porcentaje de descuento
-            double discountPercent = subtotal > 0 ? (discount / subtotal) * 100 : 0;
-            double roundedDiscountPercent = Math.Round(discountPercent, 2);
-
-            var itemInvoice = new ItemElectronicEntity
+            foreach (var item in items)
             {
-                UnitMeasureId = 70,
-                // CRÍTICO: LineExtensionAmount debe ser el valor ANTES de descuentos según FAU02
-                LineExtensionAmount = subtotal,  // NO restar el descuento aquí
-                InvoicedQuantity = item.InvoicedQuantity,
-                FreeOfChargeIndicator = false,
+                // Subtotal (precio × cantidad)
+                double subtotal = (double)(item.PriceAmount * item.InvoicedQuantity);
 
-                // Los descuentos van SOLO en allowance_charges
-                AllowanceCharges = discount > 0
-                    ? [
-                        new AllowanceChargeEntity {
+                // Descuento si existe (campo que venga en el item original)
+                double discount = item.LineDiscountAmount > 0 ? (double)item.LineDiscountAmount : 0;
+
+                // Base después del descuento (base imponible para calcular impuestos)
+                double taxableBase = subtotal - discount;
+
+                // Calcular impuesto sobre la base imponible
+                double taxAmount = taxableBase * ((double)item.Percent / 100.0);
+
+                // Redondeos: DIAN trabaja a 2 decimales, hacemos los redondeos por línea
+                double taxableBaseRounded = Math.Round(taxableBase, 2, MidpointRounding.AwayFromZero);
+                double taxAmountRounded = Math.Round(taxAmount, 2, MidpointRounding.AwayFromZero);
+                decimal discountRounded = Math.Round((decimal)discount, 2);
+
+                var allowanceCharges = new List<AllowanceChargeEntity>();
+                if (discount > 0)
+                {
+                    allowanceCharges.Add(new AllowanceChargeEntity
+                    {
                         ChargeIndicator = false,
                         AllowanceChargeReason = "Discount",
-                        MultiplierFactorNumeric = (decimal)(discountPercent / 100), // Como decimal 0-1
-                        Amount = (decimal)discount,
-                        BaseAmount = (decimal)subtotal
-                    }
-                    ]
-                    : [],
-
-                // Los impuestos se calculan sobre la base DESPUÉS de descuentos
-                TaxTotals = [
-                    new TaxTotalEntity {
-                    TaxId = 1,
-                    Percent = item.Percent,
-                    TaxAmount = taxAmount,
-                    TaxableAmount = baseAfterDiscount  // Base después de descuento
+                        MultiplierFactorNumeric = subtotal > 0 ? (decimal)(discount / subtotal) : 0m,
+                        Amount = discountRounded,
+                        BaseAmount = Math.Round((decimal)subtotal, 2)
+                    });
                 }
-                ],
 
-                WithHoldingTaxTotal = [],
-                Description = $"{item.Description} {(taxAmount > 0 ? $"IVA {taxAmount}" : "")}",
-                Notes = "",
-                Code = item.Code,
-                TypeItemIdentificationId = 1,
-                PriceAmount = item.UnitPrice,
-                BaseQuantity = item.InvoicedQuantity,
-                UnitPriceBeforeDiscount = item.UnitPriceBeforeDiscount,
-                LineDiscountAmount = discount,
-                LineDiscountType = item.LineDiscountType
-            };
+                var taxTotals = new List<TaxTotalEntity>();
+                // Si no hay impuesto relevante, puede quedar con percent = 0 y taxAmount = 0
+                taxTotals.Add(new TaxTotalEntity
+                {
+                    TaxId = item.TaxTotals != null && item.TaxTotals.Any() ? item.TaxTotals.First().TaxId : 1,
+                    Percent = item.Percent,
+                    TaxAmount = taxAmountRounded,
+                    TaxableAmount = taxableBaseRounded
+                });
 
-            itemsInvoiceResponse.Add(itemInvoice);
+                var itemInvoice = new ItemElectronicEntity
+                {
+                    UnitMeasureId = item.UnitMeasureId > 0 ? item.UnitMeasureId : 70,
+                    // CRÍTICO: LineExtensionAmount = base después del descuento (DIAN)
+                    LineExtensionAmount = taxableBaseRounded,
+                    InvoicedQuantity = item.InvoicedQuantity,
+                    FreeOfChargeIndicator = item.FreeOfChargeIndicator,
+                    AllowanceCharges = allowanceCharges,
+                    TaxTotals = taxTotals,
+                    WithHoldingTaxTotal = [],
+                    Description = item.Description + (taxAmountRounded > 0 ? $" IVA {taxAmountRounded:F2}" : ""),
+                    Notes = item.Notes,
+                    Code = item.Code,
+                    TypeItemIdentificationId = item.TypeItemIdentificationId,
+                    PriceAmount = item.PriceAmount,
+                    BaseQuantity = item.BaseQuantity,
+                };
+
+                itemsInvoiceResponse.Add(itemInvoice);
+            }
+
+            return await Task.FromResult(itemsInvoiceResponse);
         }
-
-        return await Task.FromResult(itemsInvoiceResponse);
     }
 }
