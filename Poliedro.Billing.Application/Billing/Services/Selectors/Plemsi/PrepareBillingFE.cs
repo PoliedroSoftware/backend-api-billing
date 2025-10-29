@@ -71,31 +71,28 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     double invoiceBaseTotal = invoice.ItemElectronicEntity.Sum(i => (double)i.LineExtensionAmount);
 
                     // Total descuentos: suma de montos redondeados en AllowanceCharges (informativo)
-                    double allowanceTotal = invoice.ItemElectronicEntity
-                        .Sum(i => (double)(i.AllowanceCharges?.Sum(a => (double)a.Amount) ?? 0.0));
+                    double allowanceTotal = 0;
+
+                    double invoiceTaxExclusiveTotal = invoiceBaseTotal;
+
+                    // Impuestos: suma de TaxAmount por línea (ya redondeados en PrepareItemElectronic)
+                    double totalTaxes = Math.Round(invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0)), 2, MidpointRounding.AwayFromZero);
+
+                    // invoiceTaxInclusiveTotal = base + impuestos
+                    double invoiceTaxInclusiveTotal = Math.Round(invoiceBaseTotal + totalTaxes, 2, MidpointRounding.AwayFromZero);
 
                     // Incluir descuento global (si existe) — también redondeado
                     if (globalDiscount > 0)
                     {
                         allowanceTotal += Math.Round(globalDiscount, 2);
-                        invoiceBaseTotal = Math.Round(invoiceBaseTotal - Math.Round(globalDiscount, 2), 2);
+                        
                     }
 
                     // Redondear invoiceBaseTotal (asegurar 2 decimales)
                     invoiceBaseTotal = Math.Round(invoiceBaseTotal, 2, MidpointRounding.AwayFromZero);
 
-                    // Impuestos: suma de TaxAmount por línea (ya redondeados en PrepareItemElectronic)
-                    double totalTaxes = Math.Round(invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0)), 2, MidpointRounding.AwayFromZero);
-
-                    // Totales según DIAN
-                    // invoiceTaxExclusiveTotal = base (ya con descuentos)
-                    double invoiceTaxExclusiveTotal = invoiceBaseTotal;
-
-                    // invoiceTaxInclusiveTotal = base + impuestos
-                    double invoiceTaxInclusiveTotal = Math.Round(invoiceTaxExclusiveTotal + totalTaxes, 2, MidpointRounding.AwayFromZero);
-
                     // totalToPay = invoiceTaxInclusiveTotal (si no hay cargos adicionales)
-                    double totalToPay = invoiceTaxInclusiveTotal;
+                    double totalToPay = invoiceTaxInclusiveTotal - Math.Round(globalDiscount,2);
 
                     // Asegurar que allowanceTotal también esté con 2 decimales
                     allowanceTotal = Math.Round(allowanceTotal, 2, MidpointRounding.AwayFromZero);
@@ -222,7 +219,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         // Totales según validación DIAN (ya redondeados)
                         allowanceTotal = allowanceTotal,
                         invoiceBaseTotal = invoiceBaseTotal,
-                        invoiceTaxExclusiveTotal = invoiceTaxExclusiveTotal,
+                        invoiceTaxExclusiveTotal = Math.Round(invoiceTaxExclusiveTotal,1),
                         invoiceTaxInclusiveTotal = invoiceTaxInclusiveTotal,
                         totalToPay = totalToPay,
 

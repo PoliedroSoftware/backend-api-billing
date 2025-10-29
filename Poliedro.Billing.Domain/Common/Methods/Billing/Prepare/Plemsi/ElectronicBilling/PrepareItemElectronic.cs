@@ -40,7 +40,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                     {
                         ChargeIndicator = false,
                         AllowanceChargeReason = "Discount",
-                        MultiplierFactorNumeric = subtotal > 0 ? (decimal)(discount / subtotal) : 0m,
+                        MultiplierFactorNumeric = subtotal > 0 ? Math.Round((decimal)(discount / subtotal), 6) : 0m,
                         Amount = discountRounded,
                         BaseAmount = Math.Round((decimal)subtotal, 2)
                     });
@@ -59,7 +59,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                 var itemInvoice = new ItemElectronicEntity
                 {
                     UnitMeasureId = item.UnitMeasureId > 0 ? item.UnitMeasureId : 70,
-                    // CRÍTICO: LineExtensionAmount = base después del descuento (DIAN)
+                   
                     LineExtensionAmount = taxableBaseRounded,
                     InvoicedQuantity = item.InvoicedQuantity,
                     FreeOfChargeIndicator = item.FreeOfChargeIndicator,
@@ -69,7 +69,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                     Description = item.Description + (taxAmountRounded > 0 ? $" IVA {taxAmountRounded:F2}" : ""),
                     Notes = item.Notes,
                     Code = item.Code,
-                    TypeItemIdentificationId = item.TypeItemIdentificationId,
+                    TypeItemIdentificationId = 1,
                     PriceAmount = item.PriceAmount,
                     BaseQuantity = item.BaseQuantity,
                 };
