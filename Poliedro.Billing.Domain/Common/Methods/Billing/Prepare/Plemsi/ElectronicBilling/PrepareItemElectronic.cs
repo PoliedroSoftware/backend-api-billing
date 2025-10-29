@@ -1,51 +1,83 @@
 ﻿using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
-using System;
 
-namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
-
-public class PrepareItemElectronic : IPrepareItemBilling
+namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling
 {
-       public async Task<List<ItemElectronicEntity>> PrepareItemBillingAsync(List<ItemElectronicEntity> items)
+    public class PrepareItemElectronic : IPrepareItemBilling
+    {
+        public async Task<List<ItemElectronicEntity>> PrepareItemBillingAsync(List<ItemElectronicEntity> items)
         {
-        List<ItemElectronicEntity> itemsInvoiceResponse = [];
+            var itemsInvoiceResponse = new List<ItemElectronicEntity>();
 
-        foreach (ItemElectronicEntity item in items)
-        {
-            var itemInvoice = new ItemElectronicEntity
+            foreach (var item in items)
             {
-                UnitMeasureId = 70,
-                LineExtensionAmount = item.UnitPrice * item.InvoicedQuantity,
-                InvoicedQuantity = item.InvoicedQuantity,
-                FreeOfChargeIndicator = false,
+               
+                double subtotal = Math.Round((double)(item.PriceAmount * item.InvoicedQuantity), 2, MidpointRounding.AwayFromZero);
 
+                
+                double discount = item.LineDiscountAmount > 0 ? Math.Round((double)item.LineDiscountAmount, 2, MidpointRounding.AwayFromZero) : 0;
 
-                AllowanceCharges = [],
+                
+                double taxableBase = Math.Round(subtotal - discount, 2, MidpointRounding.AwayFromZero);
 
+               
+                double taxAmount = Math.Round(taxableBase * ((double)item.Percent / 100.0), 2, MidpointRounding.AwayFromZero);
 
-                TaxTotals = [
-                     new TaxTotalEntity {
-                        TaxId = 1,
-                        Percent = item.Percent,
-                        TaxAmount = item.TaxAmount * item.InvoicedQuantity,
-                        TaxableAmount = item.UnitPrice * item.InvoicedQuantity
-                }],
+                
+                decimal discountRounded = Math.Round((decimal)discount, 2, MidpointRounding.AwayFromZero);
+                decimal multiplierFactor = subtotal > 0
+                    ? Math.Round((decimal)(discount / subtotal), 6, MidpointRounding.AwayFromZero)
+                    : 0m;
 
+               
+                var allowanceCharges = new List<AllowanceChargeEntity>();
+                if (discount > 0)
+                {
+                    allowanceCharges.Add(new AllowanceChargeEntity
+                    {
+                        ChargeIndicator = false,
+                        AllowanceChargeReason = "Discount",
+                        MultiplierFactorNumeric = multiplierFactor,
+                        Amount = discountRounded,
+                        BaseAmount = Math.Round((decimal)subtotal, 2, MidpointRounding.AwayFromZero)
+                    });
+                }
 
-                WithHoldingTaxTotal = [],
-
-
-                Description = $"{item.Description} {(item.TaxTotals?.FirstOrDefault()?.TaxAmount > 0 ? $"IVA {item.TaxTotals?.FirstOrDefault()?.TaxAmount}" : "")}",
-                Notes = "",
-                Code = item.Code,
-                TypeItemIdentificationId = 1,
-                PriceAmount = item.UnitPrice,
-                BaseQuantity = item.InvoicedQuantity,
+                
+                var taxTotals = new List<TaxTotalEntity>
+            {
+                new TaxTotalEntity
+                {
+                    TaxId = item.TaxTotals != null && item.TaxTotals.Any() ? item.TaxTotals.First().TaxId : 1,
+                    Percent = item.Percent,
+                    TaxAmount = taxAmount,
+                    TaxableAmount = taxableBase
+                }
             };
-            itemsInvoiceResponse.Add(itemInvoice);
 
+                
+                var itemInvoice = new ItemElectronicEntity
+                {
+                    UnitMeasureId = item.UnitMeasureId > 0 ? item.UnitMeasureId : 70,
+                    LineExtensionAmount = taxableBase,
+                    InvoicedQuantity = Math.Round(item.InvoicedQuantity, 2, MidpointRounding.AwayFromZero),
+                    FreeOfChargeIndicator = item.FreeOfChargeIndicator,
+                    AllowanceCharges = allowanceCharges,
+                    TaxTotals = taxTotals,
+                    WithHoldingTaxTotal = [],
+                    Description = item.Description + (taxAmount > 0 ? $" IVA {taxAmount:F2}" : ""),
+                    Notes = item.Notes,
+                    Code = item.Code,
+                    TypeItemIdentificationId = 1,
+                    PriceAmount = Math.Round(item.PriceAmount, 2, MidpointRounding.AwayFromZero),
+                    BaseQuantity = item.BaseQuantity,
+                };
+
+                itemsInvoiceResponse.Add(itemInvoice);
+            }
+
+            return await Task.FromResult(itemsInvoiceResponse);
         }
-
-        return await Task.FromResult(itemsInvoiceResponse);
     }
+
 }

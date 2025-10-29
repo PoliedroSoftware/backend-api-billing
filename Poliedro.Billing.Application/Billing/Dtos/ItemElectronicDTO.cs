@@ -4,6 +4,9 @@ public record ItemElectronicDTO
     (
         int UnitMeasureId,
         double LineExtensionAmount,
+        double? LineDiscountAmount,
+        string? LineDiscountType,
+        double? UnitPriceBeforeDiscount,
         int? Transaccion,
         bool FreeOfChargeIndicator,
         List<AllowanceChargeDTO>? AllowanceCharges,

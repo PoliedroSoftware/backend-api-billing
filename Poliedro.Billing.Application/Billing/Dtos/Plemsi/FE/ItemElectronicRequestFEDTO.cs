@@ -14,4 +14,5 @@ public record ItemElectronicRequestFEDTO
      public double price_amount { get; init; }
      public double base_quantity { get; init; }
      public double invoiced_quantity { get; init; }
-    }
+     
+}
