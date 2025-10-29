@@ -4,11 +4,6 @@ using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 {
@@ -58,43 +53,54 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         continue;
                     }
 
-                    // Procesar items (devuelven LineExtensionAmount ya con descuentos y TaxTotals con montos redondeados)
+                   
                     invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(
                         invoice.ItemElectronicEntity);
 
-                    // =============== CÁLCULOS SEGÚN DIAN ===============
+                   
+                    foreach (var item in invoice.ItemElectronicEntity)
+                    {
+                        if (item.AllowanceCharges != null)
+                        {
+                            foreach (var allowance in item.AllowanceCharges)
+                            {
+                                allowance.MultiplierFactorNumeric = Math.Round(
+                                    allowance.MultiplierFactorNumeric, 6, MidpointRounding.AwayFromZero);
+                            }
+                        }
+                    }
 
-                    // Si existe un descuento global (campo original en invoice)
+                   
+
+                  
                     double globalDiscount = invoice.DiscountAmountByInvoice > 0 ? (double)invoice.DiscountAmountByInvoice : 0;
 
-                    // Base = suma de LineExtensionAmount (ya con descuentos aplicados por línea)
+                    
                     double invoiceBaseTotal = invoice.ItemElectronicEntity.Sum(i => (double)i.LineExtensionAmount);
 
-                    // Total descuentos: suma de montos redondeados en AllowanceCharges (informativo)
+                   
                     double allowanceTotal = 0;
 
                     double invoiceTaxExclusiveTotal = invoiceBaseTotal;
 
-                    // Impuestos: suma de TaxAmount por línea (ya redondeados en PrepareItemElectronic)
+                   
                     double totalTaxes = Math.Round(invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0)), 2, MidpointRounding.AwayFromZero);
 
-                    // invoiceTaxInclusiveTotal = base + impuestos
+                    
                     double invoiceTaxInclusiveTotal = Math.Round(invoiceBaseTotal + totalTaxes, 2, MidpointRounding.AwayFromZero);
 
-                    // Incluir descuento global (si existe) — también redondeado
+                  
                     if (globalDiscount > 0)
                     {
                         allowanceTotal += Math.Round(globalDiscount, 2);
-                        
                     }
 
-                    // Redondear invoiceBaseTotal (asegurar 2 decimales)
+                
                     invoiceBaseTotal = Math.Round(invoiceBaseTotal, 2, MidpointRounding.AwayFromZero);
 
-                    // totalToPay = invoiceTaxInclusiveTotal (si no hay cargos adicionales)
-                    double totalToPay = invoiceTaxInclusiveTotal - Math.Round(globalDiscount,2);
+                    
+                    double totalToPay = invoiceTaxInclusiveTotal - Math.Round(globalDiscount, 2);
 
-                    // Asegurar que allowanceTotal también esté con 2 decimales
                     allowanceTotal = Math.Round(allowanceTotal, 2, MidpointRounding.AwayFromZero);
 
                     if (totalToPay <= 0)
@@ -103,7 +109,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         continue;
                     }
 
-                    // Asignar valores al objeto invoice (redondeados)
+                   
                     invoice.InvoiceBaseTotal = invoiceBaseTotal;
                     invoice.AllowanceTotal = allowanceTotal;
                     invoice.InvoiceTaxExclusiveTotal = invoiceTaxExclusiveTotal;
@@ -111,7 +117,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.TotalToPay = totalToPay;
                     invoice.FinalTotalToPay = totalToPay;
 
-                    // Generar número de factura
+                 
                     int invoiceNumber = invoiceCounter++;
                     string formattedDate = DateTime.Now.ToString("yyyy-MM-dd");
                     string currentTime = DateTime.Now.ToString("HH:mm:ss");
@@ -122,7 +128,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
                     invoice.Numeration = invoiceNumber.ToString();
 
-                    // Validar tipo de documento y dígito de verificación
+                    
                     DocumentType documentType = await _billingValidateScript
                         .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
 
@@ -148,13 +154,13 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         checkDigit = _config["CosumerFinal:dv"];
                     }
 
-                    // Calcular porcentaje de descuento global (si aplica)
+                   
                     double discountPercent = invoiceBaseTotal > 0 && globalDiscount > 0
                         ? (globalDiscount / invoiceBaseTotal) * 100
                         : 0;
                     double roundedDiscountPercent = Math.Round(discountPercent, 2);
 
-                    // Construir entidad electrónica (usamos los valores ya redondeados)
+                
                     FERetailelectronicEntity data = new()
                     {
                         date = formattedDate,
@@ -197,7 +203,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                             DurationMeasure = "30"
                         },
 
-                        // Incluir descuento global solo si existe (ya redondeado)
+                       
                         generalAllowances = globalDiscount > 0
                             ? new List<GeneralAllowanceEntity> {
                                 new GeneralAllowanceEntity {
@@ -216,10 +222,10 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         foot_note = invoice.Number,
                         notes = $"Fecha de la factura:{invoice.TransactionDate}",
 
-                        // Totales según validación DIAN (ya redondeados)
+                       
                         allowanceTotal = allowanceTotal,
                         invoiceBaseTotal = invoiceBaseTotal,
-                        invoiceTaxExclusiveTotal = Math.Round(invoiceTaxExclusiveTotal,1),
+                        invoiceTaxExclusiveTotal = Math.Round(invoiceTaxExclusiveTotal, 1),
                         invoiceTaxInclusiveTotal = invoiceTaxInclusiveTotal,
                         totalToPay = totalToPay,
 

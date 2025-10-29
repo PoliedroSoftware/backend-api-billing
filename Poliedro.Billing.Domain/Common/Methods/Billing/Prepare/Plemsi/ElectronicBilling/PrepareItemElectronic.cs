@@ -1,13 +1,8 @@
 ﻿using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling
 {
-    // PrepareItemElectronic.cs
     public class PrepareItemElectronic : IPrepareItemBilling
     {
         public async Task<List<ItemElectronicEntity>> PrepareItemBillingAsync(List<ItemElectronicEntity> items)
@@ -16,23 +11,25 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
 
             foreach (var item in items)
             {
-                // Subtotal (precio × cantidad)
-                double subtotal = (double)(item.PriceAmount * item.InvoicedQuantity);
+               
+                double subtotal = Math.Round((double)(item.PriceAmount * item.InvoicedQuantity), 2, MidpointRounding.AwayFromZero);
 
-                // Descuento si existe (campo que venga en el item original)
-                double discount = item.LineDiscountAmount > 0 ? (double)item.LineDiscountAmount : 0;
+                
+                double discount = item.LineDiscountAmount > 0 ? Math.Round((double)item.LineDiscountAmount, 2, MidpointRounding.AwayFromZero) : 0;
 
-                // Base después del descuento (base imponible para calcular impuestos)
-                double taxableBase = subtotal - discount;
+                
+                double taxableBase = Math.Round(subtotal - discount, 2, MidpointRounding.AwayFromZero);
 
-                // Calcular impuesto sobre la base imponible
-                double taxAmount = taxableBase * ((double)item.Percent / 100.0);
+               
+                double taxAmount = Math.Round(taxableBase * ((double)item.Percent / 100.0), 2, MidpointRounding.AwayFromZero);
 
-                // Redondeos: DIAN trabaja a 2 decimales, hacemos los redondeos por línea
-                double taxableBaseRounded = Math.Round(taxableBase, 2, MidpointRounding.AwayFromZero);
-                double taxAmountRounded = Math.Round(taxAmount, 2, MidpointRounding.AwayFromZero);
-                decimal discountRounded = Math.Round((decimal)discount, 2);
+                
+                decimal discountRounded = Math.Round((decimal)discount, 2, MidpointRounding.AwayFromZero);
+                decimal multiplierFactor = subtotal > 0
+                    ? Math.Round((decimal)(discount / subtotal), 6, MidpointRounding.AwayFromZero)
+                    : 0m;
 
+               
                 var allowanceCharges = new List<AllowanceChargeEntity>();
                 if (discount > 0)
                 {
@@ -40,37 +37,39 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                     {
                         ChargeIndicator = false,
                         AllowanceChargeReason = "Discount",
-                        MultiplierFactorNumeric = subtotal > 0 ? Math.Round((decimal)(discount / subtotal), 6) : 0m,
+                        MultiplierFactorNumeric = multiplierFactor,
                         Amount = discountRounded,
-                        BaseAmount = Math.Round((decimal)subtotal, 2)
+                        BaseAmount = Math.Round((decimal)subtotal, 2, MidpointRounding.AwayFromZero)
                     });
                 }
 
-                var taxTotals = new List<TaxTotalEntity>();
-                // Si no hay impuesto relevante, puede quedar con percent = 0 y taxAmount = 0
-                taxTotals.Add(new TaxTotalEntity
+                
+                var taxTotals = new List<TaxTotalEntity>
+            {
+                new TaxTotalEntity
                 {
                     TaxId = item.TaxTotals != null && item.TaxTotals.Any() ? item.TaxTotals.First().TaxId : 1,
                     Percent = item.Percent,
-                    TaxAmount = taxAmountRounded,
-                    TaxableAmount = taxableBaseRounded
-                });
+                    TaxAmount = taxAmount,
+                    TaxableAmount = taxableBase
+                }
+            };
 
+                
                 var itemInvoice = new ItemElectronicEntity
                 {
                     UnitMeasureId = item.UnitMeasureId > 0 ? item.UnitMeasureId : 70,
-                   
-                    LineExtensionAmount = taxableBaseRounded,
-                    InvoicedQuantity = item.InvoicedQuantity,
+                    LineExtensionAmount = taxableBase,
+                    InvoicedQuantity = Math.Round(item.InvoicedQuantity, 2, MidpointRounding.AwayFromZero),
                     FreeOfChargeIndicator = item.FreeOfChargeIndicator,
                     AllowanceCharges = allowanceCharges,
                     TaxTotals = taxTotals,
                     WithHoldingTaxTotal = [],
-                    Description = item.Description + (taxAmountRounded > 0 ? $" IVA {taxAmountRounded:F2}" : ""),
+                    Description = item.Description + (taxAmount > 0 ? $" IVA {taxAmount:F2}" : ""),
                     Notes = item.Notes,
                     Code = item.Code,
                     TypeItemIdentificationId = 1,
-                    PriceAmount = item.PriceAmount,
+                    PriceAmount = Math.Round(item.PriceAmount, 2, MidpointRounding.AwayFromZero),
                     BaseQuantity = item.BaseQuantity,
                 };
 
@@ -80,4 +79,5 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
             return await Task.FromResult(itemsInvoiceResponse);
         }
     }
+
 }
