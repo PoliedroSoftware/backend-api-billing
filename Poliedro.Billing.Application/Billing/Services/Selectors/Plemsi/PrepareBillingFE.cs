@@ -53,11 +53,11 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         continue;
                     }
 
-                   
+
                     invoice.ItemElectronicEntity = await _prepareItemElectronic.PrepareItemBillingAsync(
                         invoice.ItemElectronicEntity);
 
-                   
+
                     foreach (var item in invoice.ItemElectronicEntity)
                     {
                         if (item.AllowanceCharges != null)
@@ -70,35 +70,35 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         }
                     }
 
-                   
 
-                  
+
+
                     double globalDiscount = invoice.DiscountAmountByInvoice > 0 ? (double)invoice.DiscountAmountByInvoice : 0;
 
-                    
+
                     double invoiceBaseTotal = invoice.ItemElectronicEntity.Sum(i => (double)i.LineExtensionAmount);
 
-                   
+
                     double allowanceTotal = 0;
 
                     double invoiceTaxExclusiveTotal = invoiceBaseTotal;
 
-                   
+
                     double totalTaxes = Math.Round(invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0)), 2, MidpointRounding.AwayFromZero);
 
-                    
+
                     double invoiceTaxInclusiveTotal = Math.Round(invoiceBaseTotal + totalTaxes, 2, MidpointRounding.AwayFromZero);
 
-                  
+
                     if (globalDiscount > 0)
                     {
                         allowanceTotal += Math.Round(globalDiscount, 2);
                     }
 
-                
+
                     invoiceBaseTotal = Math.Round(invoiceBaseTotal, 2, MidpointRounding.AwayFromZero);
 
-                    
+
                     double totalToPay = invoiceTaxInclusiveTotal - Math.Round(globalDiscount, 2);
 
                     allowanceTotal = Math.Round(allowanceTotal, 2, MidpointRounding.AwayFromZero);
@@ -109,7 +109,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         continue;
                     }
 
-                   
+
                     invoice.InvoiceBaseTotal = invoiceBaseTotal;
                     invoice.AllowanceTotal = allowanceTotal;
                     invoice.InvoiceTaxExclusiveTotal = invoiceTaxExclusiveTotal;
@@ -117,7 +117,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.TotalToPay = totalToPay;
                     invoice.FinalTotalToPay = totalToPay;
 
-                 
+
                     int invoiceNumber = invoiceCounter++;
                     string formattedDate = DateTime.Now.ToString("yyyy-MM-dd");
                     string currentTime = DateTime.Now.ToString("HH:mm:ss");
@@ -128,7 +128,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
                     invoice.Numeration = invoiceNumber.ToString();
 
-                    
+
                     DocumentType documentType = await _billingValidateScript
                         .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
 
@@ -154,13 +154,13 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         checkDigit = _config["CosumerFinal:dv"];
                     }
 
-                   
+
                     double discountPercent = invoiceBaseTotal > 0 && globalDiscount > 0
                         ? (globalDiscount / invoiceBaseTotal) * 100
                         : 0;
                     double roundedDiscountPercent = Math.Round(discountPercent, 2);
 
-                
+
                     FERetailelectronicEntity data = new()
                     {
                         date = formattedDate,
@@ -203,7 +203,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                             DurationMeasure = "30"
                         },
 
-                       
+
                         generalAllowances = globalDiscount > 0
                             ? new List<GeneralAllowanceEntity> {
                                 new GeneralAllowanceEntity {
@@ -222,7 +222,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         foot_note = invoice.Number,
                         notes = $"Fecha de la factura:{invoice.TransactionDate}",
 
-                       
+
                         allowanceTotal = allowanceTotal,
                         invoiceBaseTotal = invoiceBaseTotal,
                         invoiceTaxExclusiveTotal = Math.Round(invoiceTaxExclusiveTotal, 1),
