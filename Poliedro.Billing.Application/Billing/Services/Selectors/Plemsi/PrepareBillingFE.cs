@@ -218,8 +218,8 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         items = invoice.ItemElectronicEntity,
                         resolution = clientInfo.ResolucionNumber,
                         resolutionText = clientInfo.Descripcion,
-                        head_note = invoice.Number,
-                        foot_note = invoice.Number,
+                        head_note = string.IsNullOrWhiteSpace(clientInfo.HeadNote) ? invoice.Number : clientInfo.HeadNote,
+                        foot_note = string.IsNullOrWhiteSpace(clientInfo.FootNote) ? invoice.Number : clientInfo.FootNote,
                         notes = $"Fecha de la factura:{invoice.TransactionDate}",
 
 

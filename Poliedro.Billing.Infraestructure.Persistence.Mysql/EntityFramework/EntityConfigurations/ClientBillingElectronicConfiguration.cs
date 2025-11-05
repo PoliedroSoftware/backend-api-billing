@@ -21,8 +21,10 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.Ent
             builder.Property(x => x.ApiKey).HasColumnName("apikey");
             builder.Property(x => x.Automatic).HasColumnName("automatic");
             builder.Property(x => x.MultipleResolution).HasColumnName("multiple_resolution");
-            builder.Property(x => x.Email).HasColumnName("email")
-                .HasMaxLength(100)
+            builder.Property(x => x.Email).HasColumnName("email");
+            builder.Property(x => x.HeadNote).HasColumnName("head_note");
+            builder.Property(x => x.FootNote).HasColumnName("foot_note")
+                .HasMaxLength(1000)
                 .IsRequired(false);
             builder.HasOne(x => x.Server)
                 .WithMany(x => x.clientsBillingElectronic)
