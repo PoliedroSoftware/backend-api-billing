@@ -128,14 +128,12 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
                     invoice.Numeration = invoiceNumber.ToString();
 
+                    
+
 
                     DocumentType documentType = await _billingValidateScript
                         .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
 
-                    string identification = invoice.CustomerEntity.IdentificationNumber
-                        .Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
-                    string checkDigit = await _calculateCheckDigits
-                        .CalculateCheckDigit(identification, cancellationToken);
 
                     if (documentType == DocumentType.NIT)
                     {
@@ -148,6 +146,12 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         }
                     }
 
+                    string identification = invoice.CustomerEntity.IdentificationNumber
+                        .Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
+                    string checkDigit = await _calculateCheckDigits
+                        .CalculateCheckDigit(identification, cancellationToken);
+
+                    
                     if (checkDigit == "error")
                     {
                         identification = _config["CosumerFinal:identification"];
