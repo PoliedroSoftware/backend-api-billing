@@ -24,7 +24,9 @@ public class BillingGetInfoClient : IBillingGetInfoClient
             Descripcion = clientEntity.DianResolution.Description,
             CurrentlyNumber = clientEntity.DianResolution.CurrentlyNumber,
             MultipleResolution = clientEntity.MultipleResolution,
-            ResolutionId = clientEntity.ResolutionId
+            ResolutionId = clientEntity.ResolutionId,
+            HeadNote = clientEntity.HeadNote,
+            FootNote = clientEntity.FootNote
 
         };
 

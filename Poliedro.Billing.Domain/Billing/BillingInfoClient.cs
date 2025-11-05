@@ -15,6 +15,7 @@ public class BillingInfoClient
     public required string Descripcion { get; set; }
     public required int CurrentlyNumber { get; set; }
     public required int MultipleResolution { get; set; }
-
+    public string? HeadNote { get; set; }
+    public string? FootNote { get; set; }
     public required int ResolutionId { get; set; }
 }
