@@ -135,6 +135,10 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
 
 
+                    string identification = invoice.CustomerEntity.IdentificationNumber.Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
+
+                    invoice.CustomerEntity.IdentificationNumber = identification;
+
                     if (documentType == DocumentType.NIT)
                     {
                         invoice.CustomerEntity.IdentificationNumber =
@@ -146,10 +150,9 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         }
                     }
 
-                    string identification = invoice.CustomerEntity.IdentificationNumber
-                        .Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
+
                     string checkDigit = await _calculateCheckDigits
-                        .CalculateCheckDigit(identification, cancellationToken);
+                        .CalculateCheckDigit(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
 
                     
                     if (checkDigit == "error")
@@ -185,7 +188,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         },
                         customer = new CustomerEntity
                         {
-                            IdentificationNumber = identification,
+                            IdentificationNumber = invoice.CustomerEntity.IdentificationNumber,
                             Dv = checkDigit,
                             Name = invoice.CustomerEntity.Name,
                             Phone = invoice.CustomerEntity.Phone,

@@ -21,6 +21,6 @@ public class ClientEntity
     public int Automatic { get; set; } = default!;
     public int MultipleResolution { get; set; } = default!;
     public string Email { get; set; } = string.Empty;
-    public string HeadNote {  get; set; } = string.Empty;
-    public string FootNote { get; set; } = string.Empty;
+    public string? HeadNote {  get; set; } 
+    public string? FootNote { get; set; } 
 }
