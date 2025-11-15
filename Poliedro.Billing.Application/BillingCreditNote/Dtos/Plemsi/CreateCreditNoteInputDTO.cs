@@ -1,10 +1,10 @@
-﻿using Poliedro.Billing.Application.BillingCreditNote.Dtos.Plemsi;
+﻿using Poliedro.Billing.Application.Billing.Dtos;
 
-namespace Poliedro.Billing.Application.Billing.Dtos;
-public record CreateBillingInputDTO(
-        DateTime Date,
-        DateTime Time,
+namespace Poliedro.Billing.Application.BillingCreditNote.Dtos.Plemsi;
+public record  CreateCreditNoteInputDTO
+    (
         string? SendToEmail,
+        DiscrepancyDTO? Discrepancy,
         SoftwareManufacturerDTO? SoftwareManufacturer,
         PayPointInfoDTO? PayPointInfo,
         string Number,
@@ -12,8 +12,6 @@ public record CreateBillingInputDTO(
         DateTime? TransactionDate,
         OrderReferenceDTO? OrderReference,
         bool? SendEmail,
-        AttachmentDTO? Attachment1,
-        AttachmentDTO? Attachment2,
         CustomerBillingDTO? CustomerEntity,
         PaymentDTO? PaymentEntity,
         List<GeneralAllowanceDTO>? GeneralAllowanceEntity,
@@ -32,7 +30,5 @@ public record CreateBillingInputDTO(
         double InvoiceTaxInclusiveTotal,
         double TotalToPay,
         List<AllTaxTotalDTO>? AllTaxTotalEntity,
-        List<AllHoldingsTaxTotalDTO>? AllHoldingsTaxTotalEntity,
-        double FinalTotalToPay
-
+        List<AllHoldingsTaxTotalDTO>? AllHoldingsTaxTotalEntity
     );

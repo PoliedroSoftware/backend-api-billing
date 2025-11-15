@@ -32,6 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BillingCreditNote\Services\Factories\TNS\" />
+    <Folder Include="BillingCreditNote\Services\Factories\Siigo\" />
+    <Folder Include="BillingCreditNote\Services\Factories\Plemsi\" />
+    <Folder Include="BillingCreditNote\Services\Selectors\TNS\" />
+    <Folder Include="BillingCreditNote\Services\Selectors\Siigo\" />
+    <Folder Include="BillingCreditNote\Services\Selectors\Plemsi\" />
     <Folder Include="Billing\Services\Selectors\TNS\" />
     <Folder Include="Billing\Services\Selectors\Siigo\" />
     <Folder Include="CreditNote\Commands\CreateCreditNote\Command\" />
