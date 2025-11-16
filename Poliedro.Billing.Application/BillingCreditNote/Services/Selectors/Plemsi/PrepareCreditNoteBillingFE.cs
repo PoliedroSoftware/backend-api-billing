@@ -7,6 +7,11 @@ namespace Poliedro.Billing.Application.BillingCreditNote.Services.Selectors.Plem
     {
         public Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateCreditNoteAsync(IEnumerable<CreateBilling> invoice, BillingInfoClient ClientInfo, CancellationToken cancellationToken)
         {
+
+            var results = new List<(CreateBilling Billing, object Output)>();
+            int lastInvoiceNumber;
+
+
             throw new NotImplementedException();
         }
     }

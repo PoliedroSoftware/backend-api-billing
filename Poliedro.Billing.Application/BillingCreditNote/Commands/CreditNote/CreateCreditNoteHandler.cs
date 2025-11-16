@@ -28,12 +28,14 @@ public async  Task<IEnumerable<CreditNoteDTO>> Handle(CreateCreditNoteCommand re
 
         ClientEntity client = clientResult.Value;
 
-        throw new ArgumentException("El dato no puede ser nulo o vacío.");
+        
 
         var InfoClient = await _billingGetInfoClient.BillingInfoClient(client, cancellationToken);
 
         ICreateCreditNote processor = await _getProcessorCreditNote.GetProcessorAsync(InfoClient.TypeResolution, InfoClient.Provider);
 
         IEnumerable<(CreateBilling CreditNote, object Output)> ProcessedCreditNotes = await processor.CreateCreditNoteAsync(CreateCreditNote, InfoClient, cancellationToken);
+
+        throw new ArgumentException("El dato no puede ser nulo o vacío.");
     }
 }

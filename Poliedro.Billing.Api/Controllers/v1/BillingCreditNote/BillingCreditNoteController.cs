@@ -22,7 +22,7 @@ public class BillingCreditNoteController(IMediator _mediator) : ControllerBase
     [Produces("application/json")]
     [HttpPost]
 
-    public async Task<IActionResult> CreateCreditNoteCommand([FromBody][Required] IEnumerable<CreateCreditNoteInputDTO> invoices, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateCreditNoteCommand([FromBody][Required] IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
     {
         var token = TokenHelper.ExtractBearerToken(Request);
         if (string.IsNullOrEmpty(token))

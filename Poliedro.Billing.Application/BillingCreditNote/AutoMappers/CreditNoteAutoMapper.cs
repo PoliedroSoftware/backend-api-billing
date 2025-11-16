@@ -14,7 +14,7 @@ public class CreditNoteAutoMapper : Profile
     {
 
         CreateMap<CreateBilling, CreditNoteDTO>();//output
-        CreateMap<CreateCreditNoteInputDTO, CreateBilling>();//intput
+        CreateMap<CreateBillingInputDTO, CreateBilling>();//intput
 
 
         //CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerDTO>().ReverseMap();
