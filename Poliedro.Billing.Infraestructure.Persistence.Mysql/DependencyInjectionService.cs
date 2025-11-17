@@ -2,12 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.NotifyResolution.Services;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 using Poliedro.Billing.Domain.InvoiceDetailElectronic.Ports;
-using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.InvoicePos.DomainService;
 using Poliedro.Billing.Domain.InvoicePos.DomainService.Impl;
 using Poliedro.Billing.Domain.InvoicePos.Ports;
+using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.NotifyResolution.Services;
 using Poliedro.Billing.Domain.PdfInvoice.Service;
 using Poliedro.Billing.Domain.PedingInvoice.DomainPedingInvoice;
@@ -18,14 +20,13 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Client.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.DianResolution.DomainService.Impl;
+using Poliedro.Billing.Infraestructure.Persistence.Mysql.DianResolutionCreditNote.DomineService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoiceDetailElectronic.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicePos;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
-using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 
 
 
@@ -69,7 +70,7 @@ public static class DependencyInjectionService
         services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
 
         //services.AddTransient<IGetLastInvoiceBilling>();
-
+        services.AddScoped<IDianResolutionCreditNote, DianResolutionCreditNoteDomainService>();
 
         return services;
     }
