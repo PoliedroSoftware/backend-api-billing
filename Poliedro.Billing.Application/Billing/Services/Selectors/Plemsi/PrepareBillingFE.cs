@@ -148,7 +148,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     
                     if (checkDigit == "error")
                     {
-                        identification = _config["CosumerFinal:identification"];
+                        invoice.CustomerEntity.IdentificationNumber = _config["CosumerFinal:identification"];
                         checkDigit = _config["CosumerFinal:dv"];
                     }
 
