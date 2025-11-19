@@ -65,7 +65,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     var invoice = new CreateBilling
                     {
                         Number = reader["invoice"]?.ToString(),
-                    
+
                         TransactionDate = reader.IsDBNull(reader.GetOrdinal("transaction_date"))
                             ? DateTime.MinValue
                             : reader.GetDateTime("transaction_date"),
@@ -88,6 +88,12 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                             City = reader["city"]?.ToString(),
                             State = reader["state"]?.ToString(),
                             Country = reader["country"]?.ToString()
+                        },
+
+                        PaymentEntity = new PaymentEntity
+                        {
+                            PaymentFormId = reader.IsDBNull(reader.GetOrdinal("payment_status")) ? 0 : Convert.ToInt32(reader["payment_status"])
+
                         },
 
                         ItemElectronicEntity = new List<ItemElectronicEntity>()
