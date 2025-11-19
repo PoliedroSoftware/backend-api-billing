@@ -18,7 +18,7 @@ public class CreateBilling
     public AttachmentEntity? Attachment1 { get; set; }
     public AttachmentEntity? Attachment2 { get; set; }
     public CustomerEntity? CustomerEntity { get; set; }
-    public PaymentFEEntity? PaymentEntity { get; set; }
+    public PaymentEntity? PaymentEntity { get; set; }
     public List<GeneralAllowanceEntity>? GeneralAllowanceEntity { get; set; }
     public List<ItemElectronicEntity>? ItemElectronicEntity { get; set; }
     public string? Resolution { get; set; }
