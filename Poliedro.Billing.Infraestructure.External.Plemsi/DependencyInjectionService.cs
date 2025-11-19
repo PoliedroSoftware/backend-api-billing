@@ -96,7 +96,9 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddScoped<IGetProcessorCreditNote, CreateCreditNoteFactory>();
             services.AddTransient<PrepareCreditNoteBillingFE>();
             services.AddTransient<PrepareCreditNoteBillingPOS>();
+            services.AddScoped<IBillingGetInfgoClientCreditNote, DianResolutionCreditNoteDomainService>();
 
+            services.AddScoped<IGetLastInvoiceNumberCreditNote, GetLastInvoiceNumberCreditNotePlemsi>();
 
 
             services.AddTransient<EmailErrorHandler>();

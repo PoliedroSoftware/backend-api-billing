@@ -4,17 +4,12 @@ namespace Poliedro.Billing.Application.BillingCreditNote.Dtos.Plemsi;
 
 public record CreditNoteDTO
 {
-    //public string date { get; init; }
-    //public string time { get; init; }
+
     public string prefix { get; init; }
     public int number { get; set; }
     public bool send_email { get; init; }
     public InvoiceReferenceDTO invoiceReference { get; init; }
     public DiscrepancyDTO discrepancy { get; init; }
-
-    //public OrderReferenceRequestFEDTO? orderReference { get; init; }
-    //public AttachmentRequestFEDTO? attachment1 { get; init; }
-    //public AttachmentRequestFEDTO? attachment2 { get; init; }
     public required CustomerRequestFEDTO customer { get; init; }
     public required PaymentRequestFEDTO payment { get; init; }
     public List<GeneralAllowanceRequestFEDTO>? generalAllowances { get; init; }
@@ -32,6 +27,4 @@ public record CreditNoteDTO
     public List<AllTaxTotalRequestFEDTO>? allTaxTotals { get; init; }
     public List<AllHoldingsTaxTotalRequestFEDTO>? allHoldingsTaxTotals { get; init;
     }
-    //public List<CustomSubtotalRequestFEDTO>? customSubtotals { get; init; }
-    //public double finalTotalToPay { get; init; }
 };

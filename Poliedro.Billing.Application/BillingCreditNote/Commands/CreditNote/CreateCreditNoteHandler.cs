@@ -11,7 +11,7 @@ namespace Poliedro.Billing.Application.BillingCreditNote.Commands.CreditNote;
 
 public class CreateCreditNoteHandler(
     IClientDomainService _clientDomainService,
-    IBillingGetInfoClient _billingGetInfoClient,
+    IBillingGetInfgoClientCreditNote _billingGetInfoClient,
     IGetProcessorCreditNote _getProcessorCreditNote,
     IMapper _mapper
     ) : IRequestHandler<CreateCreditNoteCommand, IEnumerable<CreditNoteDTO>>
@@ -28,9 +28,7 @@ public async  Task<IEnumerable<CreditNoteDTO>> Handle(CreateCreditNoteCommand re
 
         ClientEntity client = clientResult.Value;
 
-        
-
-        var InfoClient = await _billingGetInfoClient.BillingInfoClient(client, cancellationToken);
+        var InfoClient = await _billingGetInfoClient.BillingInfoClientCreditNote(client, cancellationToken);
 
         ICreateCreditNote processor = await _getProcessorCreditNote.GetProcessorAsync(InfoClient.TypeResolution, InfoClient.Provider);
 

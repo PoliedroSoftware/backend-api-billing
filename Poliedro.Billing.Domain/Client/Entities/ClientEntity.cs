@@ -10,7 +10,7 @@ public class ClientEntity
     public int ClientBillingElectronicId { get; set; } = default!;
     public string Name { get; set; } = string.Empty;
     public int ResolutionId { get; set; } = default!;
-    public int Resolution_credit_note_id { get; set; } = default!;
+    public int? Resolution_credit_note_id { get; set; } = default!;
     public int ServerId { get; set; } = default!;
     public ProviderType ProviderId { get; set; } = default!;
     public bool Active { get; set; } = default!;

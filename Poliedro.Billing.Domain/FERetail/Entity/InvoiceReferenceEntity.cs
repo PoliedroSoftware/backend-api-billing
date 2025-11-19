@@ -2,9 +2,9 @@
 
 public class InvoiceReferenceEntity
 {
-    public string? Number;
+    public string? Number { get; set; }
 
-    public string? UuId;
+    public string? UuId{ get; set; }
 
-    public DateTime? IssueDate;
+    public string? IssueDate { get; set; }
 }

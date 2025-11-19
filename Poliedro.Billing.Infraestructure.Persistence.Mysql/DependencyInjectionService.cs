@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.NotifyResolution.Services;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.BillingCreditNote.Ports;
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 using Poliedro.Billing.Domain.InvoiceDetailElectronic.Ports;
@@ -26,6 +27,7 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicePos;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
+using Poliedro.Billing.Infraestructure.Persistence.Mysql.ReferenceCreditNote.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
 
 
@@ -71,6 +73,8 @@ public static class DependencyInjectionService
 
         //services.AddTransient<IGetLastInvoiceBilling>();
         services.AddScoped<IDianResolutionCreditNote, DianResolutionCreditNoteDomainService>();
+
+        services.AddTransient<IGetInvoiceReferenceCreditNotePlemsi, GetInvoiceReferenceCreditNotePlemsi>();
 
         return services;
     }

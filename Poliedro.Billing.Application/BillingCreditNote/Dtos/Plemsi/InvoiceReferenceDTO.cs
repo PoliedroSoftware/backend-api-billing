@@ -5,5 +5,5 @@ public record InvoiceReferenceDTO
 
     public string uuid { get; init; } //CUFE DE LA FACTURA A REFERENCIAR
 
-    public DateTime issue_date { get; init; } //FECHA DE EMISIÓN DE LA FACTURA A REFERENCIAR
+    public string issue_date { get; init; } //FECHA DE EMISIÓN DE LA FACTURA A REFERENCIAR
 }
