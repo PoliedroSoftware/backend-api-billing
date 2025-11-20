@@ -101,6 +101,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddScoped<IGetLastInvoiceNumberCreditNote, GetLastInvoiceNumberCreditNotePlemsi>();
 
 
+
+            // Factoría y strategies
+
+
             services.AddTransient<EmailErrorHandler>();
             return services;
         }

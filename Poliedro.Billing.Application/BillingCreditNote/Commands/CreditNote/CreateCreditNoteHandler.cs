@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
+using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Application.BillingCreditNote.Dtos.Plemsi;
+using Poliedro.Billing.Application.BillingCreditNote.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.BillingCreditNote.Ports;
@@ -13,6 +16,7 @@ public class CreateCreditNoteHandler(
     IClientDomainService _clientDomainService,
     IBillingGetInfgoClientCreditNote _billingGetInfoClient,
     IGetProcessorCreditNote _getProcessorCreditNote,
+    IBillingCreditNoteSenderFactory _billingCreditNoteSenderFactory,
     IMapper _mapper
     ) : IRequestHandler<CreateCreditNoteCommand, IEnumerable<CreditNoteDTO>>
 {
@@ -33,6 +37,16 @@ public async  Task<IEnumerable<CreditNoteDTO>> Handle(CreateCreditNoteCommand re
         ICreateCreditNote processor = await _getProcessorCreditNote.GetProcessorAsync(InfoClient.TypeResolution, InfoClient.Provider);
 
         IEnumerable<(CreateBilling CreditNote, object Output)> ProcessedCreditNotes = await processor.CreateCreditNoteAsync(CreateCreditNote, InfoClient, cancellationToken);
+
+        IEnumerable<CreateBilling> billingEntitiesProcessed = ProcessedCreditNotes.Select(p => p.CreditNote);
+        IEnumerable<object> outputEntitiesProcessed = ProcessedCreditNotes.Select(p => p.Output);
+
+        IBillingCreditNoteSender sender = _billingCreditNoteSenderFactory.ResolveCreditNote(InfoClient.Provider, InfoClient.TypeResolution);
+
+        var billingResults = new List<CreateBillingResultDTO>();
+
+
+
 
         throw new ArgumentException("El dato no puede ser nulo o vacío.");
     }
