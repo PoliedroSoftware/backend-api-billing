@@ -62,8 +62,17 @@ public static class DependencyInjectionService
         
         // Composite service that implements IDianResolutionDomainService
         services.AddScoped<IDianResolutionDomainService, DianResolutionDomainService>();
+
+        // Server services - specialized implementations
+        services.AddScoped<IServerExistsService, ServerExistsService>();
+        services.AddScoped<IServerCreateService, ServerCreateService>();
+        services.AddScoped<IServerUpdateService, ServerUpdateService>();
+        services.AddScoped<IServerGetAllService, ServerGetAllService>();
+        services.AddScoped<IServerGetByIdService, ServerGetByIdService>();
         
+        // Composite service that implements IServerDomainService
         services.AddScoped<IServerDomainService, ServerDomainService>();
+        
         services.AddTransient<IMessageProvider, MessageProvider>();
        
         services.AddTransient<IInvoicePosDomainService, InvoicePosDomainService>();
