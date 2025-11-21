@@ -29,7 +29,6 @@ using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBi
 
 
 
-
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql;
 
 public static class DependencyInjectionService
@@ -40,7 +39,19 @@ public static class DependencyInjectionService
         services.AddDbContext<DataBaseContext>(
             options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)
         ));
+        
+        // Client services - specialized implementations
+        services.AddScoped<IClientExistsService, ClientExistsService>();
+        services.AddScoped<IClientCreateService, ClientCreateService>();
+        services.AddScoped<IClientUpdateService, ClientUpdateService>();
+        services.AddScoped<IClientGetAllService, ClientGetAllService>();
+        services.AddScoped<IClientGetByIdService, ClientGetByIdService>();
+        services.AddScoped<IClientGetByTokenService, ClientGetByTokenService>();
+        services.AddScoped<IClientDeleteService, ClientDeleteService>();
+        
+        // Composite service that implements IClientDomainService
         services.AddTransient<IClientDomainService, ClientBillingDomainService>();
+        
         services.AddScoped<IServerDomainService, ServerDomainService>();
 
         services.AddScoped<IDianResolutionDomainService, DianResolutionDomainService>();
