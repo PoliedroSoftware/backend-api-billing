@@ -51,10 +51,19 @@ public static class DependencyInjectionService
         
         // Composite service that implements IClientDomainService
         services.AddTransient<IClientDomainService, ClientBillingDomainService>();
+
+        // DianResolution services - specialized implementations
+        services.AddScoped<IDianResolutionExistsService, DianResolutionExistsService>();
+        services.AddScoped<IDianResolutionCreateService, DianResolutionCreateService>();
+        services.AddScoped<IDianResolutionUpdateService, DianResolutionUpdateService>();
+        services.AddScoped<IDianResolutionDeleteService, DianResolutionDeleteService>();
+        services.AddScoped<IDianResolutionGetAllService, DianResolutionGetAllService>();
+        services.AddScoped<IDianResolutionGetByIdService, DianResolutionGetByIdService>();
+        
+        // Composite service that implements IDianResolutionDomainService
+        services.AddScoped<IDianResolutionDomainService, DianResolutionDomainService>();
         
         services.AddScoped<IServerDomainService, ServerDomainService>();
-
-        services.AddScoped<IDianResolutionDomainService, DianResolutionDomainService>();
         services.AddTransient<IMessageProvider, MessageProvider>();
        
         services.AddTransient<IInvoicePosDomainService, InvoicePosDomainService>();
