@@ -172,9 +172,9 @@ IConfiguration config) : IFERetailService
                         await _emailNotificationService.SendEmailAsync(message);
 
 
-                        await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-                           new ParametersCurrentlyNumber(invoice, date.ToString(), clientItem.ResolutionId),
-                           cancellationToken);
+                        //await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
+                        //   new ParametersCurrentlyNumber(invoice, date.ToString(), clientItem.ResolutionId),
+                        //   cancellationToken);
 
 
                     }
@@ -197,9 +197,9 @@ IConfiguration config) : IFERetailService
                                     clientItem.ClientBillingElectronicId,
                                     item.invoice);
 
-                                await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-                                    new ParametersCurrentlyNumber(invoice, date.ToString(), clientItem.ResolutionId),
-                                    cancellationToken);
+                                //await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
+                                //    new ParametersCurrentlyNumber(invoice, date.ToString(), clientItem.ResolutionId),
+                                //    cancellationToken);
                             }
                         }
                         else

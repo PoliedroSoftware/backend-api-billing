@@ -7,6 +7,8 @@ public class CreateBilling
     public DateTime Date { get; set; }
     public DateTime Time { get; set; }
     public string? SendToEmail { get; set; }
+    public InvoiceReferenceEntity? InvoiceReferenceEntity { get; set; } //CreditNote
+    public DiscrepancyEntity? DiscrepancyEntity { get; set; } //CreditNote
     public SoftwareManufacturerEntity? SoftwareManufacturer { get; set; }
     public PayPointInfoEntity? PayPointInfo { get; set; }
     public required string Number { get; set; }

@@ -2,6 +2,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.AutoMappers;
+using Poliedro.Billing.Application.BillingCreditNote.AutoMappers;
 using Poliedro.Billing.Application.Client.AutoMappers;
 using Poliedro.Billing.Application.Common.Behaviors;
 using Poliedro.Billing.Application.CustomersId.AutoMappers;
@@ -36,6 +37,7 @@ public static class DependencyInjectionService
             config.AddProfile(new GetInvoiceMapper());
             config.AddProfile(new InvoiceElectronicProfile());
             config.AddProfile(new BillingAutoMapper());
+            config.AddProfile(new CreditNoteAutoMapper());
 
         });
         services.AddSingleton(mapper.CreateMapper());

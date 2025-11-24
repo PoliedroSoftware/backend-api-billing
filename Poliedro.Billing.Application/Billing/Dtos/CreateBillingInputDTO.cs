@@ -1,4 +1,6 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos;
+﻿using Poliedro.Billing.Application.BillingCreditNote.Dtos.Plemsi;
+
+namespace Poliedro.Billing.Application.Billing.Dtos;
 public record CreateBillingInputDTO(
         DateTime Date,
         DateTime Time,

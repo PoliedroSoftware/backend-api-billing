@@ -55,7 +55,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
         return await context.ClientBillingElectronic
             .Include(c => c.DianResolution)
             .Include(c => c.Server)
-            
+            .Include(c => c.DianResolutionCreditNote)
             .FirstAsync(c => c.ClientBillingElectronicId == id);
     }
 
@@ -95,6 +95,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
         return await context.ClientBillingElectronic
             .Include(c => c.DianResolution)
             .Include(c => c.Server)
+            .Include(c => c.DianResolutionCreditNote)
             .Where(c => c.Active == true)
             .FirstAsync(c => c.ApiKey == Apikey);
     }
