@@ -22,6 +22,8 @@ using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.BillingCreditNote.Impl.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.BillingCreditNote.Selectors.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
@@ -100,9 +102,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             services.AddScoped<IGetLastInvoiceNumberCreditNote, GetLastInvoiceNumberCreditNotePlemsi>();
 
-
-
             // Factoría y strategies
+            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderFE>();
+            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderPOS>();
+            services.AddScoped<IBillingCreditNoteSenderFactory, BillingCreditNoteSenderFactory>();
 
 
             services.AddTransient<EmailErrorHandler>();

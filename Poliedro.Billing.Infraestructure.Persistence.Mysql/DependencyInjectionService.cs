@@ -76,6 +76,12 @@ public static class DependencyInjectionService
 
         services.AddTransient<IGetInvoiceReferenceCreditNotePlemsi, GetInvoiceReferenceCreditNotePlemsi>();
 
+        services.AddTransient<IInsertCreditNoteRepository, InsertCreditNotePlemsiRepository>();
+        services.AddTransient<IUpdateCurrentlyNumberCreditNote, UpdateCurrentlyNumberCreditNote>();
+
+        services.AddTransient<IResponsesPlemsiCreditNoteRepository, ResponsesPlemsiCreditNoteRepository>();
+
+
         return services;
     }
 }
