@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 using Poliedro.Billing.Domain.Siigo.DomainServices;
@@ -27,7 +27,7 @@ namespace Poliedro.Billing.Infraestructure.External.Siigo.DomainServices
 
             foreach (var item in request)
             {
-                string jsonContent = JsonConvert.SerializeObject(item);
+                string jsonContent = JsonSerializer.Serialize(item);
 
                 StringContent stringContent = new StringContent(jsonContent, Encoding.UTF8, config.mediaType);
                 using var client = new HttpClient();
@@ -50,7 +50,7 @@ namespace Poliedro.Billing.Infraestructure.External.Siigo.DomainServices
                 if (response.IsSuccessStatusCode)
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    ApiRestSuccessResponseSiigo responseApi = JsonConvert.DeserializeObject<ApiRestSuccessResponseSiigo>(jsonResponse);
+                    ApiRestSuccessResponseSiigo responseApi = JsonSerializer.Deserialize<ApiRestSuccessResponseSiigo>(jsonResponse);
 
                     if (responseApi is not null)
                     {
@@ -66,7 +66,7 @@ namespace Poliedro.Billing.Infraestructure.External.Siigo.DomainServices
                 else
                 {
                     string jsonResponse = await response.Content.ReadAsStringAsync();
-                    ApiRestErrorResponseSiigo responseApi = JsonConvert.DeserializeObject<ApiRestErrorResponseSiigo>(jsonResponse);
+                    ApiRestErrorResponseSiigo responseApi = JsonSerializer.Deserialize<ApiRestErrorResponseSiigo>(jsonResponse);
                     responseSiigo.Status = false;
                     responseSiigo.Message = jsonResponse;
                     responseSiigo.Data.Add(responseApi);

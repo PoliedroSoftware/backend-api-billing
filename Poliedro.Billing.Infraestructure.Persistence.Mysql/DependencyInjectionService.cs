@@ -32,7 +32,6 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Im
 
 
 
-
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql;
 
 public static class DependencyInjectionService
@@ -43,10 +42,40 @@ public static class DependencyInjectionService
         services.AddDbContext<DataBaseContext>(
             options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)
         ));
+        
+        // Client services - specialized implementations
+        services.AddScoped<IClientExistsService, ClientExistsService>();
+        services.AddScoped<IClientCreateService, ClientCreateService>();
+        services.AddScoped<IClientUpdateService, ClientUpdateService>();
+        services.AddScoped<IClientGetAllService, ClientGetAllService>();
+        services.AddScoped<IClientGetByIdService, ClientGetByIdService>();
+        services.AddScoped<IClientGetByTokenService, ClientGetByTokenService>();
+        services.AddScoped<IClientDeleteService, ClientDeleteService>();
+        
+        // Composite service that implements IClientDomainService
         services.AddTransient<IClientDomainService, ClientBillingDomainService>();
-        services.AddScoped<IServerDomainService, ServerDomainService>();
 
+        // DianResolution services - specialized implementations
+        services.AddScoped<IDianResolutionExistsService, DianResolutionExistsService>();
+        services.AddScoped<IDianResolutionCreateService, DianResolutionCreateService>();
+        services.AddScoped<IDianResolutionUpdateService, DianResolutionUpdateService>();
+        services.AddScoped<IDianResolutionDeleteService, DianResolutionDeleteService>();
+        services.AddScoped<IDianResolutionGetAllService, DianResolutionGetAllService>();
+        services.AddScoped<IDianResolutionGetByIdService, DianResolutionGetByIdService>();
+        
+        // Composite service that implements IDianResolutionDomainService
         services.AddScoped<IDianResolutionDomainService, DianResolutionDomainService>();
+
+        // Server services - specialized implementations
+        services.AddScoped<IServerExistsService, ServerExistsService>();
+        services.AddScoped<IServerCreateService, ServerCreateService>();
+        services.AddScoped<IServerUpdateService, ServerUpdateService>();
+        services.AddScoped<IServerGetAllService, ServerGetAllService>();
+        services.AddScoped<IServerGetByIdService, ServerGetByIdService>();
+        
+        // Composite service that implements IServerDomainService
+        services.AddScoped<IServerDomainService, ServerDomainService>();
+        
         services.AddTransient<IMessageProvider, MessageProvider>();
        
         services.AddTransient<IInvoicePosDomainService, InvoicePosDomainService>();
