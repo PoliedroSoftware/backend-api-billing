@@ -27,6 +27,14 @@
 | Microsoft.Extensions.DependencyInjection.Abstractions | 8.0.1, 8.0.6 | 10.0.0      | ad3ccf64, 21ee36c9, ecf1f65e                      |
 | Newtonsoft.Json                                     | 13.0.1         | 13.0.4      | 21ee36c9                                          |
 
+## Docker and CI/CD Updates
+
+| File                                 | Old Version | New Version | Description                                       |
+|:-------------------------------------|:-----------:|:-----------:|:--------------------------------------------------|
+| Dockerfile                           | 8.0         | 10.0        | Updated ASP.NET and SDK images to .NET 10         |
+| WorkerServiceBilling/Dockerfile      | 8.0         | 10.0        | Updated runtime and SDK images to .NET 10         |
+| .github/workflows/main.yml           | 8.0.x       | 10.0.x      | Updated dotnet-version to use .NET 10 SDK         |
+
 ## All commits
 
 | Commit ID   | Description                                                                                           |
@@ -119,6 +127,33 @@
 - Removed deprecated Microsoft.AspNetCore.Mvc package (functionality included with framework)
 - Note: Package KubernetesClient 15.0.1 has a known moderate severity vulnerability (GHSA-w7r3-mgwf-4mqq). Consider updating this package as a next step.
 
+## Docker and CI/CD Configuration Updates
+
+### Dockerfile (Root)
+
+Updated Docker base images from .NET 8.0 to .NET 10.0:
+- **Base image**: `mcr.microsoft.com/dotnet/aspnet:8.0` → `mcr.microsoft.com/dotnet/aspnet:10.0`
+- **Build image**: `mcr.microsoft.com/dotnet/sdk:8.0` → `mcr.microsoft.com/dotnet/sdk:10.0`
+
+This ensures the API container runs on the .NET 10 runtime and builds using the .NET 10 SDK.
+
+### WorkerServiceBilling/Dockerfile
+
+Updated Docker base images from .NET 8.0 to .NET 10.0:
+- **Base image**: `mcr.microsoft.com/dotnet/runtime:8.0` → `mcr.microsoft.com/dotnet/runtime:10.0`
+- **Build image**: `mcr.microsoft.com/dotnet/sdk:8.0` → `mcr.microsoft.com/dotnet/sdk:10.0`
+
+This ensures the Worker Service container runs on the .NET 10 runtime.
+
+### .github/workflows/main.yml
+
+Updated GitHub Actions workflow to use .NET 10:
+- **dotnet-version**: `8.0.x` → `10.0.x`
+
+This ensures the CI/CD pipeline builds, tests, and deploys using the .NET 10 SDK.
+
+**Important**: When deploying to AWS ECS, ensure the ECS task definitions are updated to use the new Docker images built with .NET 10.
+
 ## Important Notes
 
 ### Pomelo.EntityFrameworkCore.MySql Compatibility
@@ -132,12 +167,24 @@ The Pomelo.EntityFrameworkCore.MySql package remains at version 9.0.0 as there i
 
 The KubernetesClient package (version 15.0.1) in Poliedro.Billing.Api has a known moderate severity vulnerability. Consider updating this package to a newer, secure version as a follow-up action.
 
+### Docker Image Availability
+
+The .NET 10 Docker images used in the Dockerfiles are:
+- `mcr.microsoft.com/dotnet/aspnet:10.0` - ASP.NET Core runtime
+- `mcr.microsoft.com/dotnet/runtime:10.0` - .NET runtime
+- `mcr.microsoft.com/dotnet/sdk:10.0` - .NET SDK
+
+These images are official Microsoft images and are available on Microsoft Container Registry (MCR).
+
 ## Next steps
 
 1. **Test the application thoroughly** to ensure all functionality works correctly with .NET 10
 2. **Update KubernetesClient package** to address the security vulnerability
-3. **Monitor for Pomelo.EntityFrameworkCore.MySql updates** that support EF Core 10.0.0 to eliminate compatibility warnings
-4. **Review and update other outdated packages** (e.g., PDFsharp 6.1.1 → 6.2.3)
-5. **Run all unit tests** to validate the upgrade
-6. **Update deployment configurations** to use .NET 10 runtime
-7. **Update CI/CD pipelines** to use .NET 10 SDK
+3. **Test Docker builds locally** before pushing to ensure containers build successfully with .NET 10
+4. **Update ECS Task Definitions** in AWS to reference the new Docker images with .NET 10
+5. **Monitor for Pomelo.EntityFrameworkCore.MySql updates** that support EF Core 10.0.0 to eliminate compatibility warnings
+6. **Review and update other outdated packages** (e.g., PDFsharp 6.1.1 → 6.2.3)
+7. **Run all unit tests** to validate the upgrade
+8. **Test the CI/CD pipeline** to ensure it works correctly with .NET 10 SDK
+9. **Update any environment variables or configuration** in AWS ECS/ECR that reference .NET 8
+10. **Monitor the first deployment** to production carefully to catch any runtime issues
