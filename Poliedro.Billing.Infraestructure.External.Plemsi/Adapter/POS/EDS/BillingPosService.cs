@@ -111,9 +111,9 @@ public class BillingPosService(
 
                         await _emailNotificationService.SendEmailAsync(message);
 
-                        await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-                            new ParametersCurrentlyNumber(invoice, CurrentlyDate, clientItem.ResolutionId, true),
-                           cancellationToken);
+                        //await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
+                        //    new ParametersCurrentlyNumber(invoice, CurrentlyDate, clientItem.ResolutionId, true),
+                        //   cancellationToken);
                     }
 
 
@@ -133,9 +133,9 @@ public class BillingPosService(
                                 clientItem.ClientBillingElectronicId,
                                 item.Resolution);
 
-                            await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-                             new ParametersCurrentlyNumber(invoice, CurrentlyDate, clientItem.ResolutionId, true),
-                            cancellationToken);
+                            //await updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
+                            // new ParametersCurrentlyNumber(invoice, CurrentlyDate, clientItem.ResolutionId, true),
+                            //cancellationToken);
                         }
                     }
                     else

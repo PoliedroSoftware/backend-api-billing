@@ -74,19 +74,10 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 
 
                     double globalDiscount = invoice.DiscountAmountByInvoice > 0 ? (double)invoice.DiscountAmountByInvoice : 0;
-
-
                     double invoiceBaseTotal = invoice.ItemElectronicEntity.Sum(i => (double)i.LineExtensionAmount);
-
-
                     double allowanceTotal = 0;
-
                     double invoiceTaxExclusiveTotal = invoiceBaseTotal;
-
-
                     double totalTaxes = Math.Round(invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0)), 2, MidpointRounding.AwayFromZero);
-
-
                     double invoiceTaxInclusiveTotal = Math.Round(invoiceBaseTotal + totalTaxes, 2, MidpointRounding.AwayFromZero);
 
 

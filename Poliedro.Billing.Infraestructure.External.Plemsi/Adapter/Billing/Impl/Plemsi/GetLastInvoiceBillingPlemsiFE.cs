@@ -54,20 +54,36 @@ public class GetLastInvoiceBillingPlemsiFE(
                 string JsonResponse = await Response.Content.ReadAsStringAsync();
                 var jObject = JObject.Parse(JsonResponse);
                 var Documents = jObject["data"]?["docs"];
+
                 if (Documents != null && Documents.HasValues)
                 {
+                    int maxEmitted = 0;
+                    int maxDeleted = 0;
+
                     foreach (var Doc in Documents)
                     {
-                        Console.WriteLine(Doc["state"]?.ToString());
+                        string? state = Doc["state"]?.ToString();
+                        string? numberStr = Doc["number"]?.ToString();
 
-                        if (Doc["state"]?.ToString() == "Emitted")
+                        if (int.TryParse(numberStr, out int num))
                         {
-                            if (int.TryParse(Doc["number"]?.ToString(), out int ParsedNumber))
+                            if (state == "Emitted" && num > maxEmitted)
                             {
-                                return ParsedNumber + 1;
+                                maxEmitted = num;
                             }
-                            break;
+
+                            if (state == "Deleted" && num > maxDeleted)
+                            {
+                                maxDeleted = num;
+                            }
                         }
+                    }
+
+                    int maxUsed = Math.Max(maxEmitted, maxDeleted);
+
+                    if (maxUsed > 0)
+                    {
+                        return maxUsed + 1;
                     }
                 }
             }
@@ -76,6 +92,7 @@ public class GetLastInvoiceBillingPlemsiFE(
                 return MaxNumeroFactura + 1;
             }
         }
+
         return MaxNumeroFactura;
 
     }

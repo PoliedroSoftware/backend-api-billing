@@ -32,6 +32,8 @@ public class BillingResponseApi(
             var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
 
             int NumberInvoice = int.Parse(pair.invoice.Numeration);
+            string CurrentlyDate = DateTime.Now.ToString();
+            string LastedInvoiced = pair.invoice.Number;
 
             await _insertInvoiceFE.InsertInvoiceSucces(
                NumberInvoice,
@@ -44,7 +46,7 @@ public class BillingResponseApi(
                );
 
             await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-            new ParametersCurrentlyNumber(NumberInvoice, DateTime.Now.ToString(), customerInfo.Value.ResolutionId),cancellationToken
+            new ParametersCurrentlyNumber(NumberInvoice, CurrentlyDate, customerInfo.Value.ResolutionId, LastedInvoiced),cancellationToken
             );
         }
 

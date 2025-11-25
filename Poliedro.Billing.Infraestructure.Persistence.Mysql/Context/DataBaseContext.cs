@@ -14,6 +14,9 @@ public class DataBaseContext(DbContextOptions options) : DbContext(options)
 {
     public DbSet<ServerEntity> Server { get; set; }
     public DbSet<DianResolutionEntity> DianResolution { get; set; }
+
+    public DbSet<DianResolutionEntity> DianResolutionCreditNote { get; set; }
+
     public DbSet<ClientEntity> ClientBillingElectronic { get; set; }
     public DbSet<InvoiceEntity> Invoices { get; set; }
     public DbSet<PedingInvoiceEntity> PedingInvoice { get; set; }
@@ -33,6 +36,7 @@ public class DataBaseContext(DbContextOptions options) : DbContext(options)
     {
         new ServerConfiguration(modelBuilder.Entity<ServerEntity>());
         new DianResolutionConfiguration(modelBuilder.Entity<DianResolutionEntity>());
+        new DianResolutionCreditNoteConfiguration(modelBuilder.Entity<DianResolutionCreditNoteEntity>());
         new ClientBillingElectronicConfiguration(modelBuilder.Entity<ClientEntity>());
         //new InvoiceElectronicConfiguration(modelBuilder.Entity<InvoiceElectronic>());
         //new InvoiceDetailElectronicConfiguration(modelBuilder.Entity<InvoiceWithDetailElectronic>());
