@@ -1,5 +1,4 @@
-﻿using FluentValidation.AspNetCore;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Poliedro.Billing.Api.Common.Configurations;
 
