@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 using Poliedro.Billing.Domain.TNS.DomainServices;
