@@ -6,6 +6,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Poliedro.Billing.Api;
 using Poliedro.Billing.Api.Common.Configurations;
+using Poliedro.Billing.Api.Endpoints.v1.Billing;
+using Poliedro.Billing.Api.Endpoints.v1.BillingCreditNote;
+using Poliedro.Billing.Api.Endpoints.v1.Client;
+using Poliedro.Billing.Api.Endpoints.v1.CreditNote;
+using Poliedro.Billing.Api.Endpoints.v1.CustomersId;
+using Poliedro.Billing.Api.Endpoints.v1.DianResolution;
+using Poliedro.Billing.Api.Endpoints.v1.FERetail;
+using Poliedro.Billing.Api.Endpoints.v1.GetInvoice;
+using Poliedro.Billing.Api.Endpoints.v1.InvoiceDetailElectronic;
+using Poliedro.Billing.Api.Endpoints.v1.InvoicesPendingWithDetails;
+using Poliedro.Billing.Api.Endpoints.v1.NotifyResolution;
+using Poliedro.Billing.Api.Endpoints.v1.PdfInvoice;
+using Poliedro.Billing.Api.Endpoints.v1.PendingInvoice;
+using Poliedro.Billing.Api.Endpoints.v1.Server;
+using Poliedro.Billing.Api.Endpoints.v1.Siigo;
+using Poliedro.Billing.Api.Endpoints.v1.SuccessInvoice;
+using Poliedro.Billing.Api.Endpoints.v1.Tns;
 using Poliedro.Billing.Application;
 using Poliedro.Billing.Application.Common.Behaviors;
 using Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote;
@@ -123,5 +140,31 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.MapControllers();
+// Map Minimal API Endpoints
+var apiV1 = app.MapGroup("api/v1");
+
+apiV1.MapGroup("/billing").MapBillingEndpoints();
+apiV1.MapGroup("/creditnote").MapBillingCreditNoteEndpoints();
+apiV1.MapGroup("/client").MapClientEndpoints();
+apiV1.MapGroup("/Controllers/v1/CreditNote").MapCreditNoteEndpoints();
+apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
+apiV1.MapGroup("/Controllers/v1/FERetail").MapFERetailEndpoints();
+apiV1.MapGroup("/getinvoice").MapGetInvoiceEndpoints();
+apiV1.MapGroup("/invoicedetail-electronic").MapInvoiceDetailElectronicEndpoints();
+apiV1.MapGroup("/invoicespendingwithdetails").MapInvoicesPendingWithDetailsEndpoints();
+apiV1.MapGroup("/notifyresolution").MapNotifyResolutionEndpoints();
+
+app.MapGroup("api/billing").MapPdfInvoiceEndpoints();
+
+apiV1.MapGroup("/pendinginvoice").MapPendingInvoiceEndpoints();
+apiV1.MapGroup("/server").MapServerEndpoints();
+
+app.MapGroup("api/v1/billing/invoices").MapSiigoEndpoints();
+
+apiV1.MapGroup("/invoice").MapSuccessInvoiceEndpoints();
+
+app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
+
+apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
+
 app.Run();
