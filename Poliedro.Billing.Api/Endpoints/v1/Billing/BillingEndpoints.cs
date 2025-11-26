@@ -1,9 +1,11 @@
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Common.Features;
+using System.ComponentModel.DataAnnotations;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.Billing;
 
@@ -11,7 +13,7 @@ public static class BillingEndpoints
 {
     public static RouteGroupBuilder MapBillingEndpoints(this RouteGroupBuilder group)
     {
-        group.MapPost("/", CreateBilling)
+        group.MapPost("/", CreateBillingCommand)
             .WithName("CreateBilling")
             .WithTags("Billing")
             .WithSummary("Create new Billing")
@@ -24,11 +26,10 @@ public static class BillingEndpoints
         return group;
     }
 
-    private static async Task<IResult> CreateBilling(
+    private static async Task<IResult> CreateBillingCommand(
         HttpContext context,
-        IEnumerable<CreateBillingInputDTO> invoices,
         IMediator mediator,
-        CancellationToken cancellationToken)
+        [FromBody][Required]IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
     {
         var token = TokenHelper.ExtractBearerToken(context.Request);
         if (string.IsNullOrEmpty(token))
