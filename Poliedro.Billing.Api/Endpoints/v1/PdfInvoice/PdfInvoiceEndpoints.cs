@@ -9,7 +9,7 @@ public static class PdfInvoiceEndpoints
 {
     public static RouteGroupBuilder MapPdfInvoiceEndpoints(this RouteGroupBuilder group)
     {
-        group.MapGet("/pdf/{id}", GetPdfInvoice)
+        group.MapGet("/pdfinvoice/pdf/{id}", GetPdfInvoice)
             .WithName("GetPdfInvoice")
             .WithTags("PdfInvoice")
             .WithSummary("Get PDF invoice")
