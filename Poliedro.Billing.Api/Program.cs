@@ -1,3 +1,4 @@
+using dotenv.net;
 using FluentValidation;
 using HealthChecks.UI.Client;
 using MediatR;
@@ -37,7 +38,7 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
-
+DotEnv.Load();
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
