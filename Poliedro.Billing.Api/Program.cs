@@ -176,7 +176,7 @@ app.MapScalarApiReference(options =>
 {
     options
         .WithTitle("Poliedro Billing API")
-        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+        .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
         .WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json");
 });
 
