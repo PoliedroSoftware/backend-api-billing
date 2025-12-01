@@ -1,0 +1,2448 @@
+{
+	"info": {
+		"_postman_id": "24989828-6332a0dd-7edf-4830-9cc0-2b1ff834ef7e",
+		"name": "Siigo_API_pruebas",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Token",
+			"item": [
+				{
+					"name": "Token - Auth Siigo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "fa72e741-11ca-4b22-9c64-d89faafbd7fd",
+								"exec": [
+									"const token = pm.response.json();\r",
+									"pm.globals.set(\"TokenProduccion\", token.access_token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"id": "24989828-9b543b88-a740-4374-80db-ccc4df9fd4a8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"edslagunitasas@gmail.com\",\r\n    \"access_key\": \"OWNmYmVjMGItZmFmNS00MjdjLTg5YmUtYWI5YWVlYjg4OTMxOlNyLUUvOTBzdVU=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/auth",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"auth"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-bab72782-0cef-4be7-8997-1be01cb68ac1"
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Account Groups",
+					"id": "24989828-b531a0ad-eea3-4503-b355-3dcde835b8a3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/account-groups",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"account-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product basic - Create",
+					"id": "24989828-67273b05-060a-42f3-b646-528944175a0a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\": \"Code-1\",\r\n    \"name\": \"Producto de prueba\",\r\n    \"account_group\": 1253\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/products",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product complete - Create",
+					"id": "24989828-591db491-13cf-4ee7-b4bf-70d6b0afbbd6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\": \"Code-2\",\r\n    \"name\": \"Camiseta de algodón\",\r\n    \"account_group\": 1253,\r\n    \"type\": \"Product\",\r\n    \"stock_control\": false,\r\n    \"active\": true,\r\n    \"tax_classification\": \"Taxed\",\r\n    \"tax_included\": false,\r\n    \"tax_consumption_value\": 0,\r\n    \"taxes\": [\r\n        {\r\n            \"id\": 13156\r\n        },\r\n         {\r\n            \"id\": 13158\r\n        }\r\n    ],\r\n    \"prices\": [\r\n        {\r\n            \"currency_code\": \"COP\",\r\n            \"price_list\": [\r\n                {\r\n                    \"position\": 1,\r\n                    \"value\": 12000\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"unit\": \"INH\",\r\n    \"unit_label\": \"unidad\",\r\n    \"reference\": \"REF1\",\r\n    \"description\": \"Camiseta de algodón blanca\",\r\n    \"additional_fields\": {\r\n        \"barcode\": \"B0123\",\r\n        \"brand\": \"Gef\",\r\n        \"tariff\": \"151612\",\r\n        \"model\": \"Loiry\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/products",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Products - Read all",
+					"id": "24989828-b6184aed-25b2-410d-84cc-b1ee8627fd7c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNDQzRDg2OUYxMzgwODlEREUwOTdENTNBN0YxNzVCNkQwNzIxNzdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6IkVVUTlocDhUZ0luZDRKZlZPbjhYVzIwSElYYyJ9.eyJuYmYiOjE3MzkzOTYxMjAsImV4cCI6MTc0MTk4ODEyMCwiaXNzIjoiaHR0cDovL21zLXNlY3VyaXR5OjUwMDAiLCJhdWQiOiJodHRwOi8vbXMtc2VjdXJpdHk6NTAwMC9yZXNvdXJjZXMiLCJjbGllbnRfaWQiOiJTaWlnb0FQSSIsInN1YiI6IjE5MjE2NzEiLCJhdXRoX3RpbWUiOjE3MzkzOTYxMjAsImlkcCI6ImxvY2FsIiwibmFtZSI6ImVkc2xhZ3VuaXRhc2FzQGdtYWlsLmNvbSIsIm1haWxfc2lpZ28iOiJlZHNsYWd1bml0YXNhc0BnbWFpbC5jb20iLCJjbG91ZF90ZW5hbnRfY29tcGFueV9rZXkiOiJFU1RBQ0lPTkRFU0VSVklDSU9MQUdVTklUQVNTQVMiLCJ1c2Vyc19pZCI6IjQxMiIsInRlbmFudF9pZCI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA5MDAyMzAiLCJ1c2VyX2xpY2Vuc2VfdHlwZSI6IjAiLCJwbGFuX3R5cGUiOiIxMiIsInRlbmFudF9zdGF0ZSI6IjEiLCJtdWx0aXRlbmFudF9pZCI6IjExNzIiLCJjb21wYW5pZXMiOiIwIiwiYXBpX3N1YnNjcmlwdGlvbl9rZXkiOiJjYjE1YTJjZDAzMTQ0NDJmYWRlYmY1NzQ4MzQ2MzYwZSIsImFwaV91c2VyX2NyZWF0ZWRfYXQiOiIxNzM5MzkyMzEzIiwiYWNjb3VudGFudCI6ImZhbHNlIiwianRpIjoiMDg2RDc4MDJCQkJEQTU5M0RDMTQxOUYwMDJGNEE5RkUiLCJpYXQiOjE3MzkzOTYxMjAsInNjb3BlIjpbIlNpaWdvQVBJIl0sImFtciI6WyJjdXN0b20iXX0.mqWrADXruA-0cBTD8Y2Axm1B7eBLS1OrDrDAlwnrrIj5TPLkQtj2Qd4hO1EWAjGdjlJvgYq_ofpJQsIpvBS_ilgTUHfU3XJg6ESeZcAkAJWV3945en9REkLXDt3jfn0d9CH5VDLTqao2KgNcNcgAe1zwXBfGsa3rXTF_JzZ1H3bTv3TLL7cNW1BaDuJGIY55vs9yqBnleayy-fHjmXeqGr2ROiuW5E_IOHQ2UlZyANMLnLlmKwKvinAhg_AafkFzQTu30Je-jFEvH0BetNbcd1yPxu-_lnyl4TPyZfyyEHq6o4EOzhVvNgYyc_-VWNBtIi3hZJEFlSqDuFK-xLjKqQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/products",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products"
+							],
+							"query": [
+								{
+									"key": "created_start",
+									"value": "2021-03-04",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product - Read by id",
+					"id": "24989828-4fdb84c4-8755-4093-94c4-abbe4809a2a3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/products/b39003f7-efa6-4cfa-9c08-3a82af3d5d40",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"b39003f7-efa6-4cfa-9c08-3a82af3d5d40"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product - Read by code",
+					"id": "24989828-096fd7ba-07f1-489f-8916-8b0c35d4adf3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/products?code=Sku-1",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products"
+							],
+							"query": [
+								{
+									"key": "code",
+									"value": "Sku-1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Product - Update",
+					"id": "24989828-1178e9e1-018b-436f-b0f5-bf11034f2bc8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"code\": \"Sku-2\",\r\n    \"name\": \"Camiseta de algodón\",\r\n    \"account_group\": 1253,\r\n    \"type\": \"Product\",\r\n    \"stock_control\": false,\r\n    \"active\": true,\r\n    \"tax_classification\": \"Exempt\",\r\n    \"tax_included\": false,\r\n    \"tax_consumption_value\": 0,\r\n    \"taxes\": [\r\n        {\r\n            \"id\": 13156\r\n        },\r\n         {\r\n            \"id\": 13158\r\n        }\r\n    ],\r\n    \"prices\": [\r\n        {\r\n            \"currency_code\": \"COP\",\r\n            \"price_list\": [\r\n                {\r\n                    \"position\": 1,\r\n                    \"value\": 12000\r\n                }\r\n            ]\r\n        }\r\n    ],\r\n    \"unit\": \"INH\",\r\n    \"unit_label\": \"unidad\",\r\n    \"reference\": \"REF1\",\r\n    \"description\": \"Camiseta de algodón blanca\",\r\n    \"additional_fields\": {\r\n        \"barcode\": \"B0123\",\r\n        \"brand\": \"Gef\",\r\n        \"tariff\": \"151612\",\r\n        \"model\": \"Loiry\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/products/b9596688-a8d9-49d8-a1be-901470e976d7",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"b9596688-a8d9-49d8-a1be-901470e976d7"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Products - Delete",
+					"id": "24989828-7dff977a-d58f-48ca-b982-bc3695f0293e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/products/26e953e6-441e-4e33-9767-4851f711d80a",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"products",
+								"26e953e6-441e-4e33-9767-4851f711d80a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Warehouses",
+					"id": "24989828-0495adea-cc75-4a59-b4b1-0e2a18b31943",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"document\": {\r\n        \"id\": 36002\r\n    },\r\n    \"date\": \"2021-02-22\",\r\n    \"customer\": {\r\n        \"identification\": \"109048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 11347,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Descripción desde API\",\r\n            \"discount\": 13.00,\r\n            \"quantity\": \"1\",\r\n            \"price\": 1000\r\n        }\r\n\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": \"27535\",\r\n            \"value\": 870,\r\n            \"due_date\": \"2021-03-22\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/warehouses",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"warehouses"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-962718da-2fb2-4181-ad40-33a3a99f7131"
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Customer basic - Create",
+					"id": "24989828-3b400773-436d-47eb-a5b7-1944331b70e6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"person_type\": \"Person\",\r\n    \"id_type\": \"13\",\r\n    \"identification\": \"28211179\",\r\n    \"name\": [\r\n        \"Marcos\",\r\n        \"Castillo\"\r\n    ],\r\n    \"address\": {\r\n        \"address\": \"Cra. 18 #79A - 42\",\r\n        \"city\": {\r\n            \"country_code\": \"Co\",\r\n            \"state_code\": \"11\",\r\n            \"city_code\": \"11001\"\r\n        }\r\n    },\r\n    \"phones\": [\r\n        {\r\n            \"number\": \"3006003344\"\r\n        }\r\n    ],\r\n    \"contacts\": [\r\n        {\r\n            \"first_name\": \"Marcos\",\r\n            \"last_name\": \"Castillo\",\r\n            \"email\": \"marcos.castillo@contacto.com\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/customers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer complete - Create",
+					"id": "24989828-389cc858-134e-4262-bfed-7b42a0ec6679",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"Customer\",\r\n    \"person_type\": \"Company\",\r\n    \"id_type\": \"31\",\r\n    \"identification\": \"28211180\",\r\n    \"name\": [\r\n        \"Stark Industries\"\r\n    ],\r\n    \"commercial_name\": \"Industries\",\r\n    \"branch_office\": 0,\r\n    \"active\": true,\r\n    \"vat_responsible\": true,\r\n    \"address\": {\r\n        \"address\": \"Cra. 18 #79A - 42\",\r\n        \"city\": {\r\n            \"country_code\": \"Co\",\r\n            \"state_code\": \"11\",\r\n            \"city_code\": \"11001\"\r\n        },\r\n        \"postal_code\": \"110911\"\r\n    },\r\n    \"phones\": [\r\n        {\r\n            \"number\": \"3006003344\"\r\n        }\r\n    ],\r\n    \"contacts\": [\r\n        {\r\n            \"first_name\": \"Marcos\",\r\n            \"last_name\": \"Castillo\",\r\n            \"email\": \"marcos.castillo@contacto.com\",\r\n            \"phone\": {\r\n                \"indicative\": \"57\",\r\n                \"number\": \"3005003345\",\r\n                \"extension\": \"132\"\r\n            }\r\n        }\r\n    ],\r\n    \"comments\": \"\",\r\n    \"related_users\": {\r\n        \"seller_id\": 629,\r\n        \"collector_id\": 629\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/customers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customers - Read all",
+					"id": "24989828-e0a40af4-d7cf-4063-8c8d-3d777d30c42d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IkM3QzFFQTY5M0FCMDREQTM5RkRBNTc3RDc4NTM0NEYxRkI5MDcwQzhSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6Ing4SHFhVHF3VGFPZjJsZDllRk5FOGZ1UWNNZyJ9.eyJuYmYiOjE3NjE2OTAzNTYsImV4cCI6MTc2MTc3Njc1NiwiaXNzIjoiaHR0cDovL21zLXNlY3VyaXR5OjUwMDAiLCJhdWQiOiJodHRwOi8vbXMtc2VjdXJpdHk6NTAwMC9yZXNvdXJjZXMiLCJjbGllbnRfaWQiOiJTaWlnb0FQSSIsInN1YiI6IjE5MjE2NzEiLCJhdXRoX3RpbWUiOjE3NjE2OTAzNTYsImlkcCI6ImxvY2FsIiwibmFtZSI6ImVkc2xhZ3VuaXRhc2FzQGdtYWlsLmNvbSIsIm1haWxfc2lpZ28iOiJlZHNsYWd1bml0YXNhc0BnbWFpbC5jb20iLCJjbG91ZF90ZW5hbnRfY29tcGFueV9rZXkiOiJFU1RBQ0lPTkRFU0VSVklDSU9MQUdVTklUQVNTQVMiLCJ1c2Vyc19pZCI6IjQxMiIsInRlbmFudF9pZCI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA5MDAyMzAiLCJ1c2VyX2xpY2Vuc2VfdHlwZSI6IjAiLCJwbGFuX3R5cGUiOiIxMiIsInRlbmFudF9zdGF0ZSI6IjEiLCJtdWx0aXRlbmFudF9pZCI6IjExNzIiLCJjb21wYW5pZXMiOiIwIiwiYXBpX3N1YnNjcmlwdGlvbl9rZXkiOiJjYjE1YTJjZDAzMTQ0NDJmYWRlYmY1NzQ4MzQ2MzYwZSIsImFwaV91c2VyX2NyZWF0ZWRfYXQiOiIxNzM5MzkyMzEzIiwiYWNjb3VudGFudCI6ImZhbHNlIiwianRpIjoiNzJBMjM3QzZGNTlBOTE5MDE0M0MzQzBDNDczOUY3QTciLCJpYXQiOjE3NjE2OTAzNTYsInNjb3BlIjpbIlNpaWdvQVBJIl0sImFtciI6WyJjdXN0b20iXX0.N2ErWRakEDyJiky7Au5F58T5_orhyfHQ3_nYgytpNjlGiq-8mlsiDnnLjWmDQpgB7cpXlg8iwjUzNkGBF2rjCTvi1GbyRWIdb8WzBoomN8gP7BSpOTwWGWwbRo6TMtZz15oUhwndCJIBTBv--ok5K51XoHnMyjsfSQhLgi9nbrjCcFq9oHthfCPBkv9ggy6szmDiFCWOBmBF92aCAejxVaUflcCq4pLqpRjiXzRh13gPewTBTS_6clP5xhoX3vWqDnAImoZy2-6VyJVwfcyrnETDPlOSRmRGu5SOozd94MYck__Raxc2D9hykoifwMsYMcdhqMN8NlU-wSwFfYlkow",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/customers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer - Read by id",
+					"id": "24989828-4721e384-bd90-403c-89a4-a5a0c8d10c1a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/customers/309d9763-f9ae-404d-ac73-1844bd3f905d",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"customers",
+								"309d9763-f9ae-404d-ac73-1844bd3f905d"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer - Update",
+					"id": "24989828-2f4999cc-3ea1-4207-bcde-949f8d686b9f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"person_type\": \"Person\",\r\n    \"id_type\": \"13\",\r\n    \"identification\": \"6464500\",\r\n    \"name\": [\r\n        \"Marcos\",\r\n        \"Castillo\"\r\n    ],\r\n    \"address\": {\r\n        \"address\": \"Cra. 18 #79A - 42\",\r\n        \"city\": {\r\n            \"country_code\": \"Co\",\r\n            \"state_code\": \"11\",\r\n            \"city_code\": \"11001\"\r\n        }\r\n    },\r\n    \"phones\": [\r\n        {\r\n            \"number\": \"3006003344\"\r\n        }\r\n    ],\r\n    \"contacts\": [\r\n        {\r\n            \"first_name\": \"Marcos\",\r\n            \"last_name\": \"Castillo\",\r\n            \"email\": \"marcos.castillo@contacto.com\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/customers/f197a976-41f0-457f-875d-1b55f353c4dc",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"customers",
+								"f197a976-41f0-457f-875d-1b55f353c4dc"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Customer - Delete",
+					"id": "24989828-e3c705e7-2db4-446f-8d51-1620a3d2b2d0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/customers/309d9763-f9ae-404d-ac73-1844bd3f905d",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"customers",
+								"309d9763-f9ae-404d-ac73-1844bd3f905d"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-3bd1f263-0eb5-44a5-949a-151df51a73dd"
+		},
+		{
+			"name": "Invoices",
+			"item": [
+				{
+					"name": "Document Types",
+					"id": "24989828-4c0c22ab-5e20-40b0-ac3a-af3bf4a39b7d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/document-types?type=FV",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"document-types"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "FV"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payments Types",
+					"id": "24989828-236ec05a-d0d4-432e-b454-a418427c1f52",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/payment-types?document_type=FV",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"payment-types"
+							],
+							"query": [
+								{
+									"key": "document_type",
+									"value": "FV"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice basic - Create",
+					"id": "24989828-d55a06e7-b1ae-4bcc-8913-daeb0d7bff5a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Partner-ID",
+								"value": "TestNat"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 24446\r\n    },\r\n    \"date\": \"2020-02-04\",\r\n    \"customer\": {\r\n        \"identification\": \"209048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 629,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Sku-1\",\r\n            \"quantity\": 1,\r\n            \"taxes\": [\r\n                {\r\n                    \"id\": 13156\r\n                },\r\n                {\r\n                    \"id\": 21479\r\n                }\r\n            ],\r\n            \"price\": 847.45\r\n        }\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": 5638,\r\n            \"value\": 1000,\r\n            \"due_date\": \"2022-05-08\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice + Customer - Create",
+					"id": "24989828-c5be8774-3ea4-4422-8123-a1b1970bf3b1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "reference_users",
+								"value": "Zapier"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 24446\r\n    },\r\n    \"date\": \"2022-04-08\",\r\n    \"customer\": {\r\n        \"person_type\": \"Person\",\r\n        \"id_type\": \"13\",\r\n        \"identification\": \"209048401\",\r\n        \"branch_office\": \"0\",\r\n        \"name\": [\r\n            \"Manuel\",\r\n            \"Camacho\"\r\n        ],\r\n        \"address\": {\r\n            \"address\": \"Cra. 18 #79A - 42\",\r\n            \"city\": {\r\n                \"country_code\": \"Co\",\r\n                \"state_code\": \"11\",\r\n                \"city_code\": \"11001\"\r\n            }\r\n        },\r\n        \"phones\": [\r\n            {\r\n                \"number\": \"3006003344\"\r\n            }\r\n        ],\r\n        \"contacts\": [\r\n            {\r\n                \"first_name\": \"Manuel\",\r\n                \"last_name\": \"Camacho\",\r\n                \"email\": \"manuel.camacho@contacto.com\"\r\n            }\r\n        ]\r\n    },\r\n    \"stamp\": {\r\n        \"send\": false\r\n    },\r\n    \"mail\": {\r\n        \"send\": false\r\n    },\r\n    \"seller\": 629,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Producto de prueba\",\r\n            \"taxes\": [\r\n                {\r\n                    \"id\": 13156\r\n                }\r\n            ],\r\n            \"quantity\": \"1\",\r\n            \"price\": 1000\r\n        }\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": \"5638\",\r\n            \"value\": 1190,\r\n            \"due_date\": \"2022-05-08\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice basic - Create con productos con IVA incluido",
+					"id": "24989828-a246d9a7-4cfd-45db-9cb8-b30754b00ea2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Partner-ID",
+								"value": "TestNat"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 24446\r\n    },\r\n    \"date\": \"2020-02-04\",\r\n    \"customer\": {\r\n        \"identification\": \"209048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 629,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Sku-1\",\r\n            \"quantity\": 1,\r\n            \"taxes\": [\r\n                {\r\n                    \"id\": 13156\r\n                }\r\n            ],\r\n            \"taxed_price\": 1000\r\n        }\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": 5638,\r\n            \"value\": 1000,\r\n            \"due_date\": \"2022-05-08\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice basic - Create (Payment: Crédito)",
+					"id": "24989828-801e2c06-2380-4935-bad6-87d9474aa5c8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 24446\r\n    },\r\n    \"date\": \"2021-04-07\",\r\n    \"customer\": {\r\n        \"identification\": \"109048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 629,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Descripción desde API\",\r\n            \"taxes\": [\r\n                {\r\n                    \"id\": 13156\r\n                }\r\n            ],\r\n            \"quantity\": \"1\",\r\n            \"price\": 1000\r\n        }\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": \"5636\",\r\n            \"value\": 1190,\r\n            \"due_date\": \"2021-05-12\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice basic - Create + Envío a la DIAN",
+					"id": "24989828-e0c6d859-8c70-4683-92c9-114ce7b37013",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNDQzRDg2OUYxMzgwODlEREUwOTdENTNBN0YxNzVCNkQwNzIxNzdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6IkVVUTlocDhUZ0luZDRKZlZPbjhYVzIwSElYYyJ9.eyJuYmYiOjE3Mzk1NDc3NDgsImV4cCI6MTc0MjEzOTc0OCwiaXNzIjoiaHR0cDovL21zLXNlY3VyaXR5OjUwMDAiLCJhdWQiOiJodHRwOi8vbXMtc2VjdXJpdHk6NTAwMC9yZXNvdXJjZXMiLCJjbGllbnRfaWQiOiJTaWlnb0FQSSIsInN1YiI6IjE5MjE2NzEiLCJhdXRoX3RpbWUiOjE3Mzk1NDc3NDgsImlkcCI6ImxvY2FsIiwibmFtZSI6ImVkc2xhZ3VuaXRhc2FzQGdtYWlsLmNvbSIsIm1haWxfc2lpZ28iOiJlZHNsYWd1bml0YXNhc0BnbWFpbC5jb20iLCJjbG91ZF90ZW5hbnRfY29tcGFueV9rZXkiOiJFU1RBQ0lPTkRFU0VSVklDSU9MQUdVTklUQVNTQVMiLCJ1c2Vyc19pZCI6IjQxMiIsInRlbmFudF9pZCI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA5MDAyMzAiLCJ1c2VyX2xpY2Vuc2VfdHlwZSI6IjAiLCJwbGFuX3R5cGUiOiIxMiIsInRlbmFudF9zdGF0ZSI6IjEiLCJtdWx0aXRlbmFudF9pZCI6IjExNzIiLCJjb21wYW5pZXMiOiIwIiwiYXBpX3N1YnNjcmlwdGlvbl9rZXkiOiJjYjE1YTJjZDAzMTQ0NDJmYWRlYmY1NzQ4MzQ2MzYwZSIsImFwaV91c2VyX2NyZWF0ZWRfYXQiOiIxNzM5MzkyMzEzIiwiYWNjb3VudGFudCI6ImZhbHNlIiwianRpIjoiNEIxOTQ4Q0Y2REUyMDYyRTM3NzQxMkM5MENFRjg4NTgiLCJpYXQiOjE3Mzk1NDc3NDgsInNjb3BlIjpbIlNpaWdvQVBJIl0sImFtciI6WyJjdXN0b20iXX0.tnis4ZH9ivb3fCSvEHFNiaq4QPZO9z8IGAjrP6-5TDAO1WKVfly506WPewEGEuXTLMrf8MjEof3BDlMObf-pjRCw3F-KbviY3IhuxE_ottMcC6jaCOmeTE61uF8zpeyzRIh1c-VwYsfRAPsvPJIL1mKN-KrdHvquXHvW9eiAP04bo2Hd5KJU7HS-rsTyJQrnofOSfIFvtKqNJqzh_qT5J8tWYGy54zbzKKY8WWYE0ssBbVNyXZyv0SBfvZUXD2TlGcZiBNQOedDso_xLtB1dwBDhrRcMSm43VWtVAPQswTqrkOWTre87RJVop4aUshwOF4R_Glsim5ABvJB8BoJcfg",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Partner-ID",
+								"value": "TestNat"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 14852\r\n    },\r\n    \"date\": \"2024-06-14\",\r\n    \"customer\": {\r\n        \"identification\": \"209048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 862,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Sku-1\",\r\n            \"quantity\": 1,\r\n            \"taxes\": [\r\n                {\r\n                    \"id\": 14041\r\n                }\r\n            ],\r\n            \"price\": 847.45\r\n        }\r\n    ],\r\n    \"stamp\": {\r\n            \"send\": false\r\n        },\r\n    \"mail\": {\r\n            \"send\": true\r\n        },\r\n    \"observations\": \"Observaciones\",\r\n    \"payments\": [\r\n        {\r\n            \"id\": 3421,\r\n            \"value\":  847.45,\r\n            \"due_date\": \"2024-06-14\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edición de facturas",
+					"id": "24989828-e0d27bf4-7883-49cd-95c4-4fc8c5763a4b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 24446\r\n    },\r\n    \"number\": 59897904754,\r\n    \"date\": \"2020-02-04\",\r\n    \"customer\": {\r\n        \"identification\": \"209048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 629,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"quantity\": \"1\",\r\n            \"price\": 2000\r\n        }\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": 5638,\r\n            \"value\": 2000,\r\n            \"due_date\": \"2022-05-08\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices/{de30526c-7831-4b4a-a9d5-e7f9dd49e1f1}",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices",
+								"{de30526c-7831-4b4a-a9d5-e7f9dd49e1f1}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice - Read all",
+					"id": "24989828-4e9f27ba-3c49-4254-a097-8bcb0ea780ca",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IkM3QzFFQTY5M0FCMDREQTM5RkRBNTc3RDc4NTM0NEYxRkI5MDcwQzhSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6Ing4SHFhVHF3VGFPZjJsZDllRk5FOGZ1UWNNZyJ9.eyJuYmYiOjE3NjQwODI2MTgsImV4cCI6MTc2NDE2OTAxOCwiaXNzIjoiaHR0cDovL21zLXNlY3VyaXR5OjUwMDAiLCJhdWQiOiJodHRwOi8vbXMtc2VjdXJpdHk6NTAwMC9yZXNvdXJjZXMiLCJjbGllbnRfaWQiOiJTaWlnb0FQSSIsInN1YiI6IjE5MjE2NzEiLCJhdXRoX3RpbWUiOjE3NjQwODI2MTgsImlkcCI6ImxvY2FsIiwibmFtZSI6ImVkc2xhZ3VuaXRhc2FzQGdtYWlsLmNvbSIsIm1haWxfc2lpZ28iOiJlZHNsYWd1bml0YXNhc0BnbWFpbC5jb20iLCJjbG91ZF90ZW5hbnRfY29tcGFueV9rZXkiOiJFU1RBQ0lPTkRFU0VSVklDSU9MQUdVTklUQVNTQVMiLCJ1c2Vyc19pZCI6IjQxMiIsInRlbmFudF9pZCI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA5MDAyMzAiLCJ1c2VyX2xpY2Vuc2VfdHlwZSI6IjAiLCJwbGFuX3R5cGUiOiIxMiIsInRlbmFudF9zdGF0ZSI6IjEiLCJtdWx0aXRlbmFudF9pZCI6IjExNzIiLCJjb21wYW5pZXMiOiIwIiwiYXBpX3N1YnNjcmlwdGlvbl9rZXkiOiJjYjE1YTJjZDAzMTQ0NDJmYWRlYmY1NzQ4MzQ2MzYwZSIsImFwaV91c2VyX2NyZWF0ZWRfYXQiOiIxNzM5MzkyMzEzIiwiYWNjb3VudGFudCI6ImZhbHNlIiwianRpIjoiN0ZEQ0FDOUIwNzdCOTQwMzhENzhDMERBRDY1QzBEODciLCJpYXQiOjE3NjQwODI2MTgsInNjb3BlIjpbIlNpaWdvQVBJIl0sImFtciI6WyJjdXN0b20iXX0.JdCN6iYcuk7OnXMgk05sJiNTlgxBaNYz_z9YSRjCUb_qQKp9XCZMODS2HnTVXkq8ydsmpY0YWyYo4oQcsMAP-6w-KTbR5i2H1XogVX09X2nv_G11BbvKKOYHa-wUN-5-BdV1McRP3pxeQ7tms4JtaIZPcUwnd0NX9sVW0Q2tf6TJg7gDGvdws2fN5cD_9bfITjkszaz19uom8zK0toXTuq_q9H6cp-rcFgzmD3AWGcLfUEiyR9kQsU_ESbMv83QT-zBnAATNde4IEhOb1hZrUUJi3LXZxsV4REWLKHrFVjOHVN453ZUOSz5HB0QISqvNftCjYqkSF0SnS-KlFOUIDA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices"
+							],
+							"query": [
+								{
+									"key": "created_start",
+									"value": "2021-04-07",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice - Read by id",
+					"id": "24989828-08c67372-b061-4f91-941d-984b0de7c93b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices/50923bae-a9fd-4383-9be7-7c8dee286485",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices",
+								"50923bae-a9fd-4383-9be7-7c8dee286485"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Invoice - Envío por mail",
+					"id": "24989828-756fdb47-cbed-4ac8-97cd-fefa4a8eb583",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Partner-ID",
+								"value": "TestNat"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"mail_to\": \"ejemplo@email.com\",\r\n  \"copy_to\": \"ejemplo@email.com;ejemplo2@email.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/invoices/e0fd6cbf-4a63-4228-a36e-b5ba66637791/mail",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"invoices",
+								"e0fd6cbf-4a63-4228-a36e-b5ba66637791",
+								"mail"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-ad1d59c4-fee2-46b8-a38b-e66aae18a17d"
+		},
+		{
+			"name": "Credit Notes",
+			"item": [
+				{
+					"name": "Document Types",
+					"id": "24989828-ca931082-2ba4-4c4f-b24e-906eed91a506",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/document-types?type=NC",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"document-types"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "NC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Credit Note basic - Create",
+					"id": "24989828-3fcea4b4-b0fb-4e7c-b9d8-6cc9970edb7b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 24453\r\n    },\r\n    \"date\": \"2021-04-22\",\r\n    \"invoice\": \"13b01558-d443-4120-8309-8765b08bdff7\",\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Producto de prueba\",\r\n            \"taxes\": [\r\n                {\r\n                    \"id\": 13156\r\n                }\r\n            ],\r\n            \"quantity\": \"1\",\r\n            \"price\": 1000\r\n        }\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": \"5638\",\r\n            \"value\": 1190\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/credit-notes",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"credit-notes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Credit Note - Read all",
+					"id": "24989828-e1dc0296-2166-44b7-b4df-4471963b1368",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/credit-notes",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"credit-notes"
+							],
+							"query": [
+								{
+									"key": "created_start",
+									"value": "2021-04-07",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Credit Note - Read by id",
+					"id": "24989828-10f85ca1-3531-4df6-9773-a96763186e1d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/credit-notes/81145ac5-fe19-4f0a-bea8-be98c95c2944",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"credit-notes",
+								"81145ac5-fe19-4f0a-bea8-be98c95c2944"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-3d985fde-974e-4c38-9e6c-321481b95e89"
+		},
+		{
+			"name": "Vouchers",
+			"item": [
+				{
+					"name": "Document Types",
+					"id": "24989828-c2e4021e-27b3-4f1f-8138-afecacf5a91c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/document-types?type=RC",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"document-types"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "RC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payments Types",
+					"id": "24989828-51f9dcfd-18ec-41b7-9517-2b6acaca67cf",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/payment-types?document_type=RC",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"payment-types"
+							],
+							"query": [
+								{
+									"key": "document_type",
+									"value": "RC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Voucher - Create (Abono a deuda)",
+					"id": "24989828-2945472a-4502-4cb4-93a1-003aa370b863",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 27234\r\n    },\r\n    \"date\": \"2021-04-12\",\r\n    \"type\": \"DebtPayment\",\r\n    \"customer\": {\r\n        \"identification\": \"109048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"items\": [\r\n        {\r\n            \"due\": {\r\n                \"prefix\": \"FV-1\",\r\n                \"consecutive\": 120,\r\n                \"quote\": 1\r\n            },\r\n            \"value\": 190\r\n        }\r\n    ],\r\n    \"payment\": {\r\n        \"id\": 5638,\r\n        \"value\": 10000\r\n    },\r\n    \"observations\": \"Observación de prueba\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/vouchers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"vouchers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Voucher - Create (Anticipo)",
+					"id": "24989828-50262551-c1a6-4b09-8038-cc6996c4a1a0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 27234\r\n    },\r\n    \"type\":\"AdvancePayment\",\r\n    \"date\": \"2021-04-12\",\r\n    \"customer\": {\r\n        \"identification\": \"109048401\",\r\n        \"branch_office\": \"0\"\r\n    },    \r\n    \"payment\":\r\n        {\r\n            \"id\": 5638,\r\n            \"value\": 10000\r\n        },\r\n        \"observations\":\"observación de prueba\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/vouchers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"vouchers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Voucher - Read all",
+					"id": "24989828-e1dcfc5f-4a79-4d30-ae3c-b389264bde23",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"document\": {\r\n        \"id\": 36002\r\n    },\r\n    \"date\": \"2021-02-22\",\r\n    \"customer\": {\r\n        \"identification\": \"109048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 11347,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Descripción desde API\",\r\n            \"discount\": 13.00,\r\n            \"quantity\": \"1\",\r\n            \"price\": 1000\r\n        }\r\n\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": \"27535\",\r\n            \"value\": 870,\r\n            \"due_date\": \"2021-03-22\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/vouchers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"vouchers"
+							],
+							"query": [
+								{
+									"key": "created_start",
+									"value": "2021-04-07",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Voucher - Read by id",
+					"id": "24989828-50385a01-acb6-4c57-8c14-b28e44118014",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/vouchers/4e94770d-5cb5-42be-8187-9e903a8d7eec",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"vouchers",
+								"4e94770d-5cb5-42be-8187-9e903a8d7eec"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-2aaa7e34-0102-423b-ba63-2653de745d58"
+		},
+		{
+			"name": "Taxes",
+			"item": [
+				{
+					"name": "Taxes",
+					"id": "24989828-e7922a79-bf29-427d-9906-867f5b23dff4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/taxes",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"taxes"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-53bac2d7-c7b2-4f57-b167-f82f3264c8e4"
+		},
+		{
+			"name": "Users (seller)",
+			"item": [
+				{
+					"name": "Users (seller)",
+					"id": "24989828-7b439357-c19a-418a-a75e-0ac09e083e85",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/users",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-f618834e-359a-4bbe-823b-5273f5ffe0ad"
+		},
+		{
+			"name": "Cost Centers",
+			"item": [
+				{
+					"name": "Cost Centers",
+					"id": "24989828-6c87cd56-119a-4aff-adeb-c181a4597fbc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/cost-centers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"cost-centers"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-21c93cc2-bfbc-44a3-b7df-1c7e24101835"
+		},
+		{
+			"name": "Fixed Assets",
+			"item": [
+				{
+					"name": "Asset groups",
+					"id": "24989828-147e26ee-e3ef-4673-898b-b1d1e0c2c01a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/asset-groups",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"asset-groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fixed Assets",
+					"id": "24989828-87df068d-e83a-4b6f-9326-f7a961b9bb71",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/fixed_assets",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"fixed_assets"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-7d5f87ea-9ad6-49af-a70d-4f6c43819de8"
+		},
+		{
+			"name": "Journals",
+			"item": [
+				{
+					"name": "Document Types",
+					"id": "24989828-af15ab65-17ca-4e01-88a5-46a7c40d55da",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://api.siigo.com/v1/document-types?type=CC",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"document-types"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "CC"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payments Types",
+					"id": "24989828-c39c1d26-708e-4d24-956b-13f0aee50cd9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Partner-Id",
+								"value": "123"
+							}
+						],
+						"url": {
+							"raw": "https://api.siigo.com/v1/payment-types?document_type=FV",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"payment-types"
+							],
+							"query": [
+								{
+									"key": "document_type",
+									"value": "FV"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Journals - (Sin detalles)",
+					"id": "24989828-45fdfae3-3e9d-4ab3-a055-617276c61e45",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": 27441 \r\n    },\r\n   \r\n    \"date\": \"2015-12-15\",\r\n    \"currency\": {\r\n        \"code\": \"EUR\",\r\n        \"exchange_rate\": 3000\r\n    },\r\n    \r\n    \r\n    \r\n    \"items\": [\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \r\n            \"customer\": {\r\n                \"identification\": \"8694251\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del debito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 100\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Credit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"8694251\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del credito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 100\r\n        }\r\n    ],\r\n    \"observations\": \"Observaciones\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/journals",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Journals - (All)",
+					"id": "24989828-753c5ed5-6046-4def-8a96-12b3f630aabc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": \"\" //identificador de CC\r\n    },\r\n    \"number\": 1234,\r\n    \"date\": \"2015-12-15\",\r\n    \"currency\": {\r\n        \"code\": \"EUR\",\r\n        \"exchange_rate\": 3000\r\n    },\r\n    \"items\": [\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"caja general\",\r\n            \"value\": 100\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"13050501\",\r\n                \"movement\": \"Credit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"cost_center\": 100,\r\n            \"due\": {\r\n                \"prefix\": \"CC-1\",\r\n                \"consecutive\": 5000,\r\n                \"quote\": 1,\r\n                \"date\": \"2021-04-22\"\r\n            },\r\n            \"description\": \"vencimientos\",\r\n            \"value\": 100\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"24080601\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"tax\": {\r\n                \"id\": 13156,\r\n                \"name\": \"IVA 19%\",\r\n                \"percentage\": 19,\r\n                \"base_value\": 100000\r\n            },\r\n            \"description\": \"impuestos\",\r\n            \"value\": 100\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"15240501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"fixed_assets\": {\r\n                \"id\": 8956\r\n            },\r\n            \"description\": \"activo fijo\",\r\n            \"value\": 100\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"15240501\",\r\n                \"movement\": \"Credit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"product\": {\r\n                \"code\": \"01\",\r\n                \"warehouse\": \"\",\r\n                \"action\": \"\", //incremendo o decremento (+/-)\r\n                \"quantity\": \"1\"\r\n            },\r\n            \"description\": \"Productos\",\r\n            \"value\": 500\r\n        }\r\n    ],\r\n    \"observations\": \"Observaciones\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/journals",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Journals - (Vencimientos)",
+					"id": "24989828-54b6a9ec-892d-4c42-9bd3-3338e16765e8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": \"\"\r\n    }, //identificador de CC\r\n    \"date\": \"2015-12-15\",\r\n    \"items\": [\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del debito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 100,\r\n            \r\n            \"due\": {\r\n                \"prefix\": \"CC-1\",\r\n                \"consecutive\": 5000,\r\n                \"quote\": 1,\r\n                \"date\": \"2021-04-22\"\r\n            }\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del credito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 100\r\n        }\r\n    ],\r\n    \"observations\": \"Observaciones\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/journals",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Journals - (Impuestos)",
+					"id": "24989828-77377abe-1553-4602-b983-08a08a461d09",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": \"\" //identificador de CC\r\n    },\r\n    \"date\": \"2015-12-15\",\r\n    \"items\": [\r\n        {\r\n            \"account\": {\r\n                \"code\": \"24080501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \r\n            \r\n            \"tax\": {\r\n                \"id\": 13156,\r\n                \"name\": \"IVA 19%\",\r\n                \"percentage\": 19,\r\n                \"base_value\": 100000\r\n            },\r\n           \r\n            \"value\": 19000,\r\n            \"description\": \"Descripción opcional del debito\"\r\n        },\r\n\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del credito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 100\r\n        }\r\n    ],\r\n    \"observations\": \"Observaciones\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/journals",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Journals - (Activos Fijos)",
+					"id": "24989828-7045364b-8a73-46e6-95a7-1a20d03e64ba",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": \"\" //identificador de CC\r\n    },\r\n    \"date\": \"2015-12-15\",\r\n    \"items\": [\r\n        {\r\n            \"account\": {\r\n                \"code\": \"15080501\",\r\n                \"movement\": \"Debit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del debito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 10000,\r\n            \r\n            \"fixed_asset\": {\r\n                \"id\": 5555\r\n            }\r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"15050501\",\r\n                \"movement\": \"Credit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del credito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 10000\r\n        }\r\n    ],\r\n    \"observations\": \"Observaciones\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/journals",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Journals - (Inventarios)",
+					"id": "24989828-745c0910-4b82-4c19-ac81-a19ba4a7fb2a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"document\": {\r\n        \"id\": \"\" //identificador de CC\r\n    },\r\n    \"date\": \"2015-12-15\",\r\n    \"items\": [\r\n        {\r\n            \"account\": {\r\n                \"code\": \"14350101\",\r\n                \"movement\": \"Debit\"\r\n               \r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n             \r\n            \r\n            \"product\": {\r\n                \"code\": \"01\",\r\n                \"warehouse\": \"\", //id bodega\r\n                \"quantity\": 1\r\n            },\r\n            \"description\": \"Productos\",\r\n            \"value\": 500\r\n            \r\n            \r\n            \r\n        },\r\n        {\r\n            \"account\": {\r\n                \"code\": \"11050501\",\r\n                \"movement\": \"Credit\"\r\n            },\r\n            \"customer\": {\r\n                \"identification\": \"109048401\",\r\n                \"branch_office\": \"0\"\r\n            },\r\n            \"description\": \"Descripción opcional del credito\",\r\n            \"cost_center\": 100, //aplica si en la definicion esta marcado para uso,\r\n            \"value\": 10000\r\n        }\r\n    ],\r\n    \"observations\": \"Observaciones\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/journals",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"journals"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Entries - Read all",
+					"id": "24989828-20084d70-39ba-4c1d-ad79-df451b2cf714",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\r\n    \"document\": {\r\n        \"id\": 36002\r\n    },\r\n    \"date\": \"2021-02-22\",\r\n    \"customer\": {\r\n        \"identification\": \"109048401\",\r\n        \"branch_office\": \"0\"\r\n    },\r\n    \"seller\": 11347,\r\n    \"items\": [\r\n        {\r\n            \"code\": \"Sku-1\",\r\n            \"description\": \"Descripción desde API\",\r\n            \"discount\": 13.00,\r\n            \"quantity\": \"1\",\r\n            \"price\": 1000\r\n        }\r\n\r\n    ],\r\n    \"payments\": [\r\n        {\r\n            \"id\": \"27535\",\r\n            \"value\": 870,\r\n            \"due_date\": \"2021-03-22\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/vouchers",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"vouchers"
+							],
+							"query": [
+								{
+									"key": "created_start",
+									"value": "2021-04-07",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Entries - Read by id",
+					"id": "24989828-17f4e1ac-2901-4167-a285-4ffcaad79a70",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{TokenProduccion}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.siigo.com/v1/vouchers/4e94770d-5cb5-42be-8187-9e903a8d7eec",
+							"protocol": "https",
+							"host": [
+								"api",
+								"siigo",
+								"com"
+							],
+							"path": [
+								"v1",
+								"vouchers",
+								"4e94770d-5cb5-42be-8187-9e903a8d7eec"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "24989828-bb57d2c7-3f0b-42b5-9543-901565de152b"
+		}
+	]
+}
