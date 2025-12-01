@@ -34,6 +34,7 @@ using Poliedro.Billing.Infraestructure.External.Siigo;
 using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -48,6 +49,7 @@ builder.Services.AddHttpClient<ICreditNoteDomainService, CreditNoteDomainService
 {
     client.BaseAddress = new Uri("http://159.89.239.32:5009"); 
 });
+
 
 
 
@@ -68,9 +70,14 @@ builder.Services.AddControllers(options =>
 builder.Services.AddRouting(routing => routing.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
-
-
 {
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Poliedro Billing API",
+        Version = "v1",
+        Description = "API de facturación de Poliedro"
+    });
+
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -99,6 +106,7 @@ builder.Services.AddSwaggerGen(options =>
     options.CustomSchemaIds(type => type.FullName);
 });
 
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("PoliedroBilling", policy =>
@@ -118,6 +126,7 @@ builder.Services.AddHealthChecks()
     .AddMySql(builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
 var app = builder.Build();
+
 app.MapHealthChecks("/health", new HealthCheckOptions()
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
@@ -126,21 +135,15 @@ app.MapHealthChecksUI(options =>
 {
     options.UIPath = "/health-ui";
 });
-app.UseCors("PoliedroBilling");
-
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
-});
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
-// Map Minimal API Endpoints
+app.UseCors("PoliedroBilling");
+
+// Map Minimal API Endpoints BEFORE OpenAPI/Scalar
 var apiV1 = app.MapGroup("api/v1");
 
 apiV1.MapGroup("/billing").MapBillingEndpoints();
@@ -166,5 +169,15 @@ apiV1.MapGroup("/invoice").MapSuccessInvoiceEndpoints();
 app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
 
 apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
+
+// Configure Swagger and Scalar
+app.UseSwagger();
+app.MapScalarApiReference(options =>
+{
+    options
+        .WithTitle("Poliedro Billing API")
+        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient)
+        .WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json");
+});
 
 app.Run();
