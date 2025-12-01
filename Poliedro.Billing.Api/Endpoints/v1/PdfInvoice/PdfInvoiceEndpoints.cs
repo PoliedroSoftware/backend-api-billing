@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Application.PdfInvoice.Queries;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.PdfInvoice;
@@ -8,7 +9,7 @@ public static class PdfInvoiceEndpoints
 {
     public static RouteGroupBuilder MapPdfInvoiceEndpoints(this RouteGroupBuilder group)
     {
-        group.MapGet("/pdf/{id}", GetPdfInvoice)
+        group.MapGet("/pdfinvoice/pdf/{id}", GetPdfInvoice)
             .WithName("GetPdfInvoice")
             .WithTags("PdfInvoice")
             .WithSummary("Get PDF invoice")
@@ -22,14 +23,14 @@ public static class PdfInvoiceEndpoints
 
     private static async Task<IResult> GetPdfInvoice(
         HttpContext context,
+        IMediator mediator,
         string id,
-        IMediator mediator)
+        [FromHeader(Name = "Authorization")] string authorization
+        )
     {
         try
         {
-            if (!context.Request.Headers.TryGetValue("Authorization", out var authorization) || 
-                string.IsNullOrEmpty(authorization) || 
-                !authorization.ToString().StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(authorization) || !authorization.StartsWith("Bearer "))
             {
                 return Results.Unauthorized();
             }
