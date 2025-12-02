@@ -27,6 +27,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
             SELECT 
                 v.id AS invoice_id,
                 v.identication,
+                v.person_type,
                 v.contact_name,
                 v.email,
                 v.mobile,
@@ -82,7 +83,8 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                         CustomerEntity = new CustomerEntity
                         {
                             IdentificationNumber = reader["identication"]?.ToString(),
-                            Name = reader["contact_name"]?.ToString(),
+                            TypeOfPerson = reader.IsDBNull(reader.GetOrdinal("person_type"))? 0 : Convert.ToInt32(reader["person_type"]),
+                          Name = reader["contact_name"]?.ToString(),
                             Email = reader["email"]?.ToString(),
                             Phone = reader["mobile"]?.ToString(),
                             City = reader["city"]?.ToString(),
@@ -103,18 +105,18 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 }
             }
 
-           
+
             if (invoicesMap.Count == 0)
                 return invoicesMap.Values.ToList();
 
-       
+
             var invoiceIds = invoicesMap.Keys.ToList();
             const int chunkSize = 1000;
             for (int i = 0; i < invoiceIds.Count; i += chunkSize)
             {
                 var chunk = invoiceIds.Skip(i).Take(chunkSize).ToList();
 
-              
+
                 var paramNames = chunk.Select((id, idx) => $"@id{idx}").ToList();
                 string inClause = string.Join(", ", paramNames);
 
@@ -137,7 +139,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                     d.unit_price
                 FROM v_invoice_detail d
                 WHERE d.transaccion IN ({inClause})
-                ORDER BY d.transaccion, d.id ASC"; 
+                ORDER BY d.transaccion, d.id ASC";
 
                 using var cmdDetails = new MySqlCommand(detailsQuery, connection);
                 for (int j = 0; j < chunk.Count; j++)
@@ -152,7 +154,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
 
                     if (!invoicesMap.TryGetValue(transaccion, out var invoice))
                     {
-                        
+
                         continue;
                     }
 

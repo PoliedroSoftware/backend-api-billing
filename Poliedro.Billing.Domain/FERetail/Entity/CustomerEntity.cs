@@ -7,6 +7,9 @@ public class CustomerEntity
     [JsonPropertyName("identification_number")]
     public  string? IdentificationNumber { get; set; }
 
+    [JsonPropertyName("typeOfPerson")]
+    public int? TypeOfPerson { get; set; }
+
     [JsonPropertyName("multiple_resolution")]
     public string? MultipleResolution { get; set; }
 
