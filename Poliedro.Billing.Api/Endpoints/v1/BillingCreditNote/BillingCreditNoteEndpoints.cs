@@ -1,10 +1,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.BillingCreditNote.Commands.CreditNote;
 using Poliedro.Billing.Application.Common.Features;
+using System.ComponentModel.DataAnnotations;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.BillingCreditNote;
 
@@ -27,8 +29,8 @@ public static class BillingCreditNoteEndpoints
 
     private static async Task<IResult> CreateCreditNote(
         HttpContext context,
-        IEnumerable<CreateBillingInputDTO> invoices,
         IMediator mediator,
+        [FromBody][Required]IEnumerable<CreateBillingInputDTO> invoices,
         CancellationToken cancellationToken)
     {
         var token = TokenHelper.ExtractBearerToken(context.Request);
