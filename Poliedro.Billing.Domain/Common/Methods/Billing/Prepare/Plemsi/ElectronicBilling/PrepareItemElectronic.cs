@@ -34,6 +34,10 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                     });
                 }
 
+                // Calculate tax with proper rounding
+                double taxableAmount = Math.Round(item.UnitPrice * item.InvoicedQuantity, 2, MidpointRounding.AwayFromZero);
+                double taxAmount = Math.Round(taxableAmount * (item.Percent / 100), 2, MidpointRounding.AwayFromZero);
+
 
                 var taxTotals = new List<TaxTotalEntity>
             {
@@ -41,8 +45,8 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                 {
                        TaxId = 1,
                         Percent = item.Percent,
-                        TaxAmount = item.TaxAmount * item.InvoicedQuantity,
-                        TaxableAmount = item.UnitPrice * item.InvoicedQuantity
+                        TaxAmount = taxAmount,
+                        TaxableAmount = taxableAmount
                 }
             };
 
@@ -50,7 +54,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                 var itemInvoice = new ItemElectronicEntity
                 {
                     UnitMeasureId = item.UnitMeasureId > 0 ? item.UnitMeasureId : 70,
-                    LineExtensionAmount = item.UnitPrice * item.InvoicedQuantity,
+                    LineExtensionAmount = taxableAmount,
                     InvoicedQuantity = item.InvoicedQuantity,
                     FreeOfChargeIndicator = item.FreeOfChargeIndicator,
                     AllowanceCharges = allowanceCharges,
