@@ -3,6 +3,7 @@ namespace Poliedro.Billing.Application.Billing.Dtos;
 public record CustomerBillingDTO
     (
         string IdentificationNumber,
+        int? TypeOfPerson,
         string? MultipleResolution,
         string? ApiKey,
         string? Dv,

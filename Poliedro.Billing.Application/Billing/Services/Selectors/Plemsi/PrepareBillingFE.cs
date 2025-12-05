@@ -100,6 +100,12 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         continue;
                     }
 
+                    if (invoice.CustomerEntity?.TypeOfPerson == null || invoice.CustomerEntity.TypeOfPerson == 0)
+                    {
+                        continue;
+                    }
+
+
 
                     invoice.InvoiceBaseTotal = invoiceBaseTotal;
                     invoice.AllowanceTotal = allowanceTotal;
@@ -119,27 +125,25 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
                     invoice.Numeration = invoiceNumber.ToString();
 
-                    
 
-
-                    DocumentType documentType = await _billingValidateScript
-                        .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
+                    //DocumentType documentType = await _billingValidateScript
+                    //    .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
 
 
                     string identification = invoice.CustomerEntity.IdentificationNumber.Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
 
                     invoice.CustomerEntity.IdentificationNumber = identification;
 
-                    if (documentType == DocumentType.NIT)
-                    {
-                        invoice.CustomerEntity.IdentificationNumber =
-                            invoice.CustomerEntity.IdentificationNumber.Replace("-", "");
-                        if (invoice.CustomerEntity.IdentificationNumber.Length > 0)
-                        {
-                            invoice.CustomerEntity.IdentificationNumber = invoice.CustomerEntity.IdentificationNumber
-                                .Substring(0, invoice.CustomerEntity.IdentificationNumber.Length - 1);
-                        }
-                    }
+                    //if (documentType == DocumentType.NIT)
+                    //{
+                    //    invoice.CustomerEntity.IdentificationNumber =
+                    //        invoice.CustomerEntity.IdentificationNumber.Replace("-", "");
+                    //    if (invoice.CustomerEntity.IdentificationNumber.Length > 0)
+                    //    {
+                    //        invoice.CustomerEntity.IdentificationNumber = invoice.CustomerEntity.IdentificationNumber
+                    //            .Substring(0, invoice.CustomerEntity.IdentificationNumber.Length - 1);
+                    //    }
+                    //}
 
 
                     string checkDigit = await _calculateCheckDigits
@@ -187,7 +191,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                             Email = invoice.CustomerEntity.Email,
                             MerchantRegistration = "00000000",
                             MunicipalityCode = "11001",
-                            TypeDocumentIdentificationId = (int)documentType,
+                            TypeDocumentIdentificationId = invoice.CustomerEntity.TypeOfPerson,
                             TypeOrganizationId = 1,
                             TypeLiabilityId = 117,
                             MunicipalityId = 149,
