@@ -27,6 +27,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
             SELECT 
                 v.id AS invoice_id,
                 v.identication,
+                v.person_type,
                 v.contact_name,
                 v.email,
                 v.mobile,
@@ -82,6 +83,7 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                         CustomerEntity = new CustomerEntity
                         {
                             IdentificationNumber = reader["identication"]?.ToString(),
+                            TypeOfPerson = reader.IsDBNull(reader.GetOrdinal("person_type")) ? 0 : Convert.ToInt32(reader["person_type"]),
                             Name = reader["contact_name"]?.ToString(),
                             Email = reader["email"]?.ToString(),
                             Phone = reader["mobile"]?.ToString(),
