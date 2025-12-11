@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+using Poliedro.Billing.Application.Billing.Services.Selectors.Siigo;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Resolution.Enums;
 
@@ -19,6 +20,13 @@ public class BillingPrepareFactory(IServiceProvider _serviceProvider) : IGetProc
                     _serviceProvider.GetRequiredService<PrepareBillingPOS>()
                         as ICreateBilling),
 
+            ("SIIGO", "FE") => Task.FromResult(
+                    _serviceProvider.GetRequiredService<PrepareBillingSiigoFE>()
+                        as ICreateBilling),
+
+            ("SIIGO", "POS") => Task.FromResult(
+                _serviceProvider.GetRequiredService<PrepareBillingSiigoPOS>()
+                        as ICreateBilling),
 
 
             _ => throw new ArgumentException($"Unknown provider ({provider}) or type ({resolutionType})")

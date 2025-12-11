@@ -37,7 +37,6 @@
     <Folder Include="BillingCreditNote\Services\Selectors\Siigo\" />
     <Folder Include="BillingCreditNote\Services\Selectors\Plemsi\" />
     <Folder Include="Billing\Services\Selectors\TNS\" />
-    <Folder Include="Billing\Services\Selectors\Siigo\" />
     <Folder Include="CreditNote\Commands\CreateCreditNote\Command\" />
   </ItemGroup>
 

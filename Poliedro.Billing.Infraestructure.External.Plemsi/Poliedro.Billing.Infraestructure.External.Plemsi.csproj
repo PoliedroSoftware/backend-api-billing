@@ -31,6 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Adapter\Billing\Impl\Siigo\" />
+    <Folder Include="Adapter\Billing\Selectors\Siigo\" />
     <Folder Include="Adapter\FE\EDS\" />
     <Folder Include="Adapter\POS\Retail\" />
   </ItemGroup>

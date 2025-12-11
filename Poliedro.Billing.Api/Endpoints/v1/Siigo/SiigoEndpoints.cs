@@ -1,7 +1,11 @@
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Poliedro.Billing.Api.Common.Extensions;
-using Poliedro.Billing.Application.Siigo.Commands;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using Poliedro.Billing.Api.Common.Helpers;
+using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
+using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Common.Features;
+using System.ComponentModel.DataAnnotations;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.Siigo;
 
@@ -9,11 +13,11 @@ public static class SiigoEndpoints
 {
     public static RouteGroupBuilder MapSiigoEndpoints(this RouteGroupBuilder group)
     {
-        group.MapPost("/", Create)
+        group.MapPost("/", CreateBillingCommand)
             .WithName("CreateInvoiceSiigo")
             .WithTags("Siigo")
             .WithSummary("Invoice basic - Create and Send to DIAN")
-            .Produces<CreateInvoicesSiigoCommand>(StatusCodes.Status200OK)
+            .Produces<CreateBillingCommand>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
@@ -21,28 +25,33 @@ public static class SiigoEndpoints
         return group;
     }
 
-    private static async Task<IResult> Create(
+    private static async Task<IResult> CreateBillingCommand(
         HttpContext context,
-        CreateInvoicesSiigoCommand command,
-        IMediator mediator)
+        IMediator mediator,
+        [FromBody][Required] IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
     {
-        if (!context.Request.Headers.TryGetValue("Authorization", out var authHeader))
-        {
+        var token = TokenHelper.ExtractBearerToken(context.Request);
+        if (string.IsNullOrEmpty(token))
             return Results.Unauthorized();
-        }
 
-        var updatedCommand = command with { token = authHeader.ToString().Replace("Bearer ", string.Empty) };
-
-        if (command == null || command.Invoices.Count == 0)
+        if (invoices.IsNullOrEmpty())
         {
-            return Results.BadRequest("The order list is empty or null.");
+            var emptyResponse = ResponseApiService.Response(
+                statusCode: StatusCodes.Status200OK,
+                message: "No invoices.",
+                data: invoices
+            );
+            return Results.Ok(emptyResponse);
         }
 
-        var result = await mediator.Send(updatedCommand);
+        var command = new CreateBillingCommand(invoices, token);
+        var result = await mediator.Send(command, cancellationToken);
 
-        return result.Match(
-            onSuccess => TypedResults.Ok(onSuccess),
-            onFailure => TypedResults.BadRequest(onFailure)
+        var response = ResponseApiService.Response(
+            statusCode: StatusCodes.Status200OK,
+            message: "Invoice processing result.",
+            data: result
         );
+        return Results.Ok(response);
     }
 }

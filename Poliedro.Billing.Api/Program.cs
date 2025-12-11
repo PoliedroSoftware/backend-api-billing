@@ -31,8 +31,6 @@ using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Infraestructure.External.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
-using Poliedro.Billing.Infraestructure.External.Siigo;
-using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Scalar.AspNetCore;
@@ -59,8 +57,6 @@ builder.Services
     .AddWebApi()
     .AddApplication()
     .AddExternalPlemsi(builder.Configuration)
-    .AddExternalTns(builder.Configuration)
-    .AddExternalSiigo(builder.Configuration)
     .AddPersistence(builder.Configuration);
 
 builder.Services.AddControllers(options =>

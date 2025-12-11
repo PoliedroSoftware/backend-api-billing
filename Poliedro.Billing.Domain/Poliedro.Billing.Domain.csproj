@@ -16,6 +16,7 @@
   <ItemGroup>
     <Folder Include="Common\Methods\Billing\Prepare\TNS\" />
     <Folder Include="Common\Methods\Billing\Prepare\Siigo\" />
+    <Folder Include="Siigo\Ports\" />
   </ItemGroup>
 
 </Project>
