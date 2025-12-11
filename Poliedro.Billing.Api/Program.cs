@@ -23,7 +23,7 @@ using Poliedro.Billing.Api.Endpoints.v1.PendingInvoice;
 using Poliedro.Billing.Api.Endpoints.v1.Server;
 using Poliedro.Billing.Api.Endpoints.v1.Siigo;
 using Poliedro.Billing.Api.Endpoints.v1.SuccessInvoice;
-using Poliedro.Billing.Api.Endpoints.v1.Tns;
+
 using Poliedro.Billing.Application;
 using Poliedro.Billing.Application.Common.Behaviors;
 using Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote;
@@ -163,8 +163,6 @@ apiV1.MapGroup("/server").MapServerEndpoints();
 app.MapGroup("api/v1/billing/invoices").MapSiigoEndpoints();
 
 apiV1.MapGroup("/invoice").MapSuccessInvoiceEndpoints();
-
-app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
 
 apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
 
