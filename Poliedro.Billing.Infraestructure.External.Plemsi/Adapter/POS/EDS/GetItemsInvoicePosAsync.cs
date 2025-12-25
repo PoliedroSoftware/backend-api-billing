@@ -15,8 +15,8 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
                 var itemInvoice = new ItemFERetailEntity
                 {
                     unit_measure_id = 70,
-                    invoiced_quantity = index.InvoicedQuantity.ToString(),
-                    line_extension_amount = index.Subtotal.ToString(),
+                    invoiced_quantity = index.InvoicedQuantity,
+                    line_extension_amount = index.Subtotal,
                     free_of_charge_indicator = false,
                     tax_totals =
                     [
@@ -27,7 +27,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
                     code = index.Code,
                     type_item_identification_id = 4,
                     price_amount = index.PriceAmount.ToString(),
-                    base_quantity = index.InvoicedQuantity.ToString()
+                    base_quantity = index.InvoicedQuantity
                 };
                 itemsInvoiceResponse.Add(itemInvoice);
             }

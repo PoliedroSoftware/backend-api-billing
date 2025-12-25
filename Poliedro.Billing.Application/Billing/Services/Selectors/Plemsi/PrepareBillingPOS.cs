@@ -77,8 +77,8 @@ public class PrepareBillingPOS(
                     var itemInvoice = new ItemFERetailEntity
                     {
                         unit_measure_id = 70,
-                        invoiced_quantity = item.InvoicedQuantity.ToString(),
-                        line_extension_amount = item.Subtotal.ToString(),
+                        invoiced_quantity = item.InvoicedQuantity,
+                        line_extension_amount = item.Subtotal,
                         free_of_charge_indicator = false,
                         tax_totals =[],
                         description = item.Description,
@@ -86,7 +86,7 @@ public class PrepareBillingPOS(
                         code = item.Code.ToString(),
                         type_item_identification_id = 4,
                         price_amount = item.PriceAmount.ToString(),
-                        base_quantity = item.InvoicedQuantity.ToString()
+                        base_quantity = item.InvoicedQuantity
                     };
                     itemsInvoiceResponse.Add(itemInvoice);
                 }
