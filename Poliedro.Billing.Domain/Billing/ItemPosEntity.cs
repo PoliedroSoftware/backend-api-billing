@@ -8,9 +8,9 @@ public class ItemFERetailEntity
     [JsonPropertyName("unit_measure_id")]
     public int unit_measure_id { get; set; }
     [JsonPropertyName("invoiced_quantity")]
-    public string invoiced_quantity { get; set; }
+    public double invoiced_quantity { get; set; }
     [JsonPropertyName("line_extension_amount")]
-    public string line_extension_amount { get; set; }
+    public double line_extension_amount { get; set; }
     [JsonPropertyName("free_of_charge_indicator")]
     public bool free_of_charge_indicator { get; set; }
     [JsonPropertyName("tax_totals")]
@@ -26,5 +26,5 @@ public class ItemFERetailEntity
     [JsonPropertyName("price_amount")]
     public string price_amount { get; set; }
     [JsonPropertyName("base_quantity")]
-    public string base_quantity { get; set; }
+    public double base_quantity { get; set; }
 }
