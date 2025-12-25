@@ -3,8 +3,8 @@
 public record ItemRequestPosDto
 {
     public int unit_measure_id { get; init; }
-    public string invoiced_quantity { get; init; }
-    public string line_extension_amount { get; init; }
+    public double invoiced_quantity { get; init; }
+    public double line_extension_amount { get; init; }
     public bool free_of_charge_indicator { get; init; }
     public List<TaxTotalRequestPosDto> tax_totals { get; init; }
     public string description { get; init; }
@@ -12,6 +12,6 @@ public record ItemRequestPosDto
     public string code { get; init; }
     public int type_item_identification_id { get; init; }
     public string price_amount { get; init; }
-    public string base_quantity { get; init; }
+    public double base_quantity { get; init; }
 
 }

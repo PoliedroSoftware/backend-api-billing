@@ -30,10 +30,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
                                 Resolution = reader.GetString(0),
                                 Description = reader.GetString(1),
                                 Code = reader.GetString(2),
-                                BaseQuantity = reader.GetDecimal(3),
-                                InvoicedQuantity = reader.GetDecimal(4),
+                                BaseQuantity = reader.GetDouble(3),
+                                InvoicedQuantity = reader.GetDouble(4),
                                 PriceAmount = reader.GetDecimal(5),
-                                Subtotal = reader.GetDecimal(6)
+                                Subtotal = reader.GetDouble(6)
                             };
                             invoices.Add(invoice);
                         }
