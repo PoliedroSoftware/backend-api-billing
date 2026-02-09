@@ -207,15 +207,19 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 
 
                         generalAllowances = globalDiscount > 0
-                            ? new List<GeneralAllowanceEntity> {
-                                new GeneralAllowanceEntity {
-                                    AllowanceChargeReason = "Commercial Discount",
-                                    AllowancePercent = roundedDiscountPercent,
-                                    Amount = Math.Round((decimal)globalDiscount, 2),
-                                    BaseAmount = (decimal)invoiceBaseTotal
-                                }
+                        ? new List<GeneralAllowanceEntity>
+                        {
+                            new GeneralAllowanceEntity
+                            {
+                                AllowanceChargeReason = "Commercial Discount",
+                                AllowancePercent = roundedDiscountPercent,
+                                MultiplierFactorNumeric = roundedDiscountPercent > 0 ? 1 : 0,
+                                Amount = Math.Round((decimal)globalDiscount, 2),
+                                BaseAmount = (decimal)invoiceBaseTotal
                             }
-                            : new List<GeneralAllowanceEntity>(),
+                        }
+                        : new List<GeneralAllowanceEntity>(),
+
 
                         items = invoice.ItemElectronicEntity,
                         resolution = clientInfo.ResolucionNumber,

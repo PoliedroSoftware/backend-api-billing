@@ -78,6 +78,7 @@ public class BillingAutoMapper : Profile
         CreateMap<GeneralAllowanceEntity, GeneralAllowanceRequestFEDTO>()
             .ForMember(dest => dest.allowance_charge_reason, opt => opt.MapFrom(src => src.AllowanceChargeReason))
             .ForMember(dest => dest.allowance_percent, opt => opt.MapFrom(src => src.AllowancePercent))
+            .ForMember(dest => dest.multiplier_factor_numeric, opt => opt.MapFrom(src => src.MultiplierFactorNumeric))
             .ForMember(dest => dest.amount, opt => opt.MapFrom(src => src.Amount))
             .ForMember(dest => dest.base_amount, opt => opt.MapFrom(src => src.BaseAmount));
         CreateMap<ItemElectronicEntity, ItemElectronicRequestFEDTO>()
