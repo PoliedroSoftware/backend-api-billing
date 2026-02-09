@@ -10,6 +10,9 @@ public class GeneralAllowanceEntity
     [JsonPropertyName("allowance_percent")]
     public double? AllowancePercent { get; set; }
 
+    [JsonPropertyName("multiplier_factor_numeric")]
+    public decimal MultiplierFactorNumeric { get; set; }
+
     [JsonPropertyName("amount")]
     public required decimal Amount { get; set; }
 
