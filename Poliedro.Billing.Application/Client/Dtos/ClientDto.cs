@@ -12,7 +12,7 @@ namespace Poliedro.Billing.Application.Client.Dtos
         public ProviderType ProviderId { get; set; } = default!;
         public bool Active { get; set; } = default!;
         public DianResolutionDto DianResolution { get; set; } = default!;
-        public DianResolutionCreditNoteDTO DianResolutionCreditNote { get; set; } = default!;
+        public DianResolutionCreditNoteDTO? DianResolutionCreditNote { get; set; } = default!;
         public ServerDto Server { get; set; } = default!;
         public int Iterations { get; set; } = default!;
         public DateTime Date { get; set; } = default!;

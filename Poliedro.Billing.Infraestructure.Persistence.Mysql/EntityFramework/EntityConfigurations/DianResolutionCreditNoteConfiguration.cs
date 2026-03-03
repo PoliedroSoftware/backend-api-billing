@@ -9,7 +9,7 @@ public  class DianResolutionCreditNoteConfiguration
 {
     public DianResolutionCreditNoteConfiguration(EntityTypeBuilder<DianResolutionCreditNoteEntity> builder)
     {
-        builder.ToTable("dian_resolution_credit_note");
+        builder.ToTable("credit_note_plemsi");
         builder.HasKey(x => x.ResolutionId);
         builder.Property(x => x.ResolutionId).HasColumnName("resolutionid");
         builder.Property(x => x.ResolutionNumber).HasColumnName("resolution_number");
