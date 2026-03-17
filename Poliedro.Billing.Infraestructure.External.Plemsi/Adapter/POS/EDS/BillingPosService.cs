@@ -126,7 +126,7 @@ public class BillingPosService(
                         {
                             await insertInvoice.InsertInvoiceSucces(
                                 invoice,
-                                responseApi.Data.Cude,
+                                responseApi.Data.cude,
                                 responseApi.Data.QRCode,
                                 connectionString,
                                 clientItem.ProviderId,
