@@ -68,6 +68,27 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     }
 
 
+    public async Task<Result<ClientEntity, Error>> GetByIdAsync(int clientId, int providerType, CancellationToken cancellationToken)
+    {
+        // Query client_billing_electronic joined with out_client_client to find client by external client id and provider
+        var sql = @"SELECT c.* FROM client_billing_electronic c
+                        INNER JOIN out_client_client oc ON oc.client_billing_electronic_id = c.client_billing_electronic_id
+                        WHERE oc.client_id = {0} AND oc.provider = {1} AND c.active = 1 LIMIT 1";
+
+        var client = await context.ClientBillingElectronic
+            .FromSqlRaw(sql, clientId, providerType)
+            .Include(c => c.DianResolution)
+            .Include(c => c.Server)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (client is null)
+            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(clientId);
+
+        return client;
+    }
+
+
 
     public async Task<Result<VoidResult, Error>> DeleteAsync(int id, CancellationToken cancellationToken)
     {
