@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Poliedro.Billing.Api.Common.Helpers;
+using Poliedro.Billing.Application.Common.Features;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Queries.GetAllInvoicesPendingWithDetails;
 
@@ -10,31 +10,29 @@ public static class InvoicesPendingWithDetailsEndpoints
 {
     public static RouteGroupBuilder MapInvoicesPendingWithDetailsEndpoints(this RouteGroupBuilder group)
     {
-        group.MapGet("/", GetAllAsync)
+        group.MapPost("/", GetAllAsync)
             .WithName("GetInvoicesPendingWithDetails")
             .WithTags("InvoicesPendingWithDetails")
-            .WithSummary("Get pending invoices with details by Bearer token")
-            .WithDescription("Retrieves pending invoices with details based on Bearer token")
-            .Produces<IEnumerable<CreateBillingDTO>>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status401Unauthorized)
-            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Get pending invoices with details by client id and provider type")
+            .WithDescription("Retrieves pending invoices with details based on ClientID and ProviderType in the request body")
+            .Produces<IEnumerable<CreateBillingDTO>>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return group;
     }
 
     private static async Task<IResult> GetAllAsync(
-        HttpContext context,
+        InvoicesPendingWithDetailsQuery request,
         IMediator mediator)
     {
-        var token = TokenHelper.ExtractBearerToken(context.Request);
-        if (string.IsNullOrEmpty(token))
-            return Results.Json(
-                "Authorization header is missing or invalid.",
-                statusCode: StatusCodes.Status401Unauthorized);
+        if (request is null)
+            return Results.BadRequest(ResponseApiService.Response(StatusCodes.Status400BadRequest, "Request body is required"));
 
-        IEnumerable<CreateBillingDTO> invoicesPendingWithDetails = await mediator.Send(new InvoicesPendingWithDetailsQuery(ApiKey: token));
+        var invoicesPendingWithDetails = await mediator.Send(request);
 
-        return Results.Ok(invoicesPendingWithDetails);
+        return Results.Json(
+            ResponseApiService.Response(StatusCodes.Status201Created, invoicesPendingWithDetails),
+            statusCode: StatusCodes.Status201Created);
     }
 }

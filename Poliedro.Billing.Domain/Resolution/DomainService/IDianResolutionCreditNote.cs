@@ -6,5 +6,5 @@ namespace Poliedro.Billing.Domain.Resolution.DomainService;
 
 public interface IDianResolutionCreditNote
 {
-    Task<Result<DianResolutionEntity, Error>> GetByIdAsync(int id, CancellationToken cancellationToken);
+    Task<Result<DianResolutionCreditNoteEntity, Error>> GetByIdAsync(int id, CancellationToken cancellationToken); 
 }

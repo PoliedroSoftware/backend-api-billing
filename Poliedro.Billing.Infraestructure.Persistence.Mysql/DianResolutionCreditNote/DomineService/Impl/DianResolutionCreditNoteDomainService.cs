@@ -7,19 +7,17 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.DianResolutionCreditNote.DomineService.Impl;
 
-public class DianResolutionCreditNoteDomainService
-    (
-    DataBaseContext _context
-    ) : IDianResolutionCreditNote
+
+public class DianResolutionCreditNoteDomainService(DataBaseContext _context) : IDianResolutionCreditNote
 {
-    public async Task<Result<DianResolutionEntity, Error>> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<Result<DianResolutionCreditNoteEntity, Error>> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        var DianResolutionCreditNote = await _context.DianResolutionCreditNote
+        var dianResolutionCreditNote = await _context.DianResolutionCreditNote
             .FindAsync(id, cancellationToken);
-        if (DianResolutionCreditNote != null)
-        {
-            return DianResolutionCreditNote;
-        }
-        return null;
+
+        if (dianResolutionCreditNote is null)
+            return null!;
+
+        return dianResolutionCreditNote;
     }
 }

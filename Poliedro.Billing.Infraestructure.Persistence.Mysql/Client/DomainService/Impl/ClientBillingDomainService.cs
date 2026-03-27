@@ -68,6 +68,22 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     }
 
 
+    public async Task<Result<ClientEntity, Error>> GetByIdAsync(int clientId, int providerType, CancellationToken cancellationToken)
+    {
+        var client = await context.ClientBillingElectronic
+            .AsNoTracking()
+            .Include(c => c.Server)
+            .Include(c => c.DianResolution)
+            .Where(c => c.AuthPlemsiClient == clientId && (int)c.ProviderId == providerType)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (client is null)
+            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(clientId);
+
+        return client;
+    }
+
+
 
     public async Task<Result<VoidResult, Error>> DeleteAsync(int id, CancellationToken cancellationToken)
     {

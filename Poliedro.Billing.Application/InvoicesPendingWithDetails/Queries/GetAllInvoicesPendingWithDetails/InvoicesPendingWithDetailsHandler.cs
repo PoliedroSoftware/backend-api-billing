@@ -12,19 +12,23 @@ public class InvoicesPendingWithDetailsHandler(
     IMapper mapper,
     IDatabaseUtils databaseUtils,
     IInvoicesPendingWithDetailsStrategyFactory _strategyFactory
-    ) : IRequestHandler<InvoicesPendingWithDetailsQuery, IEnumerable<CreateBillingDTO>> 
+    ) : IRequestHandler<InvoicesPendingWithDetailsQuery, IEnumerable<CreateBillingDTO>>
 {
-    public async Task<IEnumerable<CreateBillingDTO>> Handle(InvoicesPendingWithDetailsQuery request,CancellationToken cancellationToken)
+    public async Task<IEnumerable<CreateBillingDTO>> Handle(InvoicesPendingWithDetailsQuery request, CancellationToken cancellationToken)
     {
-        var client = await clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
+        var client = await clientDomainService.GetByIdAsync(request.ClientID, request.ProviderType, cancellationToken);
 
-        var repository = _strategyFactory.GetStrategy((Domain.InvoicesPendingWithDetails.Enums.ResolutionType)client.Value.DianResolution.ResolutionType);
+        if (!client.IsSuccess || client.Value is null)  
+            throw new Exception($"Cliente no encontrado: {request.ClientID}");
+
+        var repository = _strategyFactory.GetStrategy(
+            (Domain.InvoicesPendingWithDetails.Enums.ResolutionType)client.Value.DianResolution.ResolutionType);
 
         var data = await repository.GetAllInvoicePendingWithDetails(
-        client.Value.Server,
-        client.Value,
-        databaseUtils,
-        cancellationToken);
+            client.Value.Server,
+            client.Value,
+            databaseUtils,
+            cancellationToken);
 
         return mapper.Map<IEnumerable<CreateBillingDTO>>(data);
     }
