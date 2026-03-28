@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Common.Dtos;
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Queries.GetAllInvoicesPendingWithDetails;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.InvoicesPendingWithDetails;
@@ -15,7 +16,7 @@ public static class InvoicesPendingWithDetailsEndpoints
             .WithTags("InvoicesPendingWithDetails")
             .WithSummary("Get pending invoices with details by Bearer token")
             .WithDescription("Retrieves pending invoices with details based on Bearer token")
-            .Produces<IEnumerable<CreateBillingDTO>>(StatusCodes.Status200OK)
+            .Produces<PagedResponseDto<CreateBillingDTO>>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
@@ -25,16 +26,18 @@ public static class InvoicesPendingWithDetailsEndpoints
 
     private static async Task<IResult> GetAllAsync(
         HttpContext context,
-        IMediator mediator)
+        IMediator mediator,
+        int page = 1,
+        int pageSize = 10)
     {
         var token = TokenHelper.ExtractBearerToken(context.Request);
         if (string.IsNullOrEmpty(token))
-            return Results.Json(
-                "Authorization header is missing or invalid.",
+            return Results.Json("Authorization header is missing or invalid.",
                 statusCode: StatusCodes.Status401Unauthorized);
 
-        IEnumerable<CreateBillingDTO> invoicesPendingWithDetails = await mediator.Send(new InvoicesPendingWithDetailsQuery(ApiKey: token));
+        var result = await mediator.Send(
+            new InvoicesPendingWithDetailsQuery(ApiKey: token, Page: page, PageSize: pageSize));
 
-        return Results.Ok(invoicesPendingWithDetails);
+        return Results.Ok(result);
     }
 }
