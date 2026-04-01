@@ -206,7 +206,7 @@ namespace Poliedro.Billing.Application.BillingCreditNote.Services.Selectors.Plem
                             TypeDocumentIdentificationId = (int)documentType,
                             TypeOrganizationId = 1,
                             TypeLiabilityId = 117,
-                            MunicipalityId = 149,
+                            MunicipalityId = invoice.CustomerEntity.MunicipalityId,
                             TypeRegimeId = 1
                         },
                         payment = new PaymentEntity
