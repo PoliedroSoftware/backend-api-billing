@@ -116,7 +116,7 @@ IConfiguration config) : IFERetailService
                             TypeDocumentIdentificationId = (int)documentType,
                             TypeOrganizationId = 1,
                             TypeLiabilityId = 117,
-                            MunicipalityId = 149,
+                            MunicipalityId = "804",
                             TypeRegimeId = 1
                         },
                         payment = new PaymentEntity

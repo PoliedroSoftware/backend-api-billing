@@ -31,9 +31,12 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 v.contact_name,
                 v.email,
                 v.mobile,
+v.address_line_1,
                 v.city,
                 v.state,
                 v.country,
+v.custom_field1,
+v.custom_field2,
                 v.invoice,
                 v.payment_status,
                 v.transaction_date,
@@ -87,9 +90,12 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                             Name = reader["contact_name"]?.ToString(),
                             Email = reader["email"]?.ToString(),
                             Phone = reader["mobile"]?.ToString(),
+                            Address = reader["address_line_1"]?.ToString(),
                             City = reader["city"]?.ToString(),
                             State = reader["state"]?.ToString(),
-                            Country = reader["country"]?.ToString()
+                            Country = reader["country"]?.ToString(),
+                            MunicipalityCode = reader["custom_field1"]?.ToString(),
+                            MunicipalityId = reader["custom_field2"]?.ToString()
                         },
 
                         PaymentEntity = new PaymentEntity

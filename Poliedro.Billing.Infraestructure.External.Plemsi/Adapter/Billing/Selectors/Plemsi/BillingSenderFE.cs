@@ -65,7 +65,7 @@ public class BillingSenderFE(
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Excepción procesando factura: {ex.Message}");
+                Console.WriteLine($"[ERROR] Excepciï¿½n procesando factura: {ex.Message}");
                 continue;
             }
         }

@@ -126,24 +126,12 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.Numeration = invoiceNumber.ToString();
 
 
-                    //DocumentType documentType = await _billingValidateScript
-                    //    .ValidateScriptAsync(invoice.CustomerEntity.IdentificationNumber, cancellationToken);
+                  
 
 
                     string identification = invoice.CustomerEntity.IdentificationNumber.Trim().Replace(".", "").Replace("-", "").Replace(" ", "").Replace("+", "");
 
                     invoice.CustomerEntity.IdentificationNumber = identification;
-
-                    //if (documentType == DocumentType.NIT)
-                    //{
-                    //    invoice.CustomerEntity.IdentificationNumber =
-                    //        invoice.CustomerEntity.IdentificationNumber.Replace("-", "");
-                    //    if (invoice.CustomerEntity.IdentificationNumber.Length > 0)
-                    //    {
-                    //        invoice.CustomerEntity.IdentificationNumber = invoice.CustomerEntity.IdentificationNumber
-                    //            .Substring(0, invoice.CustomerEntity.IdentificationNumber.Length - 1);
-                    //    }
-                    //}
 
 
                     string checkDigit = await _calculateCheckDigits
@@ -187,14 +175,14 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                             Dv = checkDigit,
                             Name = invoice.CustomerEntity.Name,
                             Phone = invoice.CustomerEntity.Phone,
-                            Address = "Cra 4ta #12-56",
+                            Address = invoice.CustomerEntity.Address,
                             Email = invoice.CustomerEntity.Email,
                             MerchantRegistration = "00000000",
-                            MunicipalityCode = "11001",
+                            MunicipalityCode = invoice.CustomerEntity.MunicipalityCode,
                             TypeDocumentIdentificationId = invoice.CustomerEntity.TypeOfPerson,
                             TypeOrganizationId = 1,
                             TypeLiabilityId = 117,
-                            MunicipalityId = 149,
+                            MunicipalityId = invoice.CustomerEntity.MunicipalityId,
                             TypeRegimeId = 1
                         },
                         payment = new PaymentEntity

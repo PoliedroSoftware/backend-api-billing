@@ -56,7 +56,7 @@ public class CustomerEntity
     public int? TypeLiabilityId { get; set; }
 
     [JsonPropertyName("municipality_id")]
-    public int? MunicipalityId { get; set; }
+    public string? MunicipalityId { get; set; }
 
     [JsonPropertyName("municipality_code")]
     public string? MunicipalityCode { get; set; }

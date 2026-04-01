@@ -30,7 +30,7 @@ public  class DianResolutionCreditNoteConfiguration
         builder.Property(x => x.CurrentlyNumber).HasColumnName("currently_number");
         builder.Property(x => x.CurrentlyDate).HasColumnName("currently_date");
         builder.HasMany(x => x.clientsBillingElectronic)
-            .WithOne(x => x.DianResolutionCreditNote)
+            .WithOne()
             .HasForeignKey(x => x.ResolutionId);
     }
     private ValueConverter ConvertResolutionType()
