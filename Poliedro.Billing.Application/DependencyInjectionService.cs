@@ -9,7 +9,7 @@ using Poliedro.Billing.Application.CustomersId.AutoMappers;
 using Poliedro.Billing.Application.DianResolution.AutoMappers;
 using Poliedro.Billing.Application.GetInvoice.AutoMappers;
 using Poliedro.Billing.Application.InvoiceDetailElectronic.AutoMappers;
-
+using Poliedro.Billing.Application.Location.AutoMappers;
 using Poliedro.Billing.Application.NotifyResolution.AutoMappers;
 using Poliedro.Billing.Application.PendingInvoice.AutoMappers;
 using Poliedro.Billing.Application.Server.AutoMappers;
@@ -38,6 +38,7 @@ public static class DependencyInjectionService
             config.AddProfile(new InvoiceElectronicProfile());
             config.AddProfile(new BillingAutoMapper());
             config.AddProfile(new CreditNoteAutoMapper());
+            config.AddProfile(new MunicipalityMapper());
 
         });
         services.AddSingleton(mapper.CreateMapper());
