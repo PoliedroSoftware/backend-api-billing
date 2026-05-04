@@ -189,7 +189,8 @@ public class BillingAutoMapper : Profile
             .ForMember(dest => dest.price_amount, opt => opt.MapFrom(src => src.price_amount))
             .ForMember(dest => dest.base_quantity, opt => opt.MapFrom(src => src.base_quantity));
 
-
+        
+        
 
     }
 }

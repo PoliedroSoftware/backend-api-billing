@@ -16,6 +16,7 @@ using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.CustomersId.Ports;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
+using Poliedro.Billing.Domain.Location.Ports;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
@@ -28,6 +29,7 @@ using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.GetInvoice;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Location;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendMessage;
@@ -35,7 +37,6 @@ using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SuccessInvoice;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.UpdateCurrentlyNumber;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
-
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi
 {
@@ -76,15 +77,12 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddScoped<IGetProcessorBilling, BillingPrepareFactory>();
             services.AddTransient<PrepareBillingFE>();
             services.AddTransient<PrepareBillingPOS>();
-            
 
             services.AddTransient<IBillingSender, BillingSenderFE>();
             services.AddTransient<IBillingSender, BillingSenderPOS>();
             services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
-
             services.AddTransient<IBillingGetInfoClient, BillingGetInfoClient>();
-
 
             // Dependencias internas de PrepareBillingFE/POS
             services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();
@@ -99,7 +97,6 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<PrepareCreditNoteBillingFE>();
             services.AddTransient<PrepareCreditNoteBillingPOS>();
             services.AddScoped<IBillingGetInfgoClientCreditNote, DianResolutionCreditNoteDomainService>();
-
             services.AddScoped<IGetLastInvoiceNumberCreditNote, GetLastInvoiceNumberCreditNotePlemsi>();
 
             // Factoría y strategies
@@ -107,8 +104,9 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderPOS>();
             services.AddScoped<IBillingCreditNoteSenderFactory, BillingCreditNoteSenderFactory>();
 
+            // Location
+            services.AddHttpClient<IMunicipalityService, PlemsiLocationService>();
 
-            services.AddTransient<EmailErrorHandler>();
             return services;
         }
     }

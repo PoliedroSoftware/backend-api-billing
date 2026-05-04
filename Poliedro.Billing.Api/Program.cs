@@ -17,6 +17,7 @@ using Poliedro.Billing.Api.Endpoints.v1.GetInvoice;
 using Poliedro.Billing.Api.Endpoints.v1.InvoiceDetailElectronic;
 using Poliedro.Billing.Api.Endpoints.v1.InvoicesPendingWithDetails;
 using Poliedro.Billing.Api.Endpoints.v1.LastInvoiceNumber;
+using Poliedro.Billing.Api.Endpoints.v1.Location;
 using Poliedro.Billing.Api.Endpoints.v1.NotifyResolution;
 using Poliedro.Billing.Api.Endpoints.v1.PdfInvoice;
 using Poliedro.Billing.Api.Endpoints.v1.PendingInvoice;
@@ -171,6 +172,7 @@ apiV1.MapGroup("/invoice").MapSuccessInvoiceEndpoints();
 app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
 
 apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
+apiV1.MapGroup("/location").MapLocationEndpoints();
 
 // Configure Swagger and Scalar
 app.UseSwagger();
