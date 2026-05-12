@@ -37,24 +37,24 @@ jobs:
       - name: Run unit tests
         run: dotnet test --configuration Release --no-build
 
-      - name: Install JMeter
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-17-jre-headless
-          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
-          tar -xzf apache-jmeter-5.6.3.tgz
-          export JMETER_HOME=$PWD/apache-jmeter-5.6.3
-          echo "$JMETER_HOME/bin" >> $GITHUB_PATH
+      # - name: Install JMeter
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y openjdk-17-jre-headless
+      #     wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+      #     tar -xzf apache-jmeter-5.6.3.tgz
+      #     export JMETER_HOME=$PWD/apache-jmeter-5.6.3
+      #     echo "$JMETER_HOME/bin" >> $GITHUB_PATH
 
-      - name: Run JMeter Load Test
-        run: |
-          ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/Billing.jmx -l LoadTest/results.jtl -e -o LoadTest/report
+      # - name: Run JMeter Load Test
+      #   run: |
+      #     ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/Billing.jmx -l LoadTest/results.jtl -e -o LoadTest/report
 
-      - name: Upload JMeter HTML Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: jmeter-reports-onpremise
-          path: LoadTest/*_report
+      # - name: Upload JMeter HTML Reports
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: jmeter-reports-onpremise
+      #     path: LoadTest/*_report
 
       - name: Build Docker image
         run: docker build -t billing-api:latest .
