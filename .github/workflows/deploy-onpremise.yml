@@ -3,7 +3,7 @@ name: Build, Test, Deploy to On-Premise
 on:
   push:
     branches:
-      - main
+      - releasecandidate/v1.0.0
 
 jobs:
   build_and_deploy_onpremise:
@@ -18,14 +18,14 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          args: >
-            -Dsonar.projectKey=PoliedroSoftware_backend-api-billing
-            -Dsonar.organization=poliedro-software-sonarqube
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: SonarCloud Scan
+      #   uses: SonarSource/sonarcloud-github-action@v2
+      #   with:
+      #     args: >
+      #       -Dsonar.projectKey=PoliedroSoftware_backend-api-billing
+      #       -Dsonar.organization=poliedro-software-sonarqube
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 
       - name: Restore dependencies
