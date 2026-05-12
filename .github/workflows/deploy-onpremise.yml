@@ -3,7 +3,7 @@ name: Build, Test, Deploy to On-Premise
 on:
   push:
     branches:
-      - main
+      - releasecandidate/v1.0.0
 
 jobs:
   build_and_deploy_onpremise:
