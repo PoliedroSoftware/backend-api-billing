@@ -1,0 +1,107 @@
+name: Build, Test, Deploy to On-Premise
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy_onpremise:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=PoliedroSoftware_backend-api-billing
+            -Dsonar.organization=poliedro-software-sonarqube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test --configuration Release --no-build
+
+      - name: Install JMeter
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jre-headless
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf apache-jmeter-5.6.3.tgz
+          export JMETER_HOME=$PWD/apache-jmeter-5.6.3
+          echo "$JMETER_HOME/bin" >> $GITHUB_PATH
+
+      - name: Run JMeter Load Test
+        run: |
+          ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/Billing.jmx -l LoadTest/results.jtl -e -o LoadTest/report
+
+      - name: Upload JMeter HTML Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-reports-onpremise
+          path: LoadTest/*_report
+
+      - name: Build Docker image
+        run: docker build -t billing-api:latest .
+
+      - name: Save Docker image to tar
+        run: docker save billing-api:latest | gzip > billing-api.tar.gz
+
+      - name: Copy image to on-premise server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "billing-api.tar.gz"
+          target: "/tmp/"
+
+      - name: Deploy container on on-premise server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker stop billing-api || true
+            docker rm billing-api || true
+            docker rmi billing-api:latest || true
+            gunzip -c /tmp/billing-api.tar.gz | docker load
+            docker run -d --name billing-api \
+              --restart unless-stopped \
+              -p 8080:8080 \
+              -p 8081:8081 \
+              -e ASPNETCORE_ENVIRONMENT=Production \
+              -e MYSQL_CONNECTION="${{ secrets.MYSQL_CONNECTION_ONPREMISE }}" \
+              -e ConnectionStrings__MysqlConnectionRetail="${{ secrets.MYSQL_CONNECTION_RETAIL_ONPREMISE }}" \
+              billing-api:latest
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 30); do
+            if curl --fail -s http://${{ secrets.SSH_HOST }}:8080/health; then
+              echo "Container is healthy"
+              exit 0
+            fi
+            echo "Waiting for container... ($i/30)"
+            sleep 5
+          done
+          echo "Health check failed after 30 retries"
+          exit 1
