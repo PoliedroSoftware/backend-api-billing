@@ -96,9 +96,10 @@ jobs:
                --restart unless-stopped \
                -p 8080:8080 \
                -p 8081:8081 \
-               -e ASPNETCORE_ENVIRONMENT=Production \
-               -e MYSQL_CONNECTION='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
-               -e ConnectionStrings__MysqlConnectionRetail='${{ secrets.MYSQL_CONNECTION_RETAIL_ONPREMISE }}' \
+                -e ASPNETCORE_ENVIRONMENT=Production \
+                -e MYSQL_CONNECTION='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
+                -e ConnectionStrings__MysqlConnection='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
+                -e ConnectionStrings__MysqlConnectionRetail='${{ secrets.MYSQL_CONNECTION_RETAIL_ONPREMISE }}' \
                billing-api:latest"
 
       - name: Health check
