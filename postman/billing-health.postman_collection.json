@@ -1,0 +1,66 @@
+{
+	"info": {
+		"_postman_id": "billing-api-health",
+		"name": "Billing API - Health Check",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check (HTTP)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://billing-api.poliedroauth.com/health",
+					"protocol": "http",
+					"host": [
+						"api-billing",
+						"poliedroauth",
+						"com"
+					],
+					"path": [
+						"health"
+					]
+				}
+			}
+		},
+		{
+			"name": "Health Check (HTTPS)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://billing-api.poliedroauth.com/health",
+					"protocol": "https",
+					"host": [
+						"api-billing",
+						"poliedroauth",
+						"com"
+					],
+					"path": [
+						"health"
+					]
+				}
+			}
+		},
+		{
+			"name": "Health Check UI",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://billing-api.poliedroauth.com/health-ui",
+					"protocol": "https",
+					"host": [
+						"api-billing",
+						"poliedroauth",
+						"com"
+					],
+					"path": [
+						"health-ui"
+					]
+				}
+			}
+		}
+	]
+}
