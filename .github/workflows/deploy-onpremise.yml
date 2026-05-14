@@ -62,46 +62,75 @@ jobs:
       - name: Save Docker image to tar
         run: docker save billing-api:latest | gzip > billing-api.tar.gz
 
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Start Cloudflare Tunnel SSH proxy
+        run: |
+          cloudflared access tcp --hostname ${{ secrets.SSH_HOST }} --url localhost:2222 &
+          sleep 5
+          echo "SSH proxy started on localhost:2222"
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
       - name: Copy image to on-premise server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          source: "billing-api.tar.gz"
-          target: "/tmp/"
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            scp -P 2222 -o StrictHostKeyChecking=no \
+            billing-api.tar.gz ${{ secrets.SSH_USER }}@localhost:/tmp/
+        timeout-minutes: 10
 
       - name: Deploy container on on-premise server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            docker stop billing-api || true
-            docker rm billing-api || true
-            docker rmi billing-api:latest || true
-            gunzip -c /tmp/billing-api.tar.gz | docker load
-            docker run -d --name billing-api \
-              --restart unless-stopped \
-              -p 8080:8080 \
-              -p 8081:8081 \
-              -e ASPNETCORE_ENVIRONMENT=Production \
-              -e MYSQL_CONNECTION="${{ secrets.MYSQL_CONNECTION_ONPREMISE }}" \
-              -e ConnectionStrings__MysqlConnectionRetail="${{ secrets.MYSQL_CONNECTION_RETAIL_ONPREMISE }}" \
-              billing-api:latest
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+            "docker stop billing-api || true; \
+             docker rm billing-api || true; \
+             docker rmi billing-api:latest || true; \
+             gunzip -c /tmp/billing-api.tar.gz | docker load; \
+             docker run -d --name billing-api \
+               --restart unless-stopped \
+               -p 8080:8080 \
+               -p 8081:8081 \
+                -e ASPNETCORE_ENVIRONMENT=Production \
+                -e MYSQL_CONNECTION='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
+                -e ConnectionStrings__MysqlConnection='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
+                -e ConnectionStrings__MysqlConnectionRetail='${{ secrets.MYSQL_CONNECTION_RETAIL_ONPREMISE }}' \
+               billing-api:latest"
 
-      - name: Health check
+      - name: Check container logs
+        if: always()
+        run: |
+          sleep 10
+          echo "=== Container status ==="
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+            "docker ps -a --filter name=billing-api --format '{{.Names}} {{.Status}}'"
+          echo "=== Container logs (last 30 lines) ==="
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+            "docker logs billing-api --tail 30 2>&1"
+
+      - name: Health check (via SSH tunnel)
         run: |
           for i in $(seq 1 30); do
-            if curl --fail -s http://${{ secrets.SSH_HOST }}:8080/health; then
+            RESULT=$(sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+              ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+              "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/health 2>&1")
+            echo "HTTP status: $RESULT (attempt $i/30)"
+            if [ "$RESULT" = "200" ]; then
               echo "Container is healthy"
               exit 0
             fi
-            echo "Waiting for container... ($i/30)"
             sleep 5
           done
           echo "Health check failed after 30 retries"
           exit 1
+
+      - name: Kill Cloudflare Tunnel SSH proxy
+        if: always()
+        run: pkill cloudflared || true
