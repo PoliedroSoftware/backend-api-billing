@@ -14,7 +14,7 @@ public class ClientEntity
     public int ServerId { get; set; } = default!;
     public ProviderType ProviderId { get; set; } = default!;
     public bool Active { get; set; } = default!;
-    public DianResolutionEntity DianResolution { get; set; } = default!;
+    //public DianResolutionEntity DianResolution { get; set; } = default!;
 
     //public DianResolutionCreditNoteEntity? DianResolutionCreditNote { get; set; } = default!;
     public ServerEntity Server { get; set; } = default!;

@@ -16,7 +16,9 @@ public class InvoicesPendingWithDetailsHandler(
 {
     public async Task<IEnumerable<CreateBillingDTO>> Handle(InvoicesPendingWithDetailsQuery request,CancellationToken cancellationToken)
     {
-        var client = await clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
+        var client = await clientDomainService.GetByIdAsync(request.Id, cancellationToken);
+
+
 
         var repository = _strategyFactory.GetStrategy((Domain.InvoicesPendingWithDetails.Enums.ResolutionType)client.Value.DianResolution.ResolutionType);
 

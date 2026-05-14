@@ -36,7 +36,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     public async Task<Result<IEnumerable<ClientEntity>, Error>> GetAllAsync(CancellationToken cancellationToken)
     {
         var entities = await context.ClientBillingElectronic
-        .Include(c => c.DianResolution)
+        //.Include(c => c.DianResolution)
         .Include(c => c.Server)
         .Where(c => c.Active == true)
         .ToListAsync(cancellationToken);
@@ -53,9 +53,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
             return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(id);
 
         return await context.ClientBillingElectronic
-            .Include(c => c.DianResolution)
             .Include(c => c.Server)
-            //.Include(c => c.DianResolutionCreditNote)
             .FirstAsync(c => c.ClientBillingElectronicId == id);
     }
 
@@ -93,7 +91,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     public async Task<Result<ClientEntity, Error>> GetByIdAsync(string Apikey, CancellationToken cancellationToken)
     {
         return await context.ClientBillingElectronic
-            .Include(c => c.DianResolution)
+            //.Include(c => c.DianResolution)
             .Include(c => c.Server)
             //.Include(c => c.DianResolutionCreditNote)
             .Where(c => c.Active == true)
