@@ -77,7 +77,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Poliedro Billing API",
         Version = "v1",
-        Description = "API de facturación de Poliedro"
+        Description = "API de facturaciï¿½n de Poliedro"
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -131,7 +131,28 @@ var app = builder.Build();
 
 app.MapHealthChecks("/health", new HealthCheckOptions()
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            totalDuration = report.TotalDuration.ToString(),
+            entries = report.Entries.ToDictionary(
+                e => e.Key,
+                e => new
+                {
+                    status = e.Value.Status.ToString(),
+                    description = e.Value.Description,
+                    duration = e.Value.Duration.ToString(),
+                    data = e.Value.Data,
+                    tags = e.Value.Tags,
+                    exception = e.Value.Exception?.Message
+                }
+            )
+        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = false });
+        await context.Response.WriteAsync(result);
+    }
 });
 app.MapHealthChecksUI(options =>
 {

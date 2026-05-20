@@ -1,0 +1,136 @@
+name: Build, Test, Deploy to On-Premise
+
+on:
+  push:
+    branches:
+      - releasecandidate/v1.0.0
+
+jobs:
+  build_and_deploy_onpremise:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '10.0.x'
+
+      # - name: SonarCloud Scan
+      #   uses: SonarSource/sonarcloud-github-action@v2
+      #   with:
+      #     args: >
+      #       -Dsonar.projectKey=PoliedroSoftware_backend-api-billing
+      #       -Dsonar.organization=poliedro-software-sonarqube
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build the project
+        run: dotnet build --configuration Release
+
+      - name: Run unit tests
+        run: dotnet test --configuration Release --no-build
+
+      # - name: Install JMeter
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y openjdk-17-jre-headless
+      #     wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+      #     tar -xzf apache-jmeter-5.6.3.tgz
+      #     export JMETER_HOME=$PWD/apache-jmeter-5.6.3
+      #     echo "$JMETER_HOME/bin" >> $GITHUB_PATH
+
+      # - name: Run JMeter Load Test
+      #   run: |
+      #     ./apache-jmeter-5.6.3/bin/jmeter -n -t LoadTest/Billing.jmx -l LoadTest/results.jtl -e -o LoadTest/report
+
+      # - name: Upload JMeter HTML Reports
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: jmeter-reports-onpremise
+      #     path: LoadTest/*_report
+
+      - name: Build Docker image
+        run: docker build -t billing-api:latest .
+
+      - name: Save Docker image to tar
+        run: docker save billing-api:latest | gzip > billing-api.tar.gz
+
+      - name: Install cloudflared
+        run: |
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Start Cloudflare Tunnel SSH proxy
+        run: |
+          cloudflared access tcp --hostname ${{ secrets.SSH_HOST }} --url localhost:2222 &
+          sleep 5
+          echo "SSH proxy started on localhost:2222"
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Copy image to on-premise server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            scp -P 2222 -o StrictHostKeyChecking=no \
+            billing-api.tar.gz ${{ secrets.SSH_USER }}@localhost:/tmp/
+        timeout-minutes: 10
+
+      - name: Deploy container on on-premise server
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+            "docker stop billing-api || true; \
+             docker rm billing-api || true; \
+             docker rmi billing-api:latest || true; \
+             gunzip -c /tmp/billing-api.tar.gz | docker load; \
+             docker run -d --name billing-api \
+               --restart unless-stopped \
+               -p 8080:8080 \
+               -p 8081:8081 \
+                -e ASPNETCORE_ENVIRONMENT=Production \
+                -e MYSQL_CONNECTION='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
+                -e ConnectionStrings__MysqlConnection='${{ secrets.MYSQL_CONNECTION_ONPREMISE }}' \
+                -e ConnectionStrings__MysqlConnectionRetail='${{ secrets.MYSQL_CONNECTION_RETAIL_ONPREMISE }}' \
+               billing-api:latest"
+
+      - name: Check container logs
+        if: always()
+        run: |
+          sleep 10
+          echo "=== Container status ==="
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+            "docker ps -a --filter name=billing-api --format '{{.Names}} {{.Status}}'"
+          echo "=== Container logs (last 30 lines) ==="
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+            "docker logs billing-api --tail 30 2>&1"
+
+      - name: Health check (via SSH tunnel)
+        run: |
+          for i in $(seq 1 30); do
+            RESULT=$(sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+              ssh -p 2222 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@localhost \
+              "curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/health 2>&1")
+            echo "HTTP status: $RESULT (attempt $i/30)"
+            if [ "$RESULT" = "200" ]; then
+              echo "Container is healthy"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Health check failed after 30 retries"
+          exit 1
+
+      - name: Kill Cloudflare Tunnel SSH proxy
+        if: always()
+        run: pkill cloudflared || true
