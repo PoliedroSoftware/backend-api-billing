@@ -21,7 +21,7 @@ public class BillingResponseApi(
 
         foreach (var pair in paired)
         {
-            var customerInfo = await _clientDomainService.GetByIdAsync(pair.invoice.CustomerEntity.ApiKey, cancellationToken);
+            var customerInfo = await _clientDomainService.GetByIdAsync(pair.invoice.CustomerEntity.ApiKey, cancellationToken);//resolution
 
             if (customerInfo == null)
             {

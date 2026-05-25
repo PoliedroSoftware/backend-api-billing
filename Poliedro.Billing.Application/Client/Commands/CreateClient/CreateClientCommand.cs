@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Poliedro.Billing.Domain.Client.Enums;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 
@@ -7,12 +6,11 @@ namespace Poliedro.Billing.Application.Client.Commands.CreateClient
 {
     public record CreateClientCommand : IRequest<Result<VoidResult, Error>>
     {
+        public int CompanyId { get; set; } = default!;
         public string Name { get; set; } = string.Empty;
-        public int ResolutionId { get; set; } = default!;
-        public int ServerId { get; set; } = default!;
-        public ProviderType ProviderId { get; set; } = default!;
+        public string Nit { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
         public bool Active { get; set; } = default!;
-        public int Iterations { get; set; } = default!;
-        public DateTime Date { get; set; } = default!;
+        
     }
 }

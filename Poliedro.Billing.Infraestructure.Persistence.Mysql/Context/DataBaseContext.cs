@@ -38,8 +38,6 @@ public class DataBaseContext(DbContextOptions options) : DbContext(options)
         new DianResolutionConfiguration(modelBuilder.Entity<DianResolutionEntity>());
         new DianResolutionCreditNoteConfiguration(modelBuilder.Entity<DianResolutionCreditNoteEntity>());
         new ClientBillingElectronicConfiguration(modelBuilder.Entity<ClientEntity>());
-        //new InvoiceElectronicConfiguration(modelBuilder.Entity<InvoiceElectronic>());
-        //new InvoiceDetailElectronicConfiguration(modelBuilder.Entity<InvoiceWithDetailElectronic>());
         new ProviderElectronicConfiguration(modelBuilder.Entity<ProviderEntity>());
     }
 }

@@ -8,26 +8,13 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.Ent
     {
         public ClientBillingElectronicConfiguration(EntityTypeBuilder<ClientEntity> builder)
         {
-            builder.ToTable("client_billing_electronic");
-            builder.HasKey(x => x.ClientBillingElectronicId);
-            builder.Property(x => x.ClientBillingElectronicId).HasColumnName("client_billing_electronic_id");
+            builder.ToTable("billing_company");
+            builder.HasKey(x => x.CompanyId);
+            builder.Property(x => x.CompanyId).HasColumnName("company_id");
             builder.Property(x => x.Name).HasColumnName("name");
-            builder.Property(x => x.ResolutionId).HasColumnName("resolutionid");
-            //builder.Property(x => x.Resolution_credit_note_id).HasColumnName("resolution_credit_note_id");
-            builder.Property(x => x.ServerId).HasColumnName("serverid");
-            builder.Property(x => x.ProviderId).HasColumnName("providerid");
-            builder.Property(x => x.Active).HasColumnName("active");
-            builder.Property(x => x.Iterations).HasColumnName("iterations");
-            builder.Property(x => x.Date).HasColumnName("date");
-            builder.Property(x => x.ApiKey).HasColumnName("apikey");
-            builder.Property(x => x.Automatic).HasColumnName("automatic");
-            builder.Property(x => x.MultipleResolution).HasColumnName("multiple_resolution");
+            builder.Property(x => x.Nit).HasColumnName("nit").HasMaxLength(100).IsRequired(false);
             builder.Property(x => x.Email).HasColumnName("email").HasMaxLength(1000).IsRequired(false);
-            builder.Property(x => x.HeadNote).HasColumnName("head_note").HasMaxLength(1000).IsRequired(false);
-            builder.Property(x => x.FootNote).HasColumnName("foot_note").HasMaxLength(1000).IsRequired(false);
-            builder.HasOne(x => x.Server).WithMany(x => x.clientsBillingElectronic).HasForeignKey(x => x.ServerId);
-            builder.HasOne(x => x.DianResolution).WithMany(x => x.clientsBillingElectronic).HasForeignKey(x => x.ResolutionId);
-            //builder.HasOne(x => x.DianResolutionCreditNote).WithMany(x => x.clientsBillingElectronic).HasForeignKey(x => x.Resolution_credit_note_id);
+            builder.Property(x => x.Active).HasColumnName("active");
         }
     }
 }

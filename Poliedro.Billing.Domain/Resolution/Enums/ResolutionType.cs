@@ -2,7 +2,9 @@
 {
     public enum ResolutionType
     {
-        FE,
-        POS
+        Invoice,
+        Pos,
+        CreditNote,
+        DebitNote,
     }
 }

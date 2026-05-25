@@ -22,13 +22,13 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
 
     public async Task<Result<VoidResult, Error>> UpdateAsync(ClientEntity clientBillingElectronicEntity, CancellationToken cancellationToken)
     {
-        if (!await EntityExists(clientBillingElectronicEntity.ClientBillingElectronicId, cancellationToken))
-            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(clientBillingElectronicEntity.ClientBillingElectronicId);
+        if (!await EntityExists(clientBillingElectronicEntity.CompanyId, cancellationToken))
+            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(clientBillingElectronicEntity.CompanyId);
 
         context.ClientBillingElectronic.Update(clientBillingElectronicEntity);
         var result = await context.SaveChangesAsync() > 0;
         if (!result)
-            return ClientBillingElectronicErrorBuilder.ClientBillingUpdateException(clientBillingElectronicEntity.ClientBillingElectronicId);
+            return ClientBillingElectronicErrorBuilder.ClientBillingUpdateException(clientBillingElectronicEntity.CompanyId);
 
         return VoidResult.Instance;
     }
@@ -36,8 +36,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     public async Task<Result<IEnumerable<ClientEntity>, Error>> GetAllAsync(CancellationToken cancellationToken)
     {
         var entities = await context.ClientBillingElectronic
-        //.Include(c => c.DianResolution)
-        .Include(c => c.Server)
+        
         .Where(c => c.Active == true)
         .ToListAsync(cancellationToken);
 
@@ -53,23 +52,13 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
             return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(id);
 
         return await context.ClientBillingElectronic
-            .Include(c => c.Server)
-            .FirstAsync(c => c.ClientBillingElectronicId == id);
+            
+            .FirstAsync(c => c.CompanyId == id);
     }
-
-    public async Task<Result<ClientEntity, Error>> GetByTokenAsync(string token, CancellationToken cancellationToken)
-    {
-    
-        return await context.ClientBillingElectronic
-            .Include(c => c.Server)
-            .FirstAsync(c => c.ApiKey == token);
-    }
-
-
 
     public async Task<Result<VoidResult, Error>> DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var entity = await context.ClientBillingElectronic.FirstOrDefaultAsync(x => x.ClientBillingElectronicId == id);
+        var entity = await context.ClientBillingElectronic.FirstOrDefaultAsync(x => x.CompanyId == id);
         if (entity == null)
             return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(id);
 
@@ -85,16 +74,6 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     {
         return await context.ClientBillingElectronic
             .AsNoTracking()
-            .AnyAsync(c => c.ClientBillingElectronicId == id, cancellationToken);
-    }
-
-    public async Task<Result<ClientEntity, Error>> GetByIdAsync(string Apikey, CancellationToken cancellationToken)
-    {
-        return await context.ClientBillingElectronic
-            //.Include(c => c.DianResolution)
-            .Include(c => c.Server)
-            //.Include(c => c.DianResolutionCreditNote)
-            .Where(c => c.Active == true)
-            .FirstAsync(c => c.ApiKey == Apikey);
+            .AnyAsync(c => c.CompanyId == id, cancellationToken);
     }
 }
