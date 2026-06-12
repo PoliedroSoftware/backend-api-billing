@@ -10,6 +10,6 @@ public class ClientExistsService(DataBaseContext context) : IClientExistsService
     {
         return await context.ClientBillingElectronic
             .AsNoTracking()
-            .AnyAsync(c => c.ClientBillingElectronicId == id, cancellationToken);
+            .AnyAsync(c => c.CompanyId == id, cancellationToken);
     }
 }

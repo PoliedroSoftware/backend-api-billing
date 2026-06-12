@@ -29,11 +29,6 @@ namespace Poliedro.Billing.Application.DianResolution.Commands.CreateDianResolut
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull)
                 .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldNotEmpty);
 
-            RuleFor(x => x.Description)
-                .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
-
-            RuleFor(x => x.CreationDate)
-                .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
 
             RuleFor(x => x.VigencyMonth)
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull)
@@ -46,8 +41,6 @@ namespace Poliedro.Billing.Application.DianResolution.Commands.CreateDianResolut
             RuleFor(x => x.ResolutionType)
                 .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
 
-            RuleFor(x => x.ClientBillingElectronicId)
-                .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
         }
     }
 }

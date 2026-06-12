@@ -1,24 +1,25 @@
 using MySqlConnector;
 using Poliedro.Billing.Domain.Billing;
-using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
+using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 
-public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetailsStrategy
+public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils) : IInvoicesPendingWithDetailsStrategy
 {
     public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
-    ServerEntity server,
-    ClientEntity clientItem,
-    IDatabaseUtils databaseUtils,
+    ServerEntity _server,
+    DianResolutionEntity _dianResolutionEntity,
     CancellationToken cancellationToken)
     {
         var invoicesMap = new Dictionary<int, CreateBilling>();
-        using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
+        using MySqlConnection connection = new(databaseUtils.GetConnectionString(_server));
+
+        var _dianResolution = _dianResolutionEntity;
 
         try
         {
@@ -31,12 +32,12 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 v.contact_name,
                 v.email,
                 v.mobile,
-v.address_line_1,
+                v.address_line_1,
                 v.city,
                 v.state,
                 v.country,
-v.custom_field1,
-v.custom_field2,
+                v.custom_field1,
+                v.custom_field2,
                 v.invoice,
                 v.payment_status,
                 v.transaction_date,
@@ -54,12 +55,12 @@ v.custom_field2,
             WHERE i.verify IS NULL
               AND v.transaction_date >= @date
               AND v.totalToPay <> 0"
-                + ((Automatic)clientItem.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
+                + ((Automatic)_dianResolution.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
                 + " ORDER BY v.id ASC";
 
             using (var cmdInvoices = new MySqlCommand(invoicesQuery, connection))
             {
-                cmdInvoices.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
+                cmdInvoices.Parameters.AddWithValue("@date", _dianResolution.ResolutionDate.ToString("yyyy-MM-dd"));
 
                 using var reader = await cmdInvoices.ExecuteReaderAsync(cancellationToken);
                 while (await reader.ReadAsync(cancellationToken))

@@ -4,17 +4,20 @@ namespace Poliedro.Billing.Application.DianResolution.Dtos;
 
 public record DianResolutionDto(
     int ResolutionId,
+    int CompanyProviderId,
+     ResolutionType ResolutionType = default,
     string ResolutionNumber = "",
     string Prefix = "",
+    int MultipleResolution = 0,
+    int VigencyMonth = 0,
+    int Automatic = 0,
     int InitialRange = 0,
     int FinalRange = 0,
+    int CurrentRange = 0,
     DateTime ResolutionDate = default,
-    string Description = "",
-    string ResolutionFile = "",
-    bool Active = false,
     DateTime CreationDate = default,
-    int VigencyMonth = 0,
     DateTime ExpirationDate = default,
-    ResolutionType ResolutionType = default,
-    int ClientBillingElectronicId = default
+    int ExpirationDays = 0,
+    int ExpirationNumber = 0,
+    bool Active = false
 );

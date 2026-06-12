@@ -1,23 +1,24 @@
 ﻿
 using MySqlConnector;
 using Poliedro.Billing.Domain.Billing;
-using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
+using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
-public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetailsStrategy
+public class InvoicesPendingWithDetailsPOSRepository(IDatabaseUtils databaseUtils) : IInvoicesPendingWithDetailsStrategy
 {
     public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
-    ServerEntity server,
-    ClientEntity clientItem,
-    IDatabaseUtils databaseUtils,
+    ServerEntity _server,
+    DianResolutionEntity _dianResolutionEntity,
     CancellationToken cancellationToken)
     {
+        var dianResolution = _dianResolutionEntity;
+
         var invoicesMap = new Dictionary<int, CreateBilling>();
-        using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
+        using MySqlConnection connection = new(databaseUtils.GetConnectionString(_server));
 
         try
         {
@@ -38,7 +39,6 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
                 v.invoiceTaxExclusiveTotal,
                 v.invoiceTaxInclusiveTotal,
                 v.totalToPay,
-
                 d.resolution AS detail_id,
                 d.description,
                 d.code,
@@ -55,7 +55,7 @@ public class InvoicesPendingWithDetailsPOSRepository : IInvoicesPendingWithDetai
             ORDER BY v.number ASC";
 
             using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
+            command.Parameters.AddWithValue("@date", dianResolution.ResolutionDate.ToString("yyyy-MM-dd"));
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
             while (await reader.ReadAsync(cancellationToken))

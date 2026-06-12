@@ -1,10 +1,13 @@
-﻿namespace Poliedro.Billing.Domain.Common.Results;
+﻿
+
+namespace Poliedro.Billing.Domain.Common.Results;
 
 public class Result<TValue, TError>
 {
     public readonly TValue? Value;
     public readonly TError? Error;
     public bool IsSuccess { get; }
+   
 
     private Result(TValue value)
     {

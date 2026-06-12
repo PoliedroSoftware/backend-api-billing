@@ -6,17 +6,21 @@ using Poliedro.Billing.Domain.Resolution.Enums;
 namespace Poliedro.Billing.Application.DianResolution.Commands.CreateDianResolution;
 
 public record CreateDianResolutionCommand(
+    int ResolutionId,
+    int CompanyProviderId,
+    ResolutionType ResolutionType,
     string ResolutionNumber,
     string Prefix,
+    int MultipleResolution,
+    int VigencyMonth,
+    int Automatic,
     int InitialRange,
     int FinalRange,
+    int CurrentRange,
     DateTime ResolutionDate,
-    string Description,
-    bool Active,
-    DateTime CreationDate,
-    int VigencyMonth,
     DateTime ExpirationDate,
-    ResolutionType ResolutionType,
-    int ClientBillingElectronicId
+    int ExpirationDays,
+    int ExpirationNumber,
+    bool Active
     ) : IRequest<Result<VoidResult, Error>>;
 

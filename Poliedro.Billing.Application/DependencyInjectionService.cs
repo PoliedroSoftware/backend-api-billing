@@ -5,6 +5,7 @@ using Poliedro.Billing.Application.Billing.AutoMappers;
 using Poliedro.Billing.Application.BillingCreditNote.AutoMappers;
 using Poliedro.Billing.Application.Client.AutoMappers;
 using Poliedro.Billing.Application.Common.Behaviors;
+using Poliedro.Billing.Application.CompanyProvider.AutoMappers;
 using Poliedro.Billing.Application.CustomersId.AutoMappers;
 using Poliedro.Billing.Application.DianResolution.AutoMappers;
 using Poliedro.Billing.Application.GetInvoice.AutoMappers;
@@ -27,6 +28,7 @@ public static class DependencyInjectionService
         {
             
             config.AddProfile(new ClientMapper());
+            config.AddProfile(new CompanyProviderMapper());
             config.AddProfile(new ServerMapper());
             config.AddProfile(new DianResolutionMapper());
             config.AddProfile(new PaginationMapper());

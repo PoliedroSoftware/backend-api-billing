@@ -7,9 +7,9 @@ using Microsoft.OpenApi.Models;
 using Poliedro.Billing.Api;
 using Poliedro.Billing.Api.Common.Configurations;
 using Poliedro.Billing.Api.Endpoints.v1.Billing;
-using Poliedro.Billing.Api.Endpoints.v1.BillingCreditNote;
+
 using Poliedro.Billing.Api.Endpoints.v1.Client;
-using Poliedro.Billing.Api.Endpoints.v1.CreditNote;
+
 using Poliedro.Billing.Api.Endpoints.v1.CustomersId;
 using Poliedro.Billing.Api.Endpoints.v1.DianResolution;
 using Poliedro.Billing.Api.Endpoints.v1.FERetail;
@@ -31,7 +31,7 @@ using Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote;
 using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Infraestructure.External.Plemsi;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
+
 using Poliedro.Billing.Infraestructure.External.Siigo;
 using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
@@ -45,12 +45,6 @@ builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
-
-//builder.Services.AddScoped<IMockPendingInvoiceService, MockBillingService>();
-builder.Services.AddHttpClient<ICreditNoteDomainService, CreditNoteDomainService>(client =>
-{
-    client.BaseAddress = new Uri("http://159.89.239.32:5009"); 
-});
 
 
 
@@ -170,9 +164,7 @@ app.UseCors("PoliedroBilling");
 var apiV1 = app.MapGroup("api/v1");
 
 apiV1.MapGroup("/billing").MapBillingEndpoints();
-apiV1.MapGroup("/creditnote").MapBillingCreditNoteEndpoints();
 apiV1.MapGroup("/client").MapClientEndpoints();
-apiV1.MapGroup("/Controllers/v1/CreditNote").MapCreditNoteEndpoints();
 apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
 apiV1.MapGroup("/Controllers/v1/FERetail").MapFERetailEndpoints();
 apiV1.MapGroup("/getinvoice").MapGetInvoiceEndpoints();
