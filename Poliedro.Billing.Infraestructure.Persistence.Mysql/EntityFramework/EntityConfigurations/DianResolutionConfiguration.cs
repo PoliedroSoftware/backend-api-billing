@@ -15,6 +15,7 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.Ent
             builder.Property(x => x.ResolutionId).HasColumnName("resolution_id");
             builder.Property(x => x.CompanyProviderId).HasColumnName("company_provider_id");
             builder.Property(x => x.ResolutionType).HasConversion(ConvertResolutionType()).HasColumnName("document_type");
+            builder.Property(x => x.Description).HasColumnName("Description");
             builder.Property(x => x.ResolutionNumber).HasColumnName("resolution_number");
             builder.Property(x => x.Prefix).HasColumnName("prefix");
             builder.Property(x => x.MultipleResolution).HasColumnName("multiple_resolution");

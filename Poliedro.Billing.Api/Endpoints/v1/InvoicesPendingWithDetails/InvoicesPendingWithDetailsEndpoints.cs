@@ -26,6 +26,6 @@ public static class InvoicesPendingWithDetailsEndpoints
     private static async Task<IResult> GetAllAsync(int Id, IMediator mediator)
     {
         var invoices = await mediator.Send(new InvoicesPendingWithDetailsQuery(Id));
-        return TypedResults.Ok<IEnumerable<CreateBillingDTO>>(invoices);
+        return TypedResults.Ok(invoices);
     }
 }

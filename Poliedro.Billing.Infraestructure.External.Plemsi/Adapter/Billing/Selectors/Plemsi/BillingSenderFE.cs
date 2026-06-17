@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 using Poliedro.Billing.Domain.FERetail.Entity;
@@ -13,7 +12,7 @@ public class BillingSenderFE(
     IGetLastInvoiceBilling _getLastInvoiceBilling
     ) : IBillingSender
 {
-    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient ClientInfo, CancellationToken cancellationToken)
+    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
 

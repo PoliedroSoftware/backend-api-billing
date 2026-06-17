@@ -6,6 +6,7 @@ public record DianResolutionDto(
     int ResolutionId,
     int CompanyProviderId,
      ResolutionType ResolutionType = default,
+    string Description = "",
     string ResolutionNumber = "",
     string Prefix = "",
     int MultipleResolution = 0,

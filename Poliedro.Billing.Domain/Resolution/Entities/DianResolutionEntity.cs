@@ -7,6 +7,7 @@ public class DianResolutionEntity
     public int ResolutionId { get; set; }
     public Guid CompanyProviderId { get; set; }
     public ResolutionType ResolutionType { get; set; }
+    public string Description { get; set; } = string.Empty;
     public string ResolutionNumber { get; set; } = string.Empty;
     public string Prefix { get; set; } = string.Empty;
     public int MultipleResolution { get; set; }

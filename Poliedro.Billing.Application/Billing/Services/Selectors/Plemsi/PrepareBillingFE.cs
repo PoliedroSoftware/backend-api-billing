@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Common.Enum;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.Resolution.Entities;
 
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 {
@@ -11,21 +12,23 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
         IPrepareItemBilling _prepareItemElectronic,
         IGetAllTaxTotalsBilling _getAllTaxTotals,
         IGetLastInvoiceBilling _getLastInvoiceBilling,
-        IBillingValidateScript _billingValidateScript,
         ICalculateCheckDigits _calculateCheckDigits,
         IMapper _mapper,
         IConfiguration _config
     ) : ICreateBilling
     {
         public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(
-            IEnumerable<CreateBilling> invoices, BillingInfoClient clientInfo, CancellationToken cancellationToken)
+            IEnumerable<CreateBilling> invoices,
+            DianResolutionEntity dianResolutionEntity,
+            CompanyProviderEntity companyProviderEntity,
+            CancellationToken cancellationToken)
         {
             var results = new List<(CreateBilling Billing, object Output)>();
             int lastInvoiceNumber;
 
             try
             {
-                lastInvoiceNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
+                lastInvoiceNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(dianResolutionEntity,companyProviderEntity, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -33,8 +36,8 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                 return results;
             }
 
-            bool expirated = lastInvoiceNumber + invoices.Count() > clientInfo.FinalRange ||
-                             DateTime.Now > clientInfo.ExpirationDate;
+            bool expirated = lastInvoiceNumber + invoices.Count() > dianResolutionEntity.FinalRange ||
+                             DateTime.Now > dianResolutionEntity.ExpirationDate;
             if (expirated)
             {
                 Console.WriteLine("El rango de numeración ha sido superado o la resolución ha expirado.");
@@ -121,8 +124,8 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 
                     invoice.AllTaxTotalEntity = await _getAllTaxTotals
                         .IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
-                    invoice.Prefix = clientInfo.Prefix;
-                    invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
+                    invoice.Prefix = dianResolutionEntity.Prefix;
+                    invoice.CustomerEntity.ApiKey = companyProviderEntity.ApiKey;
                     invoice.Numeration = invoiceNumber.ToString();
 
 
@@ -210,10 +213,10 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 
 
                         items = invoice.ItemElectronicEntity,
-                        resolution = clientInfo.ResolucionNumber,
-                        resolutionText = clientInfo.Descripcion,
-                        head_note = string.IsNullOrWhiteSpace(clientInfo.HeadNote) ? invoice.Number : clientInfo.HeadNote,
-                        foot_note = string.IsNullOrWhiteSpace(clientInfo.FootNote) ? invoice.Number : clientInfo.FootNote,
+                        resolution = dianResolutionEntity.ResolutionNumber,
+                        resolutionText = dianResolutionEntity.Description,
+                        head_note = string.IsNullOrWhiteSpace(companyProviderEntity.HeadNote) ? invoice.Number : companyProviderEntity.HeadNote,
+                        foot_note = string.IsNullOrWhiteSpace(companyProviderEntity.FooterNote) ? invoice.Number : companyProviderEntity.FooterNote,
                         notes = $"Fecha de la factura:{invoice.TransactionDate}",
 
 

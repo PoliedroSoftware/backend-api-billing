@@ -1,8 +1,11 @@
 ﻿using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.DomainService;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
+using Poliedro.Billing.Domain.Resolution.Entities;
+using Poliedro.Billing.Domain.Server.DomainService;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
@@ -10,26 +13,24 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
 public class BillingResponseApi(
     IInsertInvoiceFE _insertInvoiceFE,
     IUpdateCurrentlyNumber _updateCurrentlyNumber,
-    IClientDomainService _clientDomainService,
+    IServerGetByIdService _serverGetByIdService,
     IDatabaseUtils _databaseUtils
     ) : IBillingResponseApi
 {
-    public async Task IBillingResponseApi(List<ApiResponseFERetailPos> response, IEnumerable<CreateBilling> processedInvoices, CancellationToken cancellationToken)
+    public async Task IBillingResponseApi(List<ApiResponseFERetailPos> response,
+        IEnumerable<CreateBilling> _processedInvoices,
+        DianResolutionEntity _dianResolutionEntity,
+        CompanyProviderEntity _companyProviderEntity,
+        CancellationToken cancellationToken)
     {
-        var paired = response.Zip(processedInvoices, (resp, invoice) => new { resp, invoice });
+        var paired = response.Zip(_processedInvoices, (resp, invoice) => new { resp, invoice });
 
 
         foreach (var pair in paired)
         {
-            var customerInfo = await _clientDomainService.GetByIdAsync(pair.invoice.CustomerEntity.ApiKey, cancellationToken);//resolution
+            var connection = await _serverGetByIdService.GetServerByIdAsync(_companyProviderEntity.ServiceId, cancellationToken);
 
-            if (customerInfo == null)
-            {
-                Console.WriteLine($"Error Insert Invoice Success", customerInfo);
-                continue;
-            }
-
-            var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
+            var connectionString = _databaseUtils.GetConnectionString(connection.Value);
 
             int NumberInvoice = int.Parse(pair.invoice.Numeration);
             string CurrentlyDate = DateTime.Now.ToString();
@@ -40,13 +41,13 @@ public class BillingResponseApi(
                 pair.resp.Data.Cude!,
                 pair.resp.Data.QRCode!,
                connectionString,
-               customerInfo.Value.ProviderId!,
-               customerInfo.Value.DianResolution.ClientBillingElectronicId,
+               (ProviderType)_companyProviderEntity.ProviderId,
+               _companyProviderEntity.CompanyId,
                pair.invoice.Number
                );
 
             await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-            new ParametersCurrentlyNumber(NumberInvoice, CurrentlyDate, customerInfo.Value.ResolutionId, LastedInvoiced),cancellationToken
+            new ParametersCurrentlyNumber(NumberInvoice, CurrentlyDate, _dianResolutionEntity.ResolutionId, LastedInvoiced),cancellationToken
             );
         }
 
