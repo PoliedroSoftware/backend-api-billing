@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Poliedro.Billing.Application.NotifyResolution.Dtos;
+using Poliedro.Billing.Domain.NotifyResolution.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 namespace Poliedro.Billing.Application.NotifyResolution.AutoMappers;
     public class NotifyResolutionAutoMapper : Profile
@@ -11,7 +12,7 @@ namespace Poliedro.Billing.Application.NotifyResolution.AutoMappers;
                    src.ExpirationDate,
                    src.ResolutionType.ToString(),
                    src.FinalRange,
-                   src.CurrentlyNumber,
+                   src.CurrentRange,
                    null
                ));
         }

@@ -22,7 +22,7 @@ public class BillingSenderFE(
             {
                 SenderRequestFEDTO? senderRequestDTO = invoice as SenderRequestFEDTO;
 
-                int LastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(ClientInfo, cancellationToken);
+                int LastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(request.DianResolutionEntity, request.CompanyProviderEntity, cancellationToken);
 
                 if (senderRequestDTO.number < LastNumber)
                 {
@@ -33,7 +33,7 @@ public class BillingSenderFE(
                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.CompanyProviderEntity.ApiKey);
 
                 var url = bool.Parse(config["Enviroment:Production"]!)
                 ? config["ApiPlemsi:FEUrl"]

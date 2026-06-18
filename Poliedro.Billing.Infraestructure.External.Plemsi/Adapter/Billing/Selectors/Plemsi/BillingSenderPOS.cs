@@ -16,7 +16,7 @@ public class BillingSenderPOS(
     ) : IBillingSender
 
 {
-    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient clientInfo, CancellationToken cancellationToken)
+    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
 
@@ -26,7 +26,7 @@ public class BillingSenderPOS(
             {
                 InvoiceRequestPosDto? invoiceRequestDto = invoice as InvoiceRequestPosDto;  
 
-                int lastNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(clientInfo, cancellationToken);
+                int lastNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(request.DianResolutionEntity,request.CompanyProviderEntity, cancellationToken);
 
                 if (invoiceRequestDto.number < lastNumber)
                 {
@@ -38,7 +38,7 @@ public class BillingSenderPOS(
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
                 using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.CompanyProviderEntity.ApiKey);
 
                 var url = bool.Parse(config["Enviroment:Production"]!)
                     ? config["ApiPlemsi:PosUrl"]

@@ -18,8 +18,7 @@ public class GetLastInvoiceNumberQueryHandler(
 {
     public async Task<Result<LastInvoiceNumberDto, Error>> Handle(GetLastInvoiceNumberQuery request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.ApiKey))
-            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundByApiKeyException();
+        
 
         var clientResult = await clientGetByIdService.GetByIdAsync(request.ApiKey, cancellationToken);
         
@@ -33,11 +32,11 @@ public class GetLastInvoiceNumberQueryHandler(
 
         try
         {
-            if (clientInfo.TypeResolution == ResolutionType.FE)
+            if (clientInfo.TypeResolution == ResolutionType.Fe)
             {
                 nextInvoiceNumber = await getLastInvoiceBilling.GetLastInvoiceNumberAsync(clientInfo, cancellationToken);
             }
-            else if (clientInfo.TypeResolution == ResolutionType.POS)
+            else if (clientInfo.TypeResolution == ResolutionType.Pos)
             {
                 nextInvoiceNumber = await invoiceLastPos.GetInvoiceLastAsync(clientInfo, cancellationToken);
             }

@@ -5,4 +5,4 @@ using Poliedro.Billing.Domain.Common.Results.Errors;
 
 namespace Poliedro.Billing.Application.LastInvoiceNumber.Queries.GetLastInvoiceNumber;
 
-public record GetLastInvoiceNumberQuery(string ApiKey) : IRequest<Result<LastInvoiceNumberDto, Error>>;
+public record GetLastInvoiceNumberQuery(int ApiKey) : IRequest<Result<LastInvoiceNumberDto, Error>>;
