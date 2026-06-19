@@ -1,6 +1,4 @@
-﻿
-
-using Poliedro.Billing.Domain.CompanyProvider.Enums;
+﻿using Poliedro.Billing.Domain.CompanyProvider.Enums;
 
 namespace Poliedro.Billing.Domain.FERetail.Ports
 {

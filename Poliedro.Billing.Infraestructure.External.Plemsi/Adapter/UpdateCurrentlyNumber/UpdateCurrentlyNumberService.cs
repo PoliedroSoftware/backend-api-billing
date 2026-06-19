@@ -21,7 +21,7 @@ public class UpdateCurrentlyNumberService(
                 return;
             }
 
-            var currentlyNumber = resolutionResult.Value.CurrentlyNumber;
+            var currentlyNumber = resolutionResult.Value.CurrentRange;
 
             if (currentlyNumber < Parameters.Invoice)
             {

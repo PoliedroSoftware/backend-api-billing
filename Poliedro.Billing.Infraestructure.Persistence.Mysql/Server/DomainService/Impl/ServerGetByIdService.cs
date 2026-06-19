@@ -10,13 +10,13 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainServic
 
 public class ServerGetByIdService(DataBaseContext context, IServerExistsService existsService) : IServerGetByIdService
 {
-    public async Task<Result<ServerEntity, Error>> GetServerByIdAsync(int id)
+    public async Task<Result<ServerEntity, Error>> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         if (!await existsService.EntityExists(id))
             return ServerErrorBuilder.ServerNotFoundException(id);
 
         return await context.Server
-            .Include(c => c.clientsBillingElectronic)
+            
             .FirstAsync(c => c.ServerId == id);
     }
 }

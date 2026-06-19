@@ -3,8 +3,6 @@ using Poliedro.Billing.Domain.Server.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.EntityConfigurations;
 using Poliedro.Billing.Domain.Client.Entities;
-using Poliedro.Billing.Domain.PedingInvoice.Entities;
-using Poliedro.Billing.Domain.InvoiceDetailElectronic.Entities;
 using Poliedro.Billing.Domain.Provider.Entities;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
@@ -19,10 +17,9 @@ public class DataBaseContext(DbContextOptions options) : DbContext(options)
     public DbSet<DianResolutionEntity> DianResolutionCreditNote { get; set; }
     public DbSet<ClientEntity> ClientBillingElectronic { get; set; }
     public DbSet<InvoiceEntity> Invoices { get; set; }
-    public DbSet<PedingInvoiceEntity> PedingInvoice { get; set; }
-    public DbSet<InvoiceElectronic> InvoiceElectronics { get; set; }
+
     public DbSet<ProviderEntity> ProviderEntities { get; set; }
-    public DbSet<InvoiceWithDetailElectronic> InvoiceDetailElectronics { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

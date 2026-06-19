@@ -26,8 +26,8 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.Ent
             builder.Property(x => x.CurrentRange).HasColumnName("current_number");
             builder.Property(x => x.ResolutionDate).HasColumnName("resolution_date");
             builder.Property(x => x.ExpirationDate).HasColumnName("expiration_date");
-            builder.Property(x => x.ExpirationDays).HasColumnName("experation_day");
-            builder.Property(x => x.ExpirationNumber).HasColumnName("expiration_number");
+            builder.Property(x => x.ExpirationDays).HasColumnName("expiration_days");
+            builder.Property(x => x.ExpirationNumber).HasColumnName("expiration_numbers");
             builder.Property(x => x.Active).HasColumnName("active");
         }
 

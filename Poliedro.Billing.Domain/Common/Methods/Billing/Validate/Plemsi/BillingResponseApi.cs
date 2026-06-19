@@ -28,7 +28,7 @@ public class BillingResponseApi(
 
         foreach (var pair in paired)
         {
-            var connection = await _serverGetByIdService.GetServerByIdAsync(_companyProviderEntity.ServiceId, cancellationToken);
+            var connection = await _serverGetByIdService.GetByIdAsync(_companyProviderEntity.ServiceId, cancellationToken);
 
             var connectionString = _databaseUtils.GetConnectionString(connection.Value);
 

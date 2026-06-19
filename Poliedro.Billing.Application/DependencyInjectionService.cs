@@ -9,7 +9,7 @@ using Poliedro.Billing.Application.CustomersId.AutoMappers;
 using Poliedro.Billing.Application.DianResolution.AutoMappers;
 using Poliedro.Billing.Application.GetInvoice.AutoMappers;
 using Poliedro.Billing.Application.Location.AutoMappers;
-using Poliedro.Billing.Application.NotifyResolution.AutoMappers;
+
 using Poliedro.Billing.Application.Server.AutoMappers;
 using Poliedro.Billing.Application.SuccessInvoice.AutoMappers;
 using System.Reflection;
@@ -30,7 +30,6 @@ public static class DependencyInjectionService
             config.AddProfile(new DianResolutionMapper());
             config.AddProfile(new PaginationMapper());
             config.AddProfile(new SuccessInvoiceAutoMapper());
-            config.AddProfile(new NotifyResolutionAutoMapper());
             config.AddProfile(new CustumersIdAutoMapper());
             config.AddProfile(new GetInvoiceMapper());
             config.AddProfile(new BillingAutoMapper());

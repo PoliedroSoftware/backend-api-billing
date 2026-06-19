@@ -14,13 +14,13 @@ using Poliedro.Billing.Api.Endpoints.v1.CustomersId;
 using Poliedro.Billing.Api.Endpoints.v1.DianResolution;
 using Poliedro.Billing.Api.Endpoints.v1.FERetail;
 using Poliedro.Billing.Api.Endpoints.v1.GetInvoice;
-using Poliedro.Billing.Api.Endpoints.v1.InvoiceDetailElectronic;
+
 using Poliedro.Billing.Api.Endpoints.v1.InvoicesPendingWithDetails;
-using Poliedro.Billing.Api.Endpoints.v1.LastInvoiceNumber;
+
 using Poliedro.Billing.Api.Endpoints.v1.Location;
-using Poliedro.Billing.Api.Endpoints.v1.NotifyResolution;
+
 using Poliedro.Billing.Api.Endpoints.v1.PdfInvoice;
-using Poliedro.Billing.Api.Endpoints.v1.PendingInvoice;
+
 using Poliedro.Billing.Api.Endpoints.v1.Server;
 using Poliedro.Billing.Api.Endpoints.v1.Siigo;
 using Poliedro.Billing.Api.Endpoints.v1.SuccessInvoice;
@@ -115,7 +115,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddValidatorsFromAssemblyContaining<CreateCreditNoteCommandValidator>();
+
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 builder.Services.AddSingleton<IMessageProvider, MessageProvider>();
 builder.Services.AddHealthChecks()
@@ -168,14 +168,13 @@ apiV1.MapGroup("/client").MapClientEndpoints();
 apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
 apiV1.MapGroup("/Controllers/v1/FERetail").MapFERetailEndpoints();
 apiV1.MapGroup("/getinvoice").MapGetInvoiceEndpoints();
-apiV1.MapGroup("/invoicedetail-electronic").MapInvoiceDetailElectronicEndpoints();
+
 apiV1.MapGroup("/invoicespendingwithdetails").MapInvoicesPendingWithDetailsEndpoints();
-apiV1.MapGroup("/lastinvoicenumber").MapLastInvoiceNumberEndpoints();
-apiV1.MapGroup("/notifyresolution").MapNotifyResolutionEndpoints();
+
 
 app.MapGroup("api/billing").MapPdfInvoiceEndpoints();
 
-apiV1.MapGroup("/pendinginvoice").MapPendingInvoiceEndpoints();
+
 apiV1.MapGroup("/server").MapServerEndpoints();
 
 app.MapGroup("api/v1/billing/invoices").MapSiigoEndpoints();

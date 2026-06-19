@@ -1,5 +1,5 @@
 ﻿using MySqlConnector;
-using Poliedro.Billing.Domain.Client.Enums;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.FERetail.Ports;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail

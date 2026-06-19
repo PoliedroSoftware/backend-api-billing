@@ -3,8 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
-using Poliedro.Billing.Application.BillingCreditNote.Services.Factories.Plemsi;
-using Poliedro.Billing.Application.BillingCreditNote.Services.Selectors.Plemsi;
 using Poliedro.Billing.Application.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -48,20 +46,20 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             ));
 
             services.AddTransient<IMessageProvider, MessageProvider>();
-            services.AddTransient<IFERetailService, FERetailService>();
-            services.AddTransient<Domain.FERetail.Ports.IInvoiceFE, Adapter.FE.Retail.InvoiceFEService>();
-            services.AddTransient<Domain.FERetail.Ports.IInvoiceLastFE, Adapter.FE.Retail.InvoiceLastFERepository>();
-            services.AddTransient<Domain.FERetail.Ports.IDatabaseUtils, Adapter.FE.Retail.DatabaseUtils>();
-            services.AddTransient<Domain.FERetail.Ports.IGetItemFE, Adapter.FE.Retail.GetItem>();
+
+            // FE (Factura Electrónica) implementations
             services.AddTransient<IGetItemsInvoiceFERetail, GetItemsInvoiceFERetail>();
-            services.AddTransient<Domain.FERetail.Ports.IInsertInvoiceFE, Adapter.FE.Retail.InsertInvoice>();
+            services.AddTransient<IDatabaseUtils, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.DatabaseUtils>();
+            services.AddTransient<IGetItemFE, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.GetItem>();
+            services.AddTransient<IInsertInvoiceFE, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.InsertInvoice>();
+
             services.AddTransient<IBillingService, BillingPosService>();
-            services.AddTransient<IInvoicePos, Adapter.POS.EDS.InvoicePosService>();
-            services.AddTransient<IInvoiceLastPos, Adapter.POS.EDS.InvoiceLastPosRepository>();
+
             services.AddTransient<IGetItemPos, Adapter.POS.EDS.GetItem>();
             services.AddTransient<IGetItemsInvoicePos, GetItemsInvoicePos>();
             services.AddTransient<IInsertInvoicePos, Adapter.POS.EDS.InsertInvoice>();
             services.AddTransient<IDatabaseUtilsPos, Adapter.POS.EDS.DatabaseUtils>();
+            services.AddTransient<IInvoiceLastPos, Adapter.POS.EDS.InvoiceLastPosRepository>();
             services.AddTransient<ISendMessage, SendMessageService>();
             services.AddTransient<ISuccessInvoiceRepository, SuccessInvoiceRepository>();
             
@@ -80,12 +78,15 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IBillingSender, BillingSenderPOS>();
             services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
-            services.AddTransient<IBillingGetInfoClient, BillingGetInfoClient>();
+
+            // Domain adapters / stubs
+            services.AddTransient<IFERetailService, Adapter.FE.Retail.FERetailService>();
+            services.AddTransient<IGetLastInvoiceBilling, Adapter.Billing.Impl.Plemsi.GetLastInvoiceBillingPlemsi>();
+            services.AddTransient<ICreditNoteDomainService, Adapter.CreditNote.CreditNoteDomainService>();
 
             // Dependencias internas de PrepareBillingFE/POS
             services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();
             services.AddScoped<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
-            services.AddScoped<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();
             services.AddScoped<IBillingValidateScript, ValidateScriptBilling>();
             services.AddScoped<ICalculateCheckDigits, CalculateCheckDigitsBilling>();
             services.AddScoped<IAllowanceChargesBilling, GetAllowanceChargesBilling>();
