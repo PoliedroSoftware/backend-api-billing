@@ -8,7 +8,7 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.CompanyProvider.Dom
 public class CompanyProviderGetByIdSevice(DataBaseContext context) :
     ICompanyProviderGetByIdService
 {
-    public async Task<CompanyProviderEntity> GetCompanyProviderByIdAsync(Guid Id, CancellationToken cancellationToken)
+    public async Task<CompanyProviderEntity> GetCompanyProviderByIdAsync(int Id, CancellationToken cancellationToken)
     {
         return await context.CompanyProvider
             .FirstAsync(c => c.CompanyProviderId == Id, cancellationToken);

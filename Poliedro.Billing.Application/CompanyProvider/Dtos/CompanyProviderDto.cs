@@ -3,7 +3,7 @@ namespace Poliedro.Billing.Application.CompanyProvider.Dtos;
 
 public record CompanyProviderDto
     (
-    Guid CompanyProviderId,
+    int CompanyProviderId,
     int CampanyId,
     int ProviderId,
     int ServiceId,

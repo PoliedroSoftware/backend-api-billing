@@ -5,7 +5,7 @@ namespace Poliedro.Billing.Domain.CompanyProvider.Entities;
 
 public class CompanyProviderEntity
 {
-    public Guid CompanyProviderId { get; set; }
+    public int CompanyProviderId { get; set; }
     public int CompanyId { get; set; }
     public int ProviderId { get; set; }
     public int ServiceId { get; set; }

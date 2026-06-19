@@ -5,7 +5,7 @@ namespace Poliedro.Billing.Domain.Resolution.Entities;
 public class DianResolutionEntity
 {
     public int ResolutionId { get; set; }
-    public Guid CompanyProviderId { get; set; }
+    public int CompanyProviderId { get; set; }
     public ResolutionType ResolutionType { get; set; }
     public string Description { get; set; } = string.Empty;
     public string ResolutionNumber { get; set; } = string.Empty;

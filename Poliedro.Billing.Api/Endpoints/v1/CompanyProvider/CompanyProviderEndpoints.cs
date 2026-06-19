@@ -22,7 +22,7 @@ public static class CompanyProviderEndpoints
         return group;
     }
 
-    private static async Task<IResult> GetById(Guid id, IMediator mediator)
+    private static async Task<IResult> GetById(int id, IMediator mediator)
     {
         var query = new GetCompanyProviderByIdQuery(id);
         var result = await mediator.Send(query);

@@ -5,5 +5,5 @@ namespace Poliedro.Billing.Domain.CompanyProvider.DomainService;
 
 public interface ICompanyProviderGetByIdService
 {
-    Task<CompanyProviderEntity> GetCompanyProviderByIdAsync(Guid Id, CancellationToken cancellationToken);
+    Task<CompanyProviderEntity> GetCompanyProviderByIdAsync(int Id, CancellationToken cancellationToken);
 }

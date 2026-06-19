@@ -1,10 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Billing.Dtos;
-using Poliedro.Billing.Application.Common.Features;
 using System.ComponentModel.DataAnnotations;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.Billing;

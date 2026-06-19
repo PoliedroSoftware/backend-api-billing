@@ -1,5 +1,4 @@
-using FluentValidation;
-using HealthChecks.UI.Client;
+
 using MediatR;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
@@ -7,31 +6,23 @@ using Microsoft.OpenApi.Models;
 using Poliedro.Billing.Api;
 using Poliedro.Billing.Api.Common.Configurations;
 using Poliedro.Billing.Api.Endpoints.v1.Billing;
-
 using Poliedro.Billing.Api.Endpoints.v1.Client;
-
+using Poliedro.Billing.Api.Endpoints.v1.CompanyProvider;
 using Poliedro.Billing.Api.Endpoints.v1.CustomersId;
 using Poliedro.Billing.Api.Endpoints.v1.DianResolution;
 using Poliedro.Billing.Api.Endpoints.v1.FERetail;
 using Poliedro.Billing.Api.Endpoints.v1.GetInvoice;
-
 using Poliedro.Billing.Api.Endpoints.v1.InvoicesPendingWithDetails;
-
 using Poliedro.Billing.Api.Endpoints.v1.Location;
-
 using Poliedro.Billing.Api.Endpoints.v1.PdfInvoice;
-
 using Poliedro.Billing.Api.Endpoints.v1.Server;
 using Poliedro.Billing.Api.Endpoints.v1.Siigo;
 using Poliedro.Billing.Api.Endpoints.v1.SuccessInvoice;
 using Poliedro.Billing.Api.Endpoints.v1.Tns;
 using Poliedro.Billing.Application;
 using Poliedro.Billing.Application.Common.Behaviors;
-using Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote;
-using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Infraestructure.External.Plemsi;
-
 using Poliedro.Billing.Infraestructure.External.Siigo;
 using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
@@ -163,28 +154,20 @@ app.UseCors("PoliedroBilling");
 // Map Minimal API Endpoints BEFORE OpenAPI/Scalar
 var apiV1 = app.MapGroup("api/v1");
 
-apiV1.MapGroup("/billing").MapBillingEndpoints();
+apiV1.MapGroup("/v1/billing").MapBillingEndpoints();
 apiV1.MapGroup("/client").MapClientEndpoints();
 apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
 apiV1.MapGroup("/Controllers/v1/FERetail").MapFERetailEndpoints();
 apiV1.MapGroup("/getinvoice").MapGetInvoiceEndpoints();
-
 apiV1.MapGroup("/invoicespendingwithdetails").MapInvoicesPendingWithDetailsEndpoints();
-
-
 app.MapGroup("api/billing").MapPdfInvoiceEndpoints();
-
-
 apiV1.MapGroup("/server").MapServerEndpoints();
-
 app.MapGroup("api/v1/billing/invoices").MapSiigoEndpoints();
-
 apiV1.MapGroup("/invoice").MapSuccessInvoiceEndpoints();
-
 app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
-
 apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
 apiV1.MapGroup("/location").MapLocationEndpoints();
+apiV1.MapGroup("/companyProvider").MapCompanyProviderEndpoints();
 
 // Configure Swagger and Scalar
 app.UseSwagger();
