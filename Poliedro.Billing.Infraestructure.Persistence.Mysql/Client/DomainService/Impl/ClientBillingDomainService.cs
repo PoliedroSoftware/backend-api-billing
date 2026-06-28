@@ -36,7 +36,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
     public async Task<Result<IEnumerable<ClientEntity>, Error>> GetAllAsync(CancellationToken cancellationToken)
     {
         var entities = await context.ClientBillingElectronic
-        
+        .AsNoTracking() 
         .Where(c => c.Active == true)
         .ToListAsync(cancellationToken);
 
@@ -52,7 +52,7 @@ public class ClientBillingDomainService(DataBaseContext context) : IClientDomain
             return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(id);
 
         return await context.ClientBillingElectronic
-            
+            .AsNoTracking() 
             .FirstAsync(c => c.CompanyId == id);
     }
 
