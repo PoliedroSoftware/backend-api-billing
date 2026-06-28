@@ -8,6 +8,20 @@ public class CompanyProviderMapper: Profile
 {
     public CompanyProviderMapper()
     {
-        CreateMap<CompanyProviderEntity, CompanyProviderDto>() .ReverseMap();
+        CreateMap<CompanyProviderEntity, CompanyProviderDto>()
+     .ConstructUsing(src => new CompanyProviderDto(
+         src.CompanyProviderId,
+         src.CompanyId,
+         src.ProviderId,
+         src.ServiceId,
+         src.ApiUser,
+         src.ApiPassword,
+         src.ApiKey,
+         src.EnvironmentType,
+         src.HeadNote,
+         src.FooterNote,
+         src.Active
+     ))
+     .ReverseMap();
     }   
 }
