@@ -34,8 +34,8 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.EntityFramework.Ent
         private ValueConverter ConvertResolutionType()
         {
             return new ValueConverter<ResolutionType, string>(
-            v => v.ToString(),
-            v => (ResolutionType)Enum.Parse(typeof(ResolutionType), v));
+                v => v.ToString().ToUpper(),
+                v => (ResolutionType)Enum.Parse(typeof(ResolutionType), v, true));
         }
     }
 }
