@@ -14,7 +14,7 @@ public class CompanyProviderEntity
     public string? ApiKey { get; set; }
     public EnvironmentType EnvironmentType { get; set; }
     public string? HeadNote { get; set; }
-    public string? FooterNote { get; set; }
+    public string? FooterNote { get; set; } 
 
     public int Active { get; set; }
 

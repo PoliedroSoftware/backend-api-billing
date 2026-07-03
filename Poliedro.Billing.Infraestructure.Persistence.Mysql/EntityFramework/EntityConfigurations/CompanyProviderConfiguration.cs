@@ -13,13 +13,19 @@ public class CompanyProviderConfiguration
         builder.Property(x => x.CompanyProviderId).HasColumnName("company_provider_id");
         builder.Property(x => x.CompanyId).HasColumnName("company_id");
         builder.Property(x => x.ProviderId).HasColumnName("provider_id");
-        builder.Property(x => x.ServiceId).HasColumnName("service_id");
+        //*
+        builder.Property(x => x.ServiceId).HasColumnName("server_id");
+
         builder.Property(x => x.ApiUser).HasColumnName("api_user").HasMaxLength(100).IsRequired(false);
         builder.Property(x => x.ApiPassword).HasColumnName("api_password").HasMaxLength(100).IsRequired(false);
         builder.Property(x => x.ApiKey).HasColumnName("api_key").HasMaxLength(100).IsRequired(false);
-        builder.Property(x => x.EnvironmentType).HasColumnName("environment_type").HasConversion<int>();
+        //*
+        builder.Property(x => x.EnvironmentType).HasColumnName("environment_type").HasConversion<string>();
+
         builder.Property(x => x.HeadNote).HasColumnName("head_note").HasMaxLength(1000).IsRequired(false);
-        builder.Property(x => x.FooterNote).HasColumnName("footer_note").HasMaxLength(1000).IsRequired(false);
+        //*
+        builder.Property(x => x.FooterNote).HasColumnName("foot_note").HasMaxLength(1000).IsRequired(false);
+
         builder.Property(x => x.Active).HasColumnName("active");
 
     }

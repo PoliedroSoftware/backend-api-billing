@@ -53,7 +53,7 @@ public static class DependencyInjectionService
         services.AddScoped<IClientDeleteService, ClientDeleteService>();
         
         // Composite service that implements IClientDomainService
-        services.AddTransient<IClientDomainService, ClientBillingDomainService>();
+        services.AddScoped<IClientDomainService, ClientBillingDomainService>(); // de Transient a Scoped
 
         // Company Provider services - specialized implementations
         services.AddScoped<ICompanyProviderGetByIdService, CompanyProviderGetByIdSevice>();

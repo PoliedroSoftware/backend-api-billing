@@ -11,6 +11,6 @@ public class CompanyProviderGetByIdSevice(DataBaseContext context) :
     public async Task<CompanyProviderEntity> GetCompanyProviderByIdAsync(int Id, CancellationToken cancellationToken)
     {
         return await context.CompanyProvider
-            .FirstAsync(c => c.CompanyProviderId == Id, cancellationToken);
+            .FirstOrDefaultAsync(c => c.CompanyProviderId == Id, cancellationToken);
     }
 }
