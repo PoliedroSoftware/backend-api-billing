@@ -12,9 +12,6 @@ public class CompanyProviderGetByIdSevice(DataBaseContext context) :
     {
         return await context.CompanyProvider
             .FirstOrDefaultAsync(c => c.CompanyProviderId == Id, cancellationToken);
-<<<<<<< HEAD
-=======
 
->>>>>>> fix/company-provider-endpoint
     }
 }
