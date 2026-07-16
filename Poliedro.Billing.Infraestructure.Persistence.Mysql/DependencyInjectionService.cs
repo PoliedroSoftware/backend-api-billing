@@ -56,7 +56,10 @@ public static class DependencyInjectionService
         services.AddScoped<IClientDomainService, ClientBillingDomainService>(); // de Transient a Scoped
 
         // Company Provider services - specialized implementations
-        services.AddScoped<ICompanyProviderGetByIdService, CompanyProviderGetByIdSevice>();
+        services.AddScoped<ICompanyProviderGetByIdService, CompanyProviderGetByIdSevice>(); // existente viejo 
+        services.AddScoped<ICompanyProviderCreateService, CompanyProviderCreateService>();   //  agregado
+        services.AddScoped<ICompanyProviderUpdateService, CompanyProviderUpdateService>();   //  agregado
+        services.AddScoped<ICompanyProviderDeleteService, CompanyProviderDeleteService>();   //  agregado
 
         // DianResolution services - specialized implementations
         services.AddScoped<IDianResolutionExistsService, DianResolutionExistsService>();

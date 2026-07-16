@@ -1,9 +1,12 @@
 ﻿using Poliedro.Billing.Domain.CompanyProvider.Enums;
+using System;
+using System.Collections.Generic;
+using System.Text;
 namespace Poliedro.Billing.Application.CompanyProvider.Dtos;
 
-public record CompanyProviderDto
-    (
-    int CompanyProviderId,
+
+public record CreateCompanyProviderDto
+(
     int CompanyId,
     int ProviderId,
     int ServiceId,
@@ -14,5 +17,4 @@ public record CompanyProviderDto
     string? HeadNote,
     string? FooterNote,
     int Active
-    );
-
+);

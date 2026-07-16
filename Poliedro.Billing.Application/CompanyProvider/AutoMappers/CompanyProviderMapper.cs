@@ -23,5 +23,8 @@ public class CompanyProviderMapper: Profile
          src.Active
      ))
      .ReverseMap();
+
+        CreateMap<CreateCompanyProviderDto, CompanyProviderEntity>();   // ← NUEVO
+        CreateMap<UpdateCompanyProviderDto, CompanyProviderEntity>();   // ← NUEVO
     }   
 }
