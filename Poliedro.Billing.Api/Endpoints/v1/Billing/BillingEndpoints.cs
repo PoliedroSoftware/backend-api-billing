@@ -11,7 +11,7 @@ public static class BillingEndpoints
     public static RouteGroupBuilder MapBillingEndpoints(this RouteGroupBuilder group)
     {
         group.MapPost("/{id}", CreateBillingAsync)
-            .WithName("Create Invoice Electronic")
+            .WithName("CreateInvoiceElectronic")
             .WithTags("Invoice Electronic")
             .WithSummary("Create new Invoice Electronic By Id")
             .WithDescription("Creates new Invoice Electronic By Id Resolution")

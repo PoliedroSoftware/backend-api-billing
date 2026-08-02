@@ -154,7 +154,7 @@ app.UseCors("PoliedroBilling");
 // Map Minimal API Endpoints BEFORE OpenAPI/Scalar
 var apiV1 = app.MapGroup("api/v1");
 
-apiV1.MapGroup("/v1/billing").MapBillingEndpoints();
+apiV1.MapGroup("/billing").MapBillingEndpoints();
 apiV1.MapGroup("/client").MapClientEndpoints();
 apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
 apiV1.MapGroup("/Controllers/v1/FERetail").MapFERetailEndpoints();
