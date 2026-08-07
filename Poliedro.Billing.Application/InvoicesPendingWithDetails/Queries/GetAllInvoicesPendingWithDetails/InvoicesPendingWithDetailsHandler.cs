@@ -24,7 +24,7 @@ public class InvoicesPendingWithDetailsHandler(
 
         var CompanyProviderResult = await _companyProviderGetByIdService.GetCompanyProviderByIdAsync(DianResolutionResult.Value.CompanyProviderId, cancellationToken);
 
-        var ServerResult = await _serverGetByIdService.GetByIdAsync(CompanyProviderResult.CompanyId, cancellationToken);
+        var ServerResult = await _serverGetByIdService.GetByIdAsync(CompanyProviderResult.ServiceId, cancellationToken);
 
         var Repository = _strategyFactory.GetStrategy(DianResolutionResult.Value.ResolutionType);
 
