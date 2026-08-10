@@ -8,6 +8,7 @@ using Poliedro.Billing.Api.Common.Configurations;
 using Poliedro.Billing.Api.Endpoints.v1.Billing;
 using Poliedro.Billing.Api.Endpoints.v1.Client;
 using Poliedro.Billing.Api.Endpoints.v1.CompanyProvider;
+using Poliedro.Billing.Api.Endpoints.v1.CreditNote;
 using Poliedro.Billing.Api.Endpoints.v1.CustomersId;
 using Poliedro.Billing.Api.Endpoints.v1.DianResolution;
 using Poliedro.Billing.Api.Endpoints.v1.FERetail;
@@ -168,6 +169,7 @@ app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
 apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
 apiV1.MapGroup("/location").MapLocationEndpoints();
 apiV1.MapGroup("/companyProvider").MapCompanyProviderEndpoints();
+apiV1.MapGroup("/creditnote").MapCreditNoteEndpoints();
 
 // Configure Swagger and Scalar
 app.UseSwagger();

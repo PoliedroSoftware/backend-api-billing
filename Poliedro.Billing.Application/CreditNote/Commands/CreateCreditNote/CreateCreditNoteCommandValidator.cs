@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Poliedro.Billing.Domain.CreditNote.Entity;
 using Poliedro.Billing.Domain.Ports;
 
 
@@ -27,7 +28,7 @@ namespace Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote
         }
     }
 
-    public class ItemValidator : AbstractValidator<ItemElectronicEntity>
+    public class ItemValidator : AbstractValidator<CreditNoteItem>
     {
         public ItemValidator(IMessageProvider messageProvider)
         {
