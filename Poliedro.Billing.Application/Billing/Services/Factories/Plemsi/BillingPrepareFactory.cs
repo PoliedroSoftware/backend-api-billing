@@ -12,12 +12,12 @@ public class BillingPrepareFactory(IServiceProvider _serviceProvider) : IGetProc
     {
         return (provider, resolutionType) switch
         {
-            (ProviderType.PLEMSI, ResolutionType.Fe) =>
+            (ProviderType.PLEMSI, ResolutionType.FE) =>
                 Task.FromResult(
                     _serviceProvider.GetRequiredService<PrepareBillingFE>()
                     as ICreateBilling),
 
-            (ProviderType.PLEMSI, ResolutionType.Pos) =>
+            (ProviderType.PLEMSI, ResolutionType.POS) =>
                 Task.FromResult(
                     _serviceProvider.GetRequiredService<PrepareBillingPOS>()
                     as ICreateBilling),

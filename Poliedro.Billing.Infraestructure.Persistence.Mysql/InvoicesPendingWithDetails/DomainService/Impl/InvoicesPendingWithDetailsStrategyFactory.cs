@@ -15,8 +15,8 @@ public class InvoicesPendingWithDetailsStrategyFactory
     {
         return resolutionType switch
         {
-            ResolutionType.Fe => _feRepo,
-            ResolutionType.Pos => _posRepo,
+            ResolutionType.FE => _feRepo,
+            ResolutionType.POS => _posRepo,
             _ => throw new NotSupportedException("Tipo de resolución no soportado")
         };
     }
