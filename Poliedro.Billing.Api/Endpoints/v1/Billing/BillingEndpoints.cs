@@ -26,9 +26,9 @@ public static class BillingEndpoints
     private static async Task<IResult> CreateBillingAsync(int id,
         HttpContext context,
         IMediator mediator,
-        [FromBody][Required]IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
+        [FromBody][Required]CreateBillingRequestDTO request, CancellationToken cancellationToken)
     {
-        var invoicesList = await mediator.Send(new CreateBillingCommand(id, invoices), cancellationToken);
+        var invoicesList = await mediator.Send(new CreateBillingCommand(id, request.Data), cancellationToken);
         return TypedResults.Ok(invoicesList);
     }
 }
