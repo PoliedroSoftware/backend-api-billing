@@ -5,6 +5,7 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
 
@@ -17,15 +18,14 @@ public class InvoiceLastPosRepository(IConfiguration config): IInvoiceLastPos
         CompanyProviderEntity companyProviderEntity,
         CancellationToken cancellationToken)
     {
-        int maxNumeroFactura = 1;
-        DateTime today = DateTime.Now;
-        string formattedDate = today.ToString("yyyy-MM-dd");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
 
-        var isProduction = bool.Parse(config["Enviroment:Production"]!);
+        bool isProduction = bool.Parse(config["Enviroment:Production"]!);
+
         string baseUrl;
 
-        if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(), out MultipleResolution resolution))
+        if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(),
+            out MultipleResolution resolution))
         {
             resolution = MultipleResolution.Single;
         }
@@ -45,43 +45,57 @@ public class InvoiceLastPosRepository(IConfiguration config): IInvoiceLastPos
                 break;
         }
 
+        string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
 
-        string apiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
+        HttpResponseMessage Response =
+            await client.GetAsync(ApiUrl, cancellationToken);
 
-        HttpResponseMessage response = await client.GetAsync(apiUrl);
-        if (response.IsSuccessStatusCode)
+        if (!Response.IsSuccessStatusCode)
         {
-            try
+            throw new InvalidOperationException(
+                $"No fue posible consultar el consecutivo en Plemsi. " +
+                $"HTTP {(int)Response.StatusCode} - {Response.ReasonPhrase}");
+        }
+
+        try
+        {
+            string JsonResponse = await Response.Content.ReadAsStringAsync();
+
+            var jObject = JObject.Parse(JsonResponse);
+            var Documents = jObject["data"]?["docs"];
+
+            if (Documents == null || !Documents.HasValues)
             {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                var jObject = JObject.Parse(jsonResponse);
-                var documents = jObject["data"]?["docs"];
+                throw new InvalidOperationException(
+                    "Plemsi respondió correctamente, pero no se encontraron documentos para determinar el consecutivo.");
+            }
 
-                if (documents != null && documents.HasValues)
+            int maxUsed = 0;
+
+            foreach (var Doc in Documents)
+            {
+                string? numberStr = Doc["number"]?.ToString();
+
+                if (int.TryParse(numberStr, out int num) && num > maxUsed)
                 {
-                    foreach (var doc in documents)
-                    {
-                        Console.WriteLine(doc["state"]?.ToString());
-
-                        if (doc["state"]?.ToString() == "Emitted")
-                        {
-                            if (int.TryParse(doc["number"]?.ToString(), out int parsedNumber))
-                            {
-                                return parsedNumber + 1;
-                            }
-                            break;
-                        }
-                    }
+                    maxUsed = num;
                 }
             }
 
-
-            catch (Exception ex)
+            if (maxUsed <= 0)
             {
-                Console.WriteLine($"Error al procesar la respuesta: {ex.Message}");
+                throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
             }
+
+            return maxUsed + 1;
+
         }
-        return maxNumeroFactura;
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException(
+        "La respuesta de Plemsi no tiene un formato JSON válido.",
+        ex);
+        }
     }
 
 

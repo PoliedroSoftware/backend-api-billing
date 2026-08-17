@@ -6,8 +6,7 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
@@ -20,16 +19,14 @@ public class GetLastInvoiceBillingPlemsi(
     public async Task<int>  GetLastInvoiceNumberAsync(DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)
     {
 
-        int MaxNumeroFactura = 1;
-        DateTime ToDay = DateTime.Now;
-        string FormattedDate = ToDay.ToString("yyyy-MM-dd");
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
-        string ApiUrl = string.Empty;
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
+
         string baseUrl;
 
-        if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(), out MultipleResolution resolution))
+        if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(),
+            out MultipleResolution resolution))
         {
             resolution = MultipleResolution.Single;
         }
@@ -49,57 +46,57 @@ public class GetLastInvoiceBillingPlemsi(
                 break;
         }
 
-        ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
+        string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
 
-        HttpResponseMessage Response = await Client.GetAsync(ApiUrl);
+        HttpResponseMessage Response =
+            await Client.GetAsync(ApiUrl, cancellationToken);
 
-        if (Response.IsSuccessStatusCode)
+        if (!Response.IsSuccessStatusCode)
         {
-            try
-            {
-                string JsonResponse = await Response.Content.ReadAsStringAsync();
-                var jObject = JObject.Parse(JsonResponse);
-                var Documents = jObject["data"]?["docs"];
-
-                if (Documents != null && Documents.HasValues)
-                {
-                    int maxEmitted = 0;
-                    int maxDeleted = 0;
-
-                    foreach (var Doc in Documents)
-                    {
-                        string? state = Doc["state"]?.ToString();
-                        string? numberStr = Doc["number"]?.ToString();
-
-                        if (int.TryParse(numberStr, out int num))
-                        {
-                            if (state == "Emitted" && num > maxEmitted)
-                            {
-                                maxEmitted = num;
-                            }
-
-                            if (state == "Deleted" && num > maxDeleted)
-                            {
-                                maxDeleted = num;
-                            }
-                        }
-                    }
-
-                    int maxUsed = Math.Max(maxEmitted, maxDeleted);
-
-                    if (maxUsed > 0)
-                    {
-                        return maxUsed + 1;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return MaxNumeroFactura + 1;
-            }
+            throw new InvalidOperationException(
+                $"No fue posible consultar el consecutivo en Plemsi. " +
+                $"HTTP {(int)Response.StatusCode} - {Response.ReasonPhrase}");
         }
 
-        return MaxNumeroFactura;
+        try
+        {
+            string JsonResponse = await Response.Content.ReadAsStringAsync();
+
+            var jObject = JObject.Parse(JsonResponse);
+            var Documents = jObject["data"]?["docs"];
+
+            if (Documents == null || !Documents.HasValues)
+            {
+                throw new InvalidOperationException(
+                    "Plemsi respondió correctamente, pero no se encontraron documentos para determinar el consecutivo.");
+            }
+
+            int maxUsed = 0;
+
+            foreach (var Doc in Documents)
+            {
+                string? numberStr = Doc["number"]?.ToString();
+
+                if (int.TryParse(numberStr, out int num) && num > maxUsed)
+                {
+                    maxUsed = num;
+                }
+            }
+
+            if (maxUsed <= 0)
+            {
+                throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
+            }
+
+            return maxUsed + 1;
+
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException(
+        "La respuesta de Plemsi no tiene un formato JSON válido.",
+        ex);
+        }
 
     }
 }
