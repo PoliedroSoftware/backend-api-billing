@@ -28,7 +28,7 @@ public class UpdateCurrentlyNumberService(
                 await using var Connection = new MySqlConnection(configuration.GetConnectionString("MysqlConnection"));
                 await Connection.OpenAsync(cancellationToken);
 
-                var Sql = @"UPDATE dian_resolution_billing SET current_number = @NewNumber, date_current = @NewDate WHERE id = @ResolutionId";
+                var Sql = @"UPDATE dian_resolution_billing SET current_number = @NewNumber, date_current = @NewDate WHERE resolution_id = @ResolutionId";
                 await using var command = new MySqlCommand(Sql, Connection);
                 command.Parameters.AddWithValue("@NewNumber", Parameters.Invoice);
                 command.Parameters.AddWithValue("@NewDate", Parameters.CurrentlyDate);
@@ -48,7 +48,7 @@ public class UpdateCurrentlyNumberService(
                 await using var Connection = new MySqlConnection(configuration.GetConnectionString("MysqlConnection"));
                 await Connection.OpenAsync(cancellationToken);
 
-                var Sql = @"UPDATE dian_resolution_billing SET expirated = 1 WHERE id = @ResolutionId";
+                var Sql = @"UPDATE dian_resolution_billing SET expirated = 1 WHERE resolution_id = @ResolutionId";
                 await using var command = new MySqlCommand(Sql, Connection);
                 command.Parameters.AddWithValue("@ResolutionId", Parameters.ResolutionId);
 
