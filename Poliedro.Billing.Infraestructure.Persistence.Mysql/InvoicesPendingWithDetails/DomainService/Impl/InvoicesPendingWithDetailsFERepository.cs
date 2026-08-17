@@ -19,8 +19,6 @@ public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils
         var invoicesMap = new Dictionary<int, CreateBilling>();
         using MySqlConnection connection = new(databaseUtils.GetConnectionString(_server));
 
-        var _dianResolution = _dianResolutionEntity;
-
         try
         {
             await connection.OpenAsync(cancellationToken);
@@ -32,12 +30,12 @@ public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils
                 v.contact_name,
                 v.email,
                 v.mobile,
-                v.address_line_1,
+v.address_line_1,
                 v.city,
                 v.state,
                 v.country,
-                v.custom_field1,
-                v.custom_field2,
+v.custom_field1,
+v.custom_field2,
                 v.invoice,
                 v.payment_status,
                 v.transaction_date,
@@ -55,12 +53,12 @@ public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils
             WHERE i.verify IS NULL
               AND v.transaction_date >= @date
               AND v.totalToPay <> 0"
-                + ((Automatic)_dianResolution.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
+                + ((Automatic)_dianResolutionEntity.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
                 + " ORDER BY v.id ASC";
 
             using (var cmdInvoices = new MySqlCommand(invoicesQuery, connection))
             {
-                cmdInvoices.Parameters.AddWithValue("@date", _dianResolution.ResolutionDate.ToString("yyyy-MM-dd"));
+                cmdInvoices.Parameters.AddWithValue("@date", _dianResolutionEntity.ResolutionDate.ToString("yyyy-MM-dd"));
 
                 using var reader = await cmdInvoices.ExecuteReaderAsync(cancellationToken);
                 while (await reader.ReadAsync(cancellationToken))
@@ -112,18 +110,18 @@ public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils
                 }
             }
 
-           
+
             if (invoicesMap.Count == 0)
                 return invoicesMap.Values.ToList();
 
-       
+
             var invoiceIds = invoicesMap.Keys.ToList();
             const int chunkSize = 1000;
             for (int i = 0; i < invoiceIds.Count; i += chunkSize)
             {
                 var chunk = invoiceIds.Skip(i).Take(chunkSize).ToList();
 
-              
+
                 var paramNames = chunk.Select((id, idx) => $"@id{idx}").ToList();
                 string inClause = string.Join(", ", paramNames);
 
@@ -146,7 +144,7 @@ public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils
                     d.unit_price
                 FROM v_invoice_detail d
                 WHERE d.transaccion IN ({inClause})
-                ORDER BY d.transaccion, d.id ASC"; 
+                ORDER BY d.transaccion, d.id ASC";
 
                 using var cmdDetails = new MySqlCommand(detailsQuery, connection);
                 for (int j = 0; j < chunk.Count; j++)
@@ -161,7 +159,7 @@ public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils
 
                     if (!invoicesMap.TryGetValue(transaccion, out var invoice))
                     {
-                        
+
                         continue;
                     }
 
