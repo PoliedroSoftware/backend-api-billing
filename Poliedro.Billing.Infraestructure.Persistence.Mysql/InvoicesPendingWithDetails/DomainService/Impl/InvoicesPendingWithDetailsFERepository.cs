@@ -190,7 +190,7 @@ v.custom_field2,
         }
         catch (Exception ex)
         {
-            throw new Exception("Error connecting to the database", ex);
+            throw new Exception($"Error connecting to the database for resolution {_dianResolutionEntity.ResolutionId} and server {_server.ServerId} ({_server.Ip}/{_server.DatabaseName})", ex);
         }
     }
 
