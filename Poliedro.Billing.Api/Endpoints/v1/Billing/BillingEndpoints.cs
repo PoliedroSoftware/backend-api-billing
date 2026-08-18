@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Common.Features;
 using System.ComponentModel.DataAnnotations;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.Billing;
@@ -18,6 +19,7 @@ public static class BillingEndpoints
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return group;
@@ -28,7 +30,15 @@ public static class BillingEndpoints
         IMediator mediator,
         [FromBody][Required]CreateBillingRequestDTO request, CancellationToken cancellationToken)
     {
-        var invoicesList = await mediator.Send(new CreateBillingCommand(id, request.Data), cancellationToken);
-        return TypedResults.Ok(invoicesList);
+        var result = await mediator.Send(new CreateBillingCommand(id, request.Data), cancellationToken);
+
+        if (!result.Success)
+        {
+            return TypedResults.Json(
+                ResponseApiService.Response(result.StatusCode, null, result.Message),
+                statusCode: result.StatusCode);
+        }
+
+        return TypedResults.Ok(result.Results);
     }
 }
