@@ -11,15 +11,14 @@ using System.Text.Json;
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
 public class GetLastInvoiceBillingPlemsi(
-    IConfiguration config
+    IConfiguration config,
+    IHttpClientFactory httpClientFactory
     
     ) : IGetLastInvoiceBilling
 {
-    private static readonly HttpClient Client = new();
     public async Task<int>  GetLastInvoiceNumberAsync(DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)
     {
-
-        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
+        using var client = httpClientFactory.CreateClient();
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
 
@@ -48,8 +47,11 @@ public class GetLastInvoiceBillingPlemsi(
 
         string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
 
+        var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
+
         HttpResponseMessage Response =
-            await Client.GetAsync(ApiUrl, cancellationToken);
+            await client.SendAsync(request, cancellationToken);
 
         if (!Response.IsSuccessStatusCode)
         {

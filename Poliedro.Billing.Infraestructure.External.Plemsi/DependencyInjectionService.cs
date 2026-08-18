@@ -47,7 +47,9 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             services.AddTransient<IMessageProvider, MessageProvider>();
 
-            // FE (Factura Electrónica) implementations
+            services.AddHttpClient();
+
+            // FE (Factura Electrï¿½nica) implementations
             services.AddTransient<IGetItemsInvoiceFERetail, GetItemsInvoiceFERetail>();
             services.AddTransient<IDatabaseUtils, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.DatabaseUtils>();
             services.AddTransient<IGetItemFE, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.GetItem>();
@@ -69,7 +71,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IEmailBodyRenderer, HtmlEmailBodyRenderer>();
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
 
-            // Factoría y strategies
+            // Factorï¿½a y strategies
             services.AddScoped<IGetProcessorBilling, BillingPrepareFactory>();
             services.AddTransient<PrepareBillingFE>();
             services.AddTransient<PrepareBillingPOS>();

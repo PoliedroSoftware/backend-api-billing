@@ -30,16 +30,35 @@ public class BillingResponseApi(
         {
             var connection = await _serverGetByIdService.GetByIdAsync(_companyProviderEntity.ServiceId, cancellationToken);
 
+            if (connection.Value is null)
+            {
+                throw new InvalidOperationException(
+                    $"No se encontró el servidor {_companyProviderEntity.ServiceId} del company provider {_companyProviderEntity.CompanyProviderId}.");
+            }
+
             var connectionString = _databaseUtils.GetConnectionString(connection.Value);
 
-            int NumberInvoice = int.Parse(pair.invoice.Numeration);
+            apiDataPos? responseData = pair.resp.Data;
+
+            if (responseData is null || responseData.Cude is null || responseData.QRCode is null)
+            {
+                throw new InvalidOperationException(
+                    $"La respuesta del proveedor para la factura {pair.invoice.Number} no incluye Cude/QRCode.");
+            }
+
+            if (!int.TryParse(pair.invoice.Numeration, out int NumberInvoice))
+            {
+                throw new InvalidOperationException(
+                    $"La numeración '{pair.invoice.Numeration}' de la factura {pair.invoice.Number} no es un número válido.");
+            }
+
             string CurrentlyDate = DateTime.Now.ToString();
             string LastedInvoiced = pair.invoice.Number;
 
             await _insertInvoiceFE.InsertInvoiceSucces(
                NumberInvoice,
-                pair.resp.Data.Cude!,
-                pair.resp.Data.QRCode!,
+                responseData.Cude,
+                responseData.QRCode,
                connectionString,
                (ProviderType)_companyProviderEntity.ProviderId,
                _companyProviderEntity.CompanyId,

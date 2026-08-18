@@ -9,12 +9,15 @@ using System.Text;
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 public class BillingSenderFE(
     IConfiguration config,
-    IGetLastInvoiceBilling _getLastInvoiceBilling
+    IGetLastInvoiceBilling _getLastInvoiceBilling,
+    IHttpClientFactory _httpClientFactory
     ) : IBillingSender
 {
     public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
+
+        using var client = _httpClientFactory.CreateClient();
 
         foreach (var invoice in request.Invoices)
         {
@@ -32,9 +35,6 @@ public class BillingSenderFE(
                var jsonContent = JsonConvert.SerializeObject(invoice);
                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.CompanyProviderEntity.ApiKey);
-
                 var url = bool.Parse(config["Enviroment:Production"]!)
                 ? config["ApiPlemsi:FEUrl"]
                 : config["ApiPlemsiQa:FEUrl"];
@@ -43,6 +43,7 @@ public class BillingSenderFE(
                 {
                     Content = stringContent
                 };
+                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.CompanyProviderEntity.ApiKey);
 
                 var response = await client.SendAsync(httpRequest, cancellationToken);
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -64,7 +65,7 @@ public class BillingSenderFE(
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Excepci�n procesando factura: {ex.Message}");
+                Console.WriteLine($"[ERROR] Excepción procesando factura: {ex.Message}");
                 continue;
             }
         }

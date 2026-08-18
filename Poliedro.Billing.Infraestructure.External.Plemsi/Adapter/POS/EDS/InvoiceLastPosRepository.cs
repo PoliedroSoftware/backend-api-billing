@@ -9,16 +9,14 @@ using System.Text.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
 
-public class InvoiceLastPosRepository(IConfiguration config): IInvoiceLastPos
+public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory httpClientFactory): IInvoiceLastPos
 {
-    private static readonly HttpClient client = new();
-
     public async Task<int> GetInvoiceLastAsync(
         DianResolutionEntity dianResolutionEntity,
         CompanyProviderEntity companyProviderEntity,
         CancellationToken cancellationToken)
     {
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
+        using var client = httpClientFactory.CreateClient();
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
 
@@ -47,8 +45,11 @@ public class InvoiceLastPosRepository(IConfiguration config): IInvoiceLastPos
 
         string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
 
+        var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
+
         HttpResponseMessage Response =
-            await client.GetAsync(ApiUrl, cancellationToken);
+            await client.SendAsync(request, cancellationToken);
 
         if (!Response.IsSuccessStatusCode)
         {
