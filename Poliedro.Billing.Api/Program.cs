@@ -49,10 +49,8 @@ builder.Services
     .AddExternalSiigo(builder.Configuration)
     .AddPersistence(builder.Configuration);
 
-builder.Services.AddControllers(options =>
-{
-    options.Filters.Add<GlobalExceptionConfiguration>();
-});
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddRouting(routing => routing.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
@@ -144,10 +142,7 @@ app.MapHealthChecksUI(options =>
     options.UIPath = "/health-ui";
 });
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+app.UseExceptionHandler();
 
 app.UseCors("PoliedroBilling");
 

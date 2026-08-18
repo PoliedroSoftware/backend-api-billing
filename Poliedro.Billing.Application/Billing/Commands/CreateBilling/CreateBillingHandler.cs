@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -19,7 +20,8 @@ public class CreateBillingHandler(
     IGetProcessorBilling _createBillingFactory,
     IBillingSenderFactory _billingSenderFactory,
     IBillingResponseApi _billingResponseApi,
-    IMapper mapper
+    IMapper mapper,
+    ILogger<CreateBillingHandler> _logger
     ) : IRequestHandler<CreateBillingCommand, CreateBillingCommandResult>
 {
     public async Task<CreateBillingCommandResult> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
@@ -33,6 +35,7 @@ public class CreateBillingHandler(
 
         if (resolution is null || resolution.Value is null)
         {
+            _logger.LogWarning("Resolución {ResolutionId} no encontrada.", request.Id);
             return CreateBillingCommandResult.NotFound($"No se encontró la resolución {request.Id}.");
         }
 
@@ -42,8 +45,20 @@ public class CreateBillingHandler(
 
         if (companyProvider is null)
         {
+            _logger.LogWarning("Company provider {CompanyProviderId} de la resolución {ResolutionId} no encontrado.",
+                resolutionEntity.CompanyProviderId, request.Id);
             return CreateBillingCommandResult.NotFound($"No se encontró el company provider {resolutionEntity.CompanyProviderId} de la resolución {request.Id}.");
         }
+
+        if (string.IsNullOrWhiteSpace(companyProvider.ApiKey))
+        {
+            _logger.LogWarning("Company provider {CompanyProviderId} sin ApiKey configurada.",
+                companyProvider.CompanyProviderId);
+            return CreateBillingCommandResult.BadRequest($"El company provider {companyProvider.CompanyProviderId} no tiene una ApiKey configurada.");
+        }
+
+        _logger.LogInformation("Iniciando emisión de {Count} facturas para la resolución {ResolutionId} (provider {ProviderId}).",
+            request.Invoices.Count(), request.Id, companyProvider.ProviderId);
 
         var billingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
 
@@ -69,6 +84,8 @@ public class CreateBillingHandler(
 
             if (result is null)
             {
+                _logger.LogWarning("No se recibió respuesta del proveedor para la factura {Number} de la resolución {ResolutionId}.",
+                    processed.Billing.Number, request.Id);
                 billingResults.Add(new CreateBillingResultDTO
                 {
                     Status = false,
@@ -89,10 +106,14 @@ public class CreateBillingHandler(
                         companyProvider,
                         cancellationToken
                     );
+
+                    _logger.LogInformation("Factura {Number} emitida y persistida para la resolución {ResolutionId}.",
+                        processed.Billing.Number, request.Id);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error al persistir la factura {processed.Billing.Number}: {ex.Message}");
+                    _logger.LogError(ex, "Error al persistir la factura {Number} de la resolución {ResolutionId}.",
+                        processed.Billing.Number, request.Id);
                     billingResults.Add(new CreateBillingResultDTO
                     {
                         Status = false,
@@ -104,7 +125,8 @@ public class CreateBillingHandler(
             }
             else
             {
-                Console.WriteLine($"Factura fallida: {result.Info}");
+                _logger.LogWarning("Factura {Number} rechazada por el proveedor: {Info}",
+                    processed.Billing.Number, result.Info);
             }
 
             billingResults.Add(new CreateBillingResultDTO
@@ -114,6 +136,10 @@ public class CreateBillingHandler(
                 Data = null
             });
         }
+
+        int successCount = billingResults.Count(r => r.Status);
+        _logger.LogInformation("Emisión completada para la resolución {ResolutionId}: {SuccessCount}/{TotalCount} facturas procesadas.",
+            request.Id, successCount, billingResults.Count);
 
         return CreateBillingCommandResult.Ok(billingResults);
     }

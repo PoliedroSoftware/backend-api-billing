@@ -26,7 +26,6 @@ public static class BillingEndpoints
     }
 
     private static async Task<IResult> CreateBillingAsync(int id,
-        HttpContext context,
         IMediator mediator,
         [FromBody][Required]CreateBillingRequestDTO request, CancellationToken cancellationToken)
     {
