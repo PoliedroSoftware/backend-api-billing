@@ -4,14 +4,14 @@ Project memory. Baseline: 2026-08-02, branch `RefactorBilling` (up to date with 
 
 ## Known outstanding items
 
-No formally tracked backlog exists in the repository (no issue tracker files, no TODO markers collected). The following are factual observations from the code, not confirmed work items:
+Closed during the billing endpoint hardening (2026-08-17, branch `RefactorBilling`): `CreateBillingValidator` implemented (validation active); global exception handling active via `GlobalExceptionHandler` (`IExceptionHandler` + ProblemDetails, `UseExceptionHandler`); empty `GlobalExceptionConfiguration` filter removed; `CreateBillingInputDTO` merged into `CreateBillingDTO`; `IHttpClientFactory` applied to Plemsi senders/last-number repos; `BillingResponseApi` null-safety (Server/Data/Numeration); senders' cast + config null-safety; `ILogger` in billing handler; `CreateBillingCommandResult` (404/400 + per-invoice results).
 
-- `Poliedro.Billing.Infraestructure.External.Plemsi\Adapter\Billing\Impl\Plemsi\GetLastInvoiceBillingPlemsi.cs` is a stub that always returns `1`; real last-invoice lookup logic is not implemented.
-- `Poliedro.Billing.Application\Billing\Commands\CreateBilling\CreateBillingValidator.cs` is empty (0 lines) — the billing command has no FluentValidation rules.
-- `Poliedro.Billing.Api\Common\Configurations\GlobalExceptionConfiguration.cs` — `OnException` body is empty; ProblemDetails helpers exist but are unreachable.
-- `WorkerServiceBilling` — worker loop fully commented out and connection string hardcoded; not in the solution.
-- Both test projects contain only empty placeholder tests and do not reference production projects.
-- `.ai/` files should be kept in sync as meaningful milestones are reached.
+Remaining (no code fixes pending in the priority list; some are documentation-only):
+- [ ] `WorkerServiceBilling` — worker loop fully commented out, hardcoded connection string, not in the solution. Dead code; not worth touching (group D).
+- [ ] Both test projects contain only empty placeholder tests and do not reference production projects.
+- [ ] Authentication not enforced on endpoints despite the documented Bearer JWT scheme — to be evaluated separately (group C, item 15).
+- [ ] `ValidationBehaviour` registered twice (Application DI + `Program.cs` line 108).
+- [ ] 7 remaining `new HttpClient()` outside the Plemsi billing flow (Siigo/TNS/PdfInvoice/InvoicePos/SendMessage/GetInvoice/CustomersId) — candidates for `IHttpClientFactory`, out of scope.
 
 ## When adding entries
 

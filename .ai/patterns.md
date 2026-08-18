@@ -22,7 +22,7 @@ Each feature has a static class with `MapXEndpoints(this RouteGroupBuilder)` tha
 - Post-send persistence: `BillingResponseApi` zips provider responses with invoices, resolves the per-company DB connection (`IServerGetByIdService` + `IDatabaseUtils`), inserts the invoice via `DynamicDbContext`, updates the resolution number.
 
 ## Wire DTOs via AutoMapper
-Input DTOs (`CreateBillingInputDTO`) map to domain `CreateBilling`; domain entities map to snake_case Plemsi wire DTOs (`SenderRequestFEDTO` family in `Application\Billing\Dtos\Plemsi\FE\`, `InvoiceRequestPosDto` family in `...\POS\`). Profiles live under each feature's `AutoMappers\` folder and **must be registered by name** in `Application\DependencyInjectionService.cs`.
+Input DTOs (`CreateBillingDTO`) map to domain `CreateBilling`; domain entities map to snake_case Plemsi wire DTOs (`SenderRequestFEDTO` family in `Application\Billing\Dtos\Plemsi\FE\`, `InvoiceRequestPosDto` family in `...\POS\`). Profiles live under each feature's `AutoMappers\` folder and **must be registered by name** in `Application\DependencyInjectionService.cs`.
 
 ## CRUD domain services: specialized ports + composite
 Features like Client, Server, DianResolution, CompanyProvider define a set of small ports (`I*ExistsService`, `I*CreateService`, `I*UpdateService`, `I*DeleteService`, `I*GetAllService`, `I*GetByIdService`) implemented per-feature under `Persistence.Mysql\<Feature>\DomainService\Impl\`, plus a composite `I*DomainService` implementation that composes them. All are registered scoped in `AddPersistence`.

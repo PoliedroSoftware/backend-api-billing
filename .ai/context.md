@@ -24,7 +24,7 @@ Persistent project memory. Baseline captured on 2026-08-02 from a clean checkout
 
 ## Commands
 
-- Build: `dotnet build` (solution root). Succeeds with ~437 pre-existing nullable/other warnings — do not chase them.
+- Build: `dotnet build` (solution root). Succeeds with ~432 pre-existing nullable/other warnings — do not chase them.
 - Test: `dotnet test`. **Both test projects contain only empty `UnitTest1` placeholders — green tests prove nothing.**
 - Run API: `dotnet run --project Poliedro.Billing.Api` → http://localhost:5062; docs at `http://localhost:5062/scalar/v1`; Swagger JSON at `/swagger/v1/swagger.json`.
 - Health: `/health` (UI at `/health-ui`) — both hit a live remote MySQL; startup/health need network + DB.
@@ -89,7 +89,7 @@ Real credentials are committed and are **the source of truth** — do not remove
 - New AutoMapper profiles must be added explicitly in `MapperConfiguration` in `Poliedro.Billing.Application\DependencyInjectionService.cs`.
 - MediatR handlers auto-register via `RegisterServicesFromAssembly`.
 - `AddExternalPlemsi` registers its own `DataBaseContext` and `IMessageProvider`, duplicating what `AddPersistence` registers; both use the `MYSQL_CONNECTION` env var (or `MysqlConnection` string).
-- `ValidationBehaviour` is registered twice (Application DI + `Program.cs` line 110).
+- `ValidationBehaviour` is registered twice (Application DI + `Program.cs` line 108).
 
 ## Deployment / CI
 
@@ -102,5 +102,5 @@ Real credentials are committed and are **the source of truth** — do not remove
 - `Pomelo.EntityFrameworkCore.MySql` pinned at 9.0.0 against EF Core 10 → NU1608 warning expected. `KubernetesClient 15.0.1` has a known moderate vulnerability. Both pre-existing; don't "fix" without asking.
 - `ServerVersion.AutoDetect` against live remote MySQL — an agent without network/DB access cannot run the app end-to-end.
 - No `global.json`; requires .NET 10 SDK.
-- `GetLastInvoiceBillingPlemsi` is a stub returning `1`.
-- `CreateBillingValidator.cs` and the global exception filter are effectively empty (validation/error handling effectively not active).
+- Billing validation is active (`CreateBillingValidator` + `ValidationBehaviour`); unhandled exceptions map to ProblemDetails via `GlobalExceptionHandler` (`IExceptionHandler`) with `AddProblemDetails` + `UseExceptionHandler`.
+- `GetLastInvoiceBillingPlemsi` and `InvoiceLastPosRepository` implement the last-invoice lookup (JSON over HTTP) and are nearly identical (dedup candidate).

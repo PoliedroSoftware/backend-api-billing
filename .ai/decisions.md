@@ -62,8 +62,18 @@ No assembly scanning. Every profile must be added to the `MapperConfiguration` i
 
 TNS and Siigo use their own config models + settings services (`ApiTNS`, `ApiSiigo` sections) and REST clients. Siigo sends `Partner-ID: Test` header. Plemsi persistence uses `BillingResponseApi`, `DynamicDbContext` (retail), and `IUpdateCurrentlyNumber`.
 
+## ADR-013 — Billing factories scoped to Plemsi FE/POS only
+**Status:** Adopted (scope decision)
+
+`BillingPrepareFactory` and `BillingSenderFactory` support only `(PLEMSI, FE)` and `(PLEMSI, POS)` and throw for any other combination. Intentional: Siigo and TNS are separate endpoint groups (`api/v1/billing/invoices`, `api/v1/billing/sales/create`) and do not flow through `POST /api/v1/billing/{id}`. No code change; recorded during the billing endpoint hardening (priority group C, item 14).
+
+## ADR-014 — Per-invoice consecutive number guard kept (sequential processing)
+**Status:** Adopted (keep)
+
+`BillingSenderFE`/`BillingSenderPOS` re-query the last Plemsi number and overwrite the local number when lower, per invoice inside the sequential `foreach`. Consistent with the deliberately sequential processing of the billing flow (no parallelization). Kept as-is (priority group C, item 16).
+
 ## Non-decisions / open questions (not resolved in code)
 
-- No authentication enforcement found on endpoints despite a Bearer JWT Swagger security scheme being documented.
-- `ValidationBehaviour` registered twice; billing validator file empty — intended validation behavior is unclear.
-- Worker service purpose/scope is undefined (loop commented out, not in solution).
+- No authentication enforcement found on endpoints despite a Bearer JWT Swagger security scheme being documented. Scheduled for separate evaluation, not scoped to the billing endpoint (priority group C, item 15).
+- `ValidationBehaviour` registered twice (Application DI + `Program.cs` line 108). The billing validator is now implemented (`CreateBillingValidator`); the duplicate `IPipelineBehavior` registration remains.
+- Worker service purpose/scope is undefined (loop commented out, not in solution). Considered dead code; not worth touching (priority group D, item 17).
