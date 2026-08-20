@@ -7,24 +7,8 @@ namespace Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote
 {
     public class CreateCreditNoteCommandValidator : AbstractValidator<CreateCreditNoteCommand>
     {
-        public CreateCreditNoteCommandValidator(IMessageProvider messageProvider)
+        public CreateCreditNoteCommandValidator()
         {
-            RuleFor(x => x.Discrepancy)
-                .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
-
-            RuleFor(x => x.Resolution)
-                .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull)
-                .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldNotEmpty);
-
-            RuleFor(x => x.Prefix)
-                .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull)
-                .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldNotEmpty);
-
-            RuleFor(x => x.Number)
-                .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
-            RuleFor(x => x.Number)
-    .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldMustBeGreaterThanZero);
-
         }
     }
 
