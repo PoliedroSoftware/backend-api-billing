@@ -36,6 +36,7 @@ using Poliedro.Billing.Infraestructure.External.Siigo;
 using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
+using Poliedro.Billing.Api.Observability;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,10 +60,29 @@ builder.Services.AddHttpClient<ICreditNoteDomainService, CreditNoteDomainService
 builder.Services
     .AddWebApi()
     .AddApplication()
+    .AddObservability()
     .AddExternalPlemsi(builder.Configuration)
     .AddExternalTns(builder.Configuration)
     .AddExternalSiigo(builder.Configuration)
     .AddPersistence(builder.Configuration);
+
+// Registrar decorators de observabilidad para IBillingSender (Plemsi)
+// Se resuelven las implementaciones concretas registradas por AddExternalPlemsi
+builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
+{
+    var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderFE>();
+    var metrics = sp.GetRequiredService<Poliedro.Billing.Api.Observability.Providers.IProviderMetrics>();
+    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorFE>>();
+    return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorFE(concrete, metrics, logger);
+});
+
+builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
+{
+    var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderPOS>();
+    var metrics = sp.GetRequiredService<Poliedro.Billing.Api.Observability.Providers.IProviderMetrics>();
+    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS>>();
+    return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS(concrete, metrics, logger);
+});
 
 builder.Services.AddControllers(options =>
 {
@@ -128,6 +148,10 @@ builder.Services.AddHealthChecks()
     .AddMySql(builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
 var app = builder.Build();
+
+// Observability: Prometheus HTTP metrics middleware
+app.UsePrometheusMetrics()
+   .MapPrometheusMetrics();
 
 app.MapHealthChecks("/health", new HealthCheckOptions()
 {

@@ -29,6 +29,8 @@
     </PackageReference>
     <PackageReference Include="Scalar.AspNetCore" Version="1.2.45" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="prometheus-net" Version="8.2.1" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
   </ItemGroup>
 
   <ItemGroup>
