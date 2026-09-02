@@ -11,7 +11,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://api-billing.poliedroauth.com/health",
+					"raw": "http://billing-api.poliedroauth.com/health",
 					"protocol": "http",
 					"host": [
 						"api-billing",
@@ -30,7 +30,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://api-billing.poliedroauth.com/health",
+					"raw": "https://billing-api.poliedroauth.com/health",
 					"protocol": "https",
 					"host": [
 						"api-billing",
@@ -49,7 +49,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://api-billing.poliedroauth.com/health-ui",
+					"raw": "https://billing-api.poliedroauth.com/health-ui",
 					"protocol": "https",
 					"host": [
 						"api-billing",

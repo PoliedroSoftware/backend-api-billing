@@ -16,6 +16,7 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
         CompanyProviderEntity companyProviderEntity,
         CancellationToken cancellationToken)
     {
+<<<<<<< HEAD
         using var client = httpClientFactory.CreateClient();
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
@@ -23,6 +24,16 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
         string baseUrl;
 
         if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(),
+=======
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientInfo.ApiKey);
+
+        bool isProduction = bool.Parse(config["Enviroment:Production"]!);
+
+        string baseUrl;
+
+        if (!Enum.TryParse(clientInfo.MultipleResolution.ToString(),
+>>>>>>> origin/releasecandidate/v1.0.0
             out MultipleResolution resolution))
         {
             resolution = MultipleResolution.Single;
@@ -43,6 +54,7 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
                 break;
         }
 
+<<<<<<< HEAD
         string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
 
         var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
@@ -51,6 +63,13 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
         HttpResponseMessage Response =
             await client.SendAsync(request, cancellationToken);
 
+=======
+        string ApiUrl = $"{baseUrl}{clientInfo.Prefix}";
+
+        HttpResponseMessage Response =
+            await client.GetAsync(ApiUrl, cancellationToken);
+
+>>>>>>> origin/releasecandidate/v1.0.0
         if (!Response.IsSuccessStatusCode)
         {
             throw new InvalidOperationException(
@@ -90,6 +109,7 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
 
             return maxUsed + 1;
 
+<<<<<<< HEAD
         }
         catch (JsonException ex)
         {
@@ -97,6 +117,18 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
         "La respuesta de Plemsi no tiene un formato JSON válido.",
         ex);
         }
+=======
+        }
+        catch (JsonException ex)
+        {
+            throw new InvalidOperationException(
+        "La respuesta de Plemsi no tiene un formato JSON válido.",
+        ex);
+        }
+
+
+
+>>>>>>> origin/releasecandidate/v1.0.0
     }
 
 

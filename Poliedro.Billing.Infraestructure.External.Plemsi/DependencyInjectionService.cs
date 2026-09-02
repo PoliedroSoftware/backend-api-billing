@@ -76,8 +76,10 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<PrepareBillingFE>();
             services.AddTransient<PrepareBillingPOS>();
 
-            services.AddTransient<IBillingSender, BillingSenderFE>();
-            services.AddTransient<IBillingSender, BillingSenderPOS>();
+            // Registrar concrete implementations para que el decorador pueda resolverlas
+            services.AddTransient<BillingSenderFE>();
+            services.AddTransient<BillingSenderPOS>();
+
             services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
 
@@ -95,7 +97,14 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
            
 
+<<<<<<< HEAD
             
+=======
+            // Factor�a y strategies
+            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderFE>();
+            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderPOS>();
+            services.AddScoped<IBillingCreditNoteSenderFactory, BillingCreditNoteSenderFactory>();
+>>>>>>> origin/releasecandidate/v1.0.0
 
             // Location
             services.AddHttpClient<IMunicipalityService, PlemsiLocationService>();

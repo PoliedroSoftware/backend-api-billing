@@ -51,8 +51,12 @@ builder.Services
     .AddExternalSiigo(builder.Configuration)
     .AddPersistence(builder.Configuration);
 
+<<<<<<< HEAD
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+=======
+// Registrar decorators de observabilidad para IBillingSender (Plemsi)
+// Se resuelven las implementaciones concretas registradas por AddExternalPlemsi
 builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
 {
     var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderFE>();
@@ -69,6 +73,11 @@ builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSend
     return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS(concrete, metrics, logger);
 });
 
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<GlobalExceptionConfiguration>();
+});
+>>>>>>> origin/releasecandidate/v1.0.0
 
 builder.Services.AddRouting(routing => routing.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
