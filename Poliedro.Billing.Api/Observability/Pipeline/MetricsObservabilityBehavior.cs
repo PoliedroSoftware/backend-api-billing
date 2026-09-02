@@ -109,7 +109,7 @@ public class MetricsObservabilityBehavior<TRequest, TResponse>
     private static (string Provider, string ClientId, string InvoiceType) ExtractLabels(CreateBillingCommand request)
     {
         var provider = "pending"; // Se actualiza en el handler
-        var clientId = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey.Length)) ?? "unknown";
+        var clientId = request.Id.ToString()?.Substring(0, Math.Min(8, request.Id.ToString()?.Length ?? 0)) ?? "unknown";
         var invoiceType = "FE"; // FE = Factura Electrónica (default)
 
         return (provider, clientId, invoiceType);

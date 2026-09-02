@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
@@ -9,31 +10,23 @@ using System.Text.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
 
-public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory httpClientFactory): IInvoiceLastPos
+public class InvoiceLastPosRepository(IConfiguration config) : IInvoiceLastPos
 {
+    private static readonly HttpClient client = new();
+
     public async Task<int> GetInvoiceLastAsync(
         DianResolutionEntity dianResolutionEntity,
         CompanyProviderEntity companyProviderEntity,
         CancellationToken cancellationToken)
     {
-<<<<<<< HEAD
-        using var client = httpClientFactory.CreateClient();
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
 
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
 
         string baseUrl;
 
         if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(),
-=======
-
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", clientInfo.ApiKey);
-
-        bool isProduction = bool.Parse(config["Enviroment:Production"]!);
-
-        string baseUrl;
-
-        if (!Enum.TryParse(clientInfo.MultipleResolution.ToString(),
->>>>>>> origin/releasecandidate/v1.0.0
             out MultipleResolution resolution))
         {
             resolution = MultipleResolution.Single;
@@ -54,22 +47,11 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
                 break;
         }
 
-<<<<<<< HEAD
         string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
-
-        var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
-
-        HttpResponseMessage Response =
-            await client.SendAsync(request, cancellationToken);
-
-=======
-        string ApiUrl = $"{baseUrl}{clientInfo.Prefix}";
 
         HttpResponseMessage Response =
             await client.GetAsync(ApiUrl, cancellationToken);
 
->>>>>>> origin/releasecandidate/v1.0.0
         if (!Response.IsSuccessStatusCode)
         {
             throw new InvalidOperationException(
@@ -102,22 +84,13 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
                 }
             }
 
-            if (maxUsed <= 0)
+            if (maxUsed <= 0) 
             {
                 throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
             }
 
             return maxUsed + 1;
 
-<<<<<<< HEAD
-        }
-        catch (JsonException ex)
-        {
-            throw new InvalidOperationException(
-        "La respuesta de Plemsi no tiene un formato JSON válido.",
-        ex);
-        }
-=======
         }
         catch (JsonException ex)
         {
@@ -127,8 +100,6 @@ public class InvoiceLastPosRepository(IConfiguration config, IHttpClientFactory 
         }
 
 
-
->>>>>>> origin/releasecandidate/v1.0.0
     }
 
 

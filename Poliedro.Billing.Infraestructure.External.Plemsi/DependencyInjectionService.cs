@@ -95,18 +95,8 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddScoped<ICalculateCheckDigits, CalculateCheckDigitsBilling>();
             services.AddScoped<IAllowanceChargesBilling, GetAllowanceChargesBilling>();
 
-           
+          
 
-<<<<<<< HEAD
-            
-=======
-            // Factor�a y strategies
-            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderFE>();
-            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderPOS>();
-            services.AddScoped<IBillingCreditNoteSenderFactory, BillingCreditNoteSenderFactory>();
->>>>>>> origin/releasecandidate/v1.0.0
-
-            // Location
             services.AddHttpClient<IMunicipalityService, PlemsiLocationService>();
 
             return services;

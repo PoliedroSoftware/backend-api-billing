@@ -6,31 +6,7 @@ using Poliedro.Billing.Api.Observability.Providers;
 
 namespace Poliedro.Billing.Api.Observability.Decorators;
 
-/// <summary>
-/// Decorator del patrón IBillingSender para Plemsi - Factura Electrónica.
-/// 
-/// Ubicación: Observability/Decorators - capa pura de instrumentación
-/// Responsabilidad: Envolver IBillingSender para capturar:
-/// - billing_plemsi_requests_total
-/// - billing_plemsi_errors_total
-/// - billing_plemsi_duration_seconds
-/// - billing_provider_status
-/// 
-/// Sin modificar la lógica de negocio de BillingSenderFE.
-/// 
-/// Patrón: Decorator (Structural Design Pattern)
-/// ✓ Agrega observabilidad sin modificar implementación original
-/// ✓ Mantiene arquitectura limpia: negocio ⊥ observabilidad
-/// ✓ Fácil de remover (descomentar registro en Program.cs)
-/// ✓ Reutilizable para otros senders (POS, CreditNote)
-/// 
-/// Flujo:
-/// 1. BeginRequest() → init metrics scope + timestamp
-/// 2. _innerSender.SendAsync() → llamada HTTP real a Plemsi
-/// 3. Success → RecordSuccess() + calcula duración automáticamente
-/// 4. Error → RecordError(categorizado por tipo) + duración
-/// 5. Finally → scope.Dispose() para limpieza
-/// </summary>
+
 public class BillingMetricsDecoratorFE : IBillingSender
 {
     private readonly IBillingSender _innerSender;
@@ -49,7 +25,6 @@ public class BillingMetricsDecoratorFE : IBillingSender
 
     public async Task<List<ApiResponseFERetailPos>> SendAsync(
         PlemsiInvoiceRequest request,
-        BillingInfoClient clientInfo,
         CancellationToken cancellationToken)
     {
         var scope = _metrics.BeginRequest();
@@ -59,13 +34,13 @@ public class BillingMetricsDecoratorFE : IBillingSender
         {
             _logger.LogInformation("Iniciando llamada a Plemsi (FE) - Request Type: {RequestType}", requestType);
 
-            var result = await _innerSender.SendAsync(request, clientInfo, cancellationToken);
+            var result = await _innerSender.SendAsync(request, cancellationToken);
 
             // Éxito: registrar en métricas del proveedor
             _metrics.RecordSuccess(scope, requestType);
 
             // Registrar métrica de negocio (billing) con labels del proveedor
-            var clientId = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientId = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceSuccessTotal
                 .WithLabels(_metrics.ProviderName, clientId, "FE")
                 .Inc();
@@ -78,7 +53,7 @@ public class BillingMetricsDecoratorFE : IBillingSender
         {
             // Categoría: timeout
             _metrics.RecordError(scope, requestType, "timeout");
-            var clientIdTimeout = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientIdTimeout = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceFailedTotal
                 .WithLabels(_metrics.ProviderName, clientIdTimeout, "FE", "timeout")
                 .Inc();
@@ -96,7 +71,7 @@ public class BillingMetricsDecoratorFE : IBillingSender
                 _ => "http_error"
             };
             _metrics.RecordError(scope, requestType, errorReason);
-            var clientIdHttp = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientIdHttp = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceFailedTotal
                 .WithLabels(_metrics.ProviderName, clientIdHttp, "FE", errorReason)
                 .Inc();
@@ -107,7 +82,7 @@ public class BillingMetricsDecoratorFE : IBillingSender
         {
             // Otras excepciones
             _metrics.RecordError(scope, requestType, "unknown_error");
-            var clientIdUnknown = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientIdUnknown = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceFailedTotal
                 .WithLabels(_metrics.ProviderName, clientIdUnknown, "FE", "unknown_error")
                 .Inc();
@@ -121,10 +96,7 @@ public class BillingMetricsDecoratorFE : IBillingSender
     }
 }
 
-/// <summary>
-/// Decorator para BillingSenderPOS (Point of Sale).
-/// Misma estructura que FE pero para emisión de factura de POS.
-/// </summary>
+
 public class BillingMetricsDecoratorPOS : IBillingSender
 {
     private readonly IBillingSender _innerSender;
@@ -143,7 +115,6 @@ public class BillingMetricsDecoratorPOS : IBillingSender
 
     public async Task<List<ApiResponseFERetailPos>> SendAsync(
         PlemsiInvoiceRequest request,
-        BillingInfoClient clientInfo,
         CancellationToken cancellationToken)
     {
         var scope = _metrics.BeginRequest();
@@ -153,11 +124,11 @@ public class BillingMetricsDecoratorPOS : IBillingSender
         {
             _logger.LogInformation("Iniciando llamada a Plemsi (POS) - Request Type: {RequestType}", requestType);
 
-            var result = await _innerSender.SendAsync(request, clientInfo, cancellationToken);
+            var result = await _innerSender.SendAsync(request, cancellationToken);
 
             _metrics.RecordSuccess(scope, requestType);
 
-            var clientId = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientId = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceSuccessTotal
                 .WithLabels(_metrics.ProviderName, clientId, "POS")
                 .Inc();
@@ -169,7 +140,7 @@ public class BillingMetricsDecoratorPOS : IBillingSender
         catch (TimeoutException ex)
         {
             _metrics.RecordError(scope, requestType, "timeout");
-            var clientIdTimeoutPos = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientIdTimeoutPos = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceFailedTotal
                 .WithLabels(_metrics.ProviderName, clientIdTimeoutPos, "POS", "timeout")
                 .Inc();
@@ -186,7 +157,7 @@ public class BillingMetricsDecoratorPOS : IBillingSender
                 _ => "http_error"
             };
             _metrics.RecordError(scope, requestType, errorReason);
-            var clientIdHttpPos = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientIdHttpPos = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceFailedTotal
                 .WithLabels(_metrics.ProviderName, clientIdHttpPos, "POS", errorReason)
                 .Inc();
@@ -196,7 +167,7 @@ public class BillingMetricsDecoratorPOS : IBillingSender
         catch (Exception ex)
         {
             _metrics.RecordError(scope, requestType, "unknown_error");
-            var clientIdUnknownPos = request.ApiKey?.Substring(0, Math.Min(8, request.ApiKey?.Length ?? 0)) ?? "unknown";
+            var clientIdUnknownPos = request.CompanyProviderEntity.ApiKey?.Substring(0, Math.Min(8, request.CompanyProviderEntity.ApiKey?.Length ?? 0)) ?? "unknown";
             Poliedro.Billing.Api.Observability.BillingMetrics.InvoiceFailedTotal
                 .WithLabels(_metrics.ProviderName, clientIdUnknownPos, "POS", "unknown_error")
                 .Inc();
