@@ -3,12 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
-using Poliedro.Billing.Application.BillingCreditNote.Services.Factories.Plemsi;
-using Poliedro.Billing.Application.BillingCreditNote.Services.Selectors.Plemsi;
 using Poliedro.Billing.Application.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.BillingCreditNote.Ports;
+
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Validate;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
@@ -23,9 +21,7 @@ using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.BillingCreditNote.Impl.Plemsi;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.BillingCreditNote.Selectors.Plemsi;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CreditNote;
+
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.GetInvoice;
@@ -50,23 +46,25 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             ));
 
             services.AddTransient<IMessageProvider, MessageProvider>();
-            services.AddTransient<IFERetailService, FERetailService>();
-            services.AddTransient<Domain.FERetail.Ports.IInvoiceFE, Adapter.FE.Retail.InvoiceFEService>();
-            services.AddTransient<Domain.FERetail.Ports.IInvoiceLastFE, Adapter.FE.Retail.InvoiceLastFERepository>();
-            services.AddTransient<Domain.FERetail.Ports.IDatabaseUtils, Adapter.FE.Retail.DatabaseUtils>();
-            services.AddTransient<Domain.FERetail.Ports.IGetItemFE, Adapter.FE.Retail.GetItem>();
+
+            services.AddHttpClient();
+
+            // FE (Factura Electr�nica) implementations
             services.AddTransient<IGetItemsInvoiceFERetail, GetItemsInvoiceFERetail>();
-            services.AddTransient<Domain.FERetail.Ports.IInsertInvoiceFE, Adapter.FE.Retail.InsertInvoice>();
+            services.AddTransient<IDatabaseUtils, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.DatabaseUtils>();
+            services.AddTransient<IGetItemFE, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.GetItem>();
+            services.AddTransient<IInsertInvoiceFE, Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail.InsertInvoice>();
+
             services.AddTransient<IBillingService, BillingPosService>();
-            services.AddTransient<IInvoicePos, Adapter.POS.EDS.InvoicePosService>();
-            services.AddTransient<IInvoiceLastPos, Adapter.POS.EDS.InvoiceLastPosRepository>();
+
             services.AddTransient<IGetItemPos, Adapter.POS.EDS.GetItem>();
             services.AddTransient<IGetItemsInvoicePos, GetItemsInvoicePos>();
             services.AddTransient<IInsertInvoicePos, Adapter.POS.EDS.InsertInvoice>();
             services.AddTransient<IDatabaseUtilsPos, Adapter.POS.EDS.DatabaseUtils>();
+            services.AddTransient<IInvoiceLastPos, Adapter.POS.EDS.InvoiceLastPosRepository>();
             services.AddTransient<ISendMessage, SendMessageService>();
             services.AddTransient<ISuccessInvoiceRepository, SuccessInvoiceRepository>();
-            services.AddTransient<ICreditNoteDomainService, CreditNoteDomainService>();
+            
             services.AddTransient<IUpdateCurrentlyNumber, UpdateCurrentlyNumberService>();
             services.AddTransient<IEmailSender, SmtpEmailSender>();
             services.AddTransient<ICustomersIdRepository, CustomersIdRepository>();
@@ -84,29 +82,21 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
 
             services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
-            services.AddTransient<IBillingGetInfoClient, BillingGetInfoClient>();
+
+            // Domain adapters / stubs
+            services.AddTransient<IFERetailService, Adapter.FE.Retail.FERetailService>();
+            services.AddTransient<IGetLastInvoiceBilling, Adapter.Billing.Impl.Plemsi.GetLastInvoiceBillingPlemsi>();
+            services.AddTransient<ICreditNoteDomainService, Adapter.CreditNote.CreditNoteDomainService>();
 
             // Dependencias internas de PrepareBillingFE/POS
             services.AddScoped<IPrepareItemBilling, PrepareItemElectronic>();
             services.AddScoped<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
-            services.AddScoped<IGetLastInvoiceBilling, GetLastInvoiceBillingPlemsiFE>();
             services.AddScoped<IBillingValidateScript, ValidateScriptBilling>();
             services.AddScoped<ICalculateCheckDigits, CalculateCheckDigitsBilling>();
             services.AddScoped<IAllowanceChargesBilling, GetAllowanceChargesBilling>();
 
-            // Dependencias CreditNote
-            services.AddScoped<IGetProcessorCreditNote, CreateCreditNoteFactory>();
-            services.AddTransient<PrepareCreditNoteBillingFE>();
-            services.AddTransient<PrepareCreditNoteBillingPOS>();
-            services.AddScoped<IBillingGetInfgoClientCreditNote, DianResolutionCreditNoteDomainService>();
-            services.AddScoped<IGetLastInvoiceNumberCreditNote, GetLastInvoiceNumberCreditNotePlemsi>();
+          
 
-            // Factor�a y strategies
-            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderFE>();
-            services.AddTransient<IBillingCreditNoteSender, BillingCreditNoteSenderPOS>();
-            services.AddScoped<IBillingCreditNoteSenderFactory, BillingCreditNoteSenderFactory>();
-
-            // Location
             services.AddHttpClient<IMunicipalityService, PlemsiLocationService>();
 
             return services;

@@ -1,8 +1,7 @@
-﻿namespace Poliedro.Billing.Domain.Client.Enums
+﻿namespace Poliedro.Billing.Domain.Client.Enums;
+
+public enum ProviderType
 {
-    public enum ProviderType
-    {
-        PLEMSI = 1,
-        TNS = 2
-    }
+    PLEMSI = 1,
+    TNS = 2
 }

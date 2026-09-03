@@ -6,5 +6,5 @@ namespace Poliedro.Billing.Domain.Server.DomainService;
 
 public interface IServerGetByIdService
 {
-    Task<Result<ServerEntity, Error>> GetByIdAsync(int id);
+    Task<Result<ServerEntity, Error>> GetByIdAsync(int id, CancellationToken cancellationToken);
 }

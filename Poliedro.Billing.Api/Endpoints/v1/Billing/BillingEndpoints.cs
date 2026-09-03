@@ -1,7 +1,5 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Common.Features;
@@ -13,46 +11,33 @@ public static class BillingEndpoints
 {
     public static RouteGroupBuilder MapBillingEndpoints(this RouteGroupBuilder group)
     {
-        group.MapPost("/", CreateBillingCommand)
-            .WithName("CreateBilling")
-            .WithTags("Billing")
-            .WithSummary("Create new Billing")
-            .WithDescription("Creates new billing records")
+        group.MapPost("/{id}", CreateBillingAsync)
+            .WithName("CreateInvoiceElectronic")
+            .WithTags("Invoice Electronic")
+            .WithSummary("Create new Invoice Electronic By Id")
+            .WithDescription("Creates new Invoice Electronic By Id Resolution")
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return group;
     }
 
-    private static async Task<IResult> CreateBillingCommand(
-        HttpContext context,
+    private static async Task<IResult> CreateBillingAsync(int id,
         IMediator mediator,
-        [FromBody][Required]IEnumerable<CreateBillingInputDTO> invoices, CancellationToken cancellationToken)
+        [FromBody][Required]CreateBillingRequestDTO request, CancellationToken cancellationToken)
     {
-        var token = TokenHelper.ExtractBearerToken(context.Request);
-        if (string.IsNullOrEmpty(token))
-            return Results.Unauthorized();
+        var result = await mediator.Send(new CreateBillingCommand(id, request.Data), cancellationToken);
 
-        if (invoices.IsNullOrEmpty())
+        if (!result.Success)
         {
-            var emptyResponse = ResponseApiService.Response(
-                statusCode: StatusCodes.Status200OK,
-                message: "No invoices.",
-                data: invoices
-            );
-            return Results.Ok(emptyResponse);
+            return TypedResults.Json(
+                ResponseApiService.Response(result.StatusCode, null, result.Message),
+                statusCode: result.StatusCode);
         }
 
-        var command = new CreateBillingCommand(invoices, token);
-        var result = await mediator.Send(command, cancellationToken);
-
-        var response = ResponseApiService.Response(
-            statusCode: StatusCodes.Status200OK,
-            message: "Invoice processing result.",
-            data: result
-        );
-        return Results.Ok(response);
+        return TypedResults.Ok(result.Results);
     }
 }

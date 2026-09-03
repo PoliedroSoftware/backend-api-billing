@@ -2,16 +2,14 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.AutoMappers;
-using Poliedro.Billing.Application.BillingCreditNote.AutoMappers;
 using Poliedro.Billing.Application.Client.AutoMappers;
 using Poliedro.Billing.Application.Common.Behaviors;
+using Poliedro.Billing.Application.CompanyProvider.AutoMappers;
 using Poliedro.Billing.Application.CustomersId.AutoMappers;
 using Poliedro.Billing.Application.DianResolution.AutoMappers;
 using Poliedro.Billing.Application.GetInvoice.AutoMappers;
-using Poliedro.Billing.Application.InvoiceDetailElectronic.AutoMappers;
 using Poliedro.Billing.Application.Location.AutoMappers;
-using Poliedro.Billing.Application.NotifyResolution.AutoMappers;
-using Poliedro.Billing.Application.PendingInvoice.AutoMappers;
+
 using Poliedro.Billing.Application.Server.AutoMappers;
 using Poliedro.Billing.Application.SuccessInvoice.AutoMappers;
 using System.Reflection;
@@ -27,17 +25,14 @@ public static class DependencyInjectionService
         {
             
             config.AddProfile(new ClientMapper());
+            config.AddProfile(new CompanyProviderMapper());
             config.AddProfile(new ServerMapper());
             config.AddProfile(new DianResolutionMapper());
             config.AddProfile(new PaginationMapper());
-            config.AddProfile(new PendingInvoiceMapper());
             config.AddProfile(new SuccessInvoiceAutoMapper());
-            config.AddProfile(new NotifyResolutionAutoMapper());
             config.AddProfile(new CustumersIdAutoMapper());
             config.AddProfile(new GetInvoiceMapper());
-            config.AddProfile(new InvoiceElectronicProfile());
             config.AddProfile(new BillingAutoMapper());
-            config.AddProfile(new CreditNoteAutoMapper());
             config.AddProfile(new MunicipalityMapper());
 
         });

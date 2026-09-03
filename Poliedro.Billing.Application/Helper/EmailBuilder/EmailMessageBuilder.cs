@@ -1,15 +1,16 @@
 ﻿using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Domain.Client.Entities;
+using Poliedro.Billing.Domain.Resolution.Entities;
 
 namespace Poliedro.Billing.Application.Helper.EmailBuilder;
 public static class EmailMessageBuilder
 {
-    public static EmailMessageDto BuildResolutionExpiredMessage(ClientEntity clientItem, int invoice,
+    public static EmailMessageDto BuildResolutionExpiredMessage(ClientEntity clientEntity, DianResolutionEntity dianResolutionEntity, int invoice,
         string companyEmail, string subject = "Resolución Expirada")
     {
-        var to = $"{clientItem.Email},{companyEmail}";
+        var to = $"{clientEntity.Email},{companyEmail}";
 
-        var reason = invoice > clientItem.DianResolution.FinalRange
+        var reason = invoice > dianResolutionEntity.FinalRange
             ? "por numeración"
             : "por fecha";
 
@@ -22,13 +23,13 @@ public static class EmailMessageBuilder
              Footer: "Gracias por su atención.",
              AdditionalData: new Dictionary<string, string>
              {
-                    { "Cliente", clientItem.Name },
-                    { "Fecha", clientItem.DianResolution.ExpirationDate.ToString() },
-                    { "Resolución", clientItem.DianResolution.ResolutionNumber },
-                    { "Rango Inicial", clientItem.DianResolution.InitialRange.ToString() },
-                    { "Rango Final", clientItem.DianResolution.FinalRange.ToString() },
-                    { "Tipo de Resolución", clientItem.DianResolution.Description },
-                    { "Numeración Actual", clientItem.DianResolution.CurrentlyNumber.ToString() },
+                    { "Cliente", clientEntity.Name },
+                    { "Fecha", dianResolutionEntity.ExpirationDate.ToString() },
+                    { "Resolución", dianResolutionEntity.ResolutionNumber },
+                    { "Rango Inicial", dianResolutionEntity.InitialRange.ToString() },
+                    { "Rango Final", dianResolutionEntity.FinalRange.ToString() },
+                    { "Tipo de Resolución", dianResolutionEntity.Description },
+                    { "Numeración Actual", dianResolutionEntity.CurrentRange.ToString() },
                     { "Última Factura", invoice.ToString() }
              }
          )

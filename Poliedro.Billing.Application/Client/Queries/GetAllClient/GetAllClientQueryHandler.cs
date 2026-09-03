@@ -18,7 +18,7 @@ public class GetAllClientQueryHandler
         Handle(GetAllClientQuery request, CancellationToken cancellationToken)
     {
         var result = await clientBillingElectronicDomainService.GetAllAsync(cancellationToken);
-        if (!result.IsSuccess && result.Value != null)
+        if (!result.IsSuccess) // cambio de result.IsFailure por !result.IsSuccess
             return result.Error!;
 
         return mapper.Map<List<ClientDto>>(result.Value);

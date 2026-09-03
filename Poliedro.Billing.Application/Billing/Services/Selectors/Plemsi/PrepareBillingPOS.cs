@@ -3,14 +3,20 @@ using Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Billing.Pos.Entity;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.Resolution.Entities;
 namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
 public class PrepareBillingPOS(
     IInvoiceLastPos _getLastInvoiceBilling,
     IMapper _mapper
     ) : ICreateBilling
 {
-    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(IEnumerable<CreateBilling> invoices, BillingInfoClient clientInfo, CancellationToken cancellationToken)
+    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(
+        IEnumerable<CreateBilling> invoices,
+        DianResolutionEntity dianResolutionEntity,
+        CompanyProviderEntity companyProviderEntity,
+        CancellationToken cancellationToken)
     {
 
         var results = new List<(CreateBilling Billing, object Output)>();
@@ -18,7 +24,7 @@ public class PrepareBillingPOS(
 
         try
         {
-            lastInvoiceNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(clientInfo, cancellationToken);
+            lastInvoiceNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(dianResolutionEntity, companyProviderEntity, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -26,7 +32,7 @@ public class PrepareBillingPOS(
             return results;
         }
 
-        bool expirated = lastInvoiceNumber + invoices.Count() > clientInfo.FinalRange || DateTime.Now > clientInfo.ExpirationDate;
+        bool expirated = lastInvoiceNumber + invoices.Count() > dianResolutionEntity.FinalRange || DateTime.Now > dianResolutionEntity.ExpirationDate;
         if (expirated)
         {
             Console.WriteLine("El rango de numeración ha sido superado o la resolución ha expirado.");
@@ -43,12 +49,12 @@ public class PrepareBillingPOS(
                 int InvoiceNumber = invoiceCounter++;
                 invoice.Numeration = InvoiceNumber.ToString();
                 invoice.Number = invoice.Resolution;
-                invoice.Prefix = clientInfo.Prefix;
+                invoice.Prefix = dianResolutionEntity.Prefix;
                 if (invoice.CustomerEntity == null)
                 {
                     invoice.CustomerEntity = new CustomerEntity();
                 }
-                invoice.CustomerEntity.ApiKey = clientInfo.ApiKey;
+                invoice.CustomerEntity.ApiKey = companyProviderEntity.ApiKey;
                
 
 
@@ -109,8 +115,8 @@ public class PrepareBillingPOS(
                         companyName = "Poliedro Software S.A.S"
                     },
                     sendToEmail = "poliedrosoftware@gmail.com",
-                    resolution = clientInfo.ResolucionNumber,
-                    prefix = clientInfo.Prefix,
+                    resolution = dianResolutionEntity.ResolutionNumber,
+                    prefix = dianResolutionEntity.Prefix,
                     head_note = $"Fecha de la factura:{CurrentTime}",
                     foot_note = invoice.Number,
                     payment =  new PaymentPosEntity

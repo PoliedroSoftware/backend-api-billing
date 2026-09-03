@@ -42,24 +42,7 @@ namespace Poliedro.Billing.Application.DianResolution.Commands.UpdateDianResolut
                     .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
             });
 
-            When(x => !string.IsNullOrEmpty(x.Description), () =>
-            {
-                RuleFor(x => x.Description)
-                    .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldNotEmpty);
-            });
-
-            When(x => x.ResolutionFile != null, () =>
-            {
-                RuleFor(x => x.ResolutionFile)
-                    .NotEmpty().WithMessage(messageProvider.ErrorValidatorFieldNotEmpty)
-                    .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
-            });
-
-            When(x => x.CreationDate != default, () =>
-            {
-                RuleFor(x => x.CreationDate)
-                    .NotNull().WithMessage(messageProvider.ErrorValidatorFieldNotNull);
-            });
+            
 
             When(x => x.VigencyMonth != 0, () =>
             {
@@ -80,11 +63,7 @@ namespace Poliedro.Billing.Application.DianResolution.Commands.UpdateDianResolut
                     .IsInEnum().WithMessage(messageProvider.ErrorValidatorResolutionTypeValid);
             });
 
-            When(x => x.ClientBillingElectronicId != default, () =>
-            {
-                RuleFor(x => x.ClientBillingElectronicId)
-                    .GreaterThan(0).WithMessage(messageProvider.ErrorValidatorFieldGreatherThanZero);
-            });
+            
         }
     }
 }

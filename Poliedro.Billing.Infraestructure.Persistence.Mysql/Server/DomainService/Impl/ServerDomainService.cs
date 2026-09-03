@@ -1,12 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Poliedro.Billing.Application.Server.Dtos;
-using Poliedro.Billing.Application.Server.Errors;
 using Poliedro.Billing.Domain.Common.Pagination;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 using Poliedro.Billing.Domain.Server.DomainService;
 using Poliedro.Billing.Domain.Server.Entities;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
+
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
 
@@ -26,5 +23,5 @@ public class ServerDomainService(
         => getAllService.GetAllAsync(paginationParams);
 
     public Task<Result<ServerEntity, Error>> GetByIdAsync(int id)
-        => getByIdService.GetByIdAsync(id);
+        => getByIdService.GetByIdAsync(id, CancellationToken.None);
 }

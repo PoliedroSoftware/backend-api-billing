@@ -21,14 +21,14 @@ public class UpdateCurrentlyNumberService(
                 return;
             }
 
-            var currentlyNumber = resolutionResult.Value.CurrentlyNumber;
+            var currentlyNumber = resolutionResult.Value.CurrentRange;
 
             if (currentlyNumber < Parameters.Invoice)
             {
                 await using var Connection = new MySqlConnection(configuration.GetConnectionString("MysqlConnection"));
                 await Connection.OpenAsync(cancellationToken);
 
-                var Sql = @"UPDATE dian_resolution SET currently_number = @NewNumber, currently_date = @NewDate WHERE resolutionid = @ResolutionId";
+                var Sql = @"UPDATE dian_resolution_billing SET current_number = @NewNumber, date_current = @NewDate WHERE resolution_id = @ResolutionId";
                 await using var command = new MySqlCommand(Sql, Connection);
                 command.Parameters.AddWithValue("@NewNumber", Parameters.Invoice);
                 command.Parameters.AddWithValue("@NewDate", Parameters.CurrentlyDate);
@@ -40,7 +40,7 @@ public class UpdateCurrentlyNumberService(
             }
             else
             {
-                Console.WriteLine($"No update needed. Current currently_number ({currentlyNumber}) is greater or equal to new invoice ({Parameters.Invoice}).");
+                Console.WriteLine($"No update needed. Current current_number ({currentlyNumber}) is greater or equal to new invoice ({Parameters.Invoice}).");
             }
 
             if (Parameters.Expirated)
@@ -48,7 +48,7 @@ public class UpdateCurrentlyNumberService(
                 await using var Connection = new MySqlConnection(configuration.GetConnectionString("MysqlConnection"));
                 await Connection.OpenAsync(cancellationToken);
 
-                var Sql = @"UPDATE dian_resolution SET expirated = 1 WHERE resolutionid = @ResolutionId";
+                var Sql = @"UPDATE dian_resolution_billing SET expirated = 1 WHERE resolution_id = @ResolutionId";
                 await using var command = new MySqlCommand(Sql, Connection);
                 command.Parameters.AddWithValue("@ResolutionId", Parameters.ResolutionId);
 

@@ -1,88 +1,146 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.DomainService;
-using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using Poliedro.Billing.Domain.CompanyProvider.DomainService;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.Resolution.DomainService;
+using Poliedro.Billing.Domain.Resolution.Entities;
+
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;
+
 public class CreateBillingHandler(
-    IClientDomainService _clientDomainService,
+    IDianResolutionGetByIdService _dianResolutionGetByIdService,
+    ICompanyProviderGetByIdService _companyProviderGetByIdService,
     IGetProcessorBilling _createBillingFactory,
     IBillingSenderFactory _billingSenderFactory,
     IBillingResponseApi _billingResponseApi,
-    IBillingGetInfoClient _billingGetInfoClient,
-    IMapper mapper
-    ) : IRequestHandler<CreateBillingCommand, IEnumerable<CreateBillingResultDTO>>
+    IMapper mapper,
+    ILogger<CreateBillingHandler> _logger
+    ) : IRequestHandler<CreateBillingCommand, CreateBillingCommandResult>
 {
-    public async Task<IEnumerable<CreateBillingResultDTO>> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
+    public async Task<CreateBillingCommandResult> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
     {
-        // DTOs de entrada a CreateBilling
+        if (request.Invoices is null)
+        {
+            return CreateBillingCommandResult.BadRequest("El campo 'data' del cuerpo de la petición es obligatorio.");
+        }
+
+        var resolution = await _dianResolutionGetByIdService.GetByIdAsync(request.Id, cancellationToken);
+
+        if (resolution is null || resolution.Value is null)
+        {
+            _logger.LogWarning("Resolución {ResolutionId} no encontrada.", request.Id);
+            return CreateBillingCommandResult.NotFound($"No se encontró la resolución {request.Id}.");
+        }
+
+        DianResolutionEntity resolutionEntity = resolution.Value;
+
+        var companyProvider = await _companyProviderGetByIdService.GetCompanyProviderByIdAsync(resolutionEntity.CompanyProviderId, cancellationToken);
+
+        if (companyProvider is null)
+        {
+            _logger.LogWarning("Company provider {CompanyProviderId} de la resolución {ResolutionId} no encontrado.",
+                resolutionEntity.CompanyProviderId, request.Id);
+            return CreateBillingCommandResult.NotFound($"No se encontró el company provider {resolutionEntity.CompanyProviderId} de la resolución {request.Id}.");
+        }
+
+        if (string.IsNullOrWhiteSpace(companyProvider.ApiKey))
+        {
+            _logger.LogWarning("Company provider {CompanyProviderId} sin ApiKey configurada.",
+                companyProvider.CompanyProviderId);
+            return CreateBillingCommandResult.BadRequest($"El company provider {companyProvider.CompanyProviderId} no tiene una ApiKey configurada.");
+        }
+
+        _logger.LogInformation("Iniciando emisión de {Count} facturas para la resolución {ResolutionId} (provider {ProviderId}).",
+            request.Invoices.Count(), request.Id, companyProvider.ProviderId);
+
         var billingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
 
-        var clientResult = await _clientDomainService.GetByIdAsync(request.ApiKey, cancellationToken);
+        ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(resolutionEntity.ResolutionType, (ProviderType)companyProvider.ProviderId);
 
-        if (!clientResult.IsSuccess || clientResult.Value is null)
-        Console.WriteLine($"No Found Client Billing");
+        IEnumerable<(Domain.Billing.CreateBilling Billing, object Output)> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, resolutionEntity, companyProvider, cancellationToken);
 
-        ClientEntity client = clientResult.Value;
-        //datos de la persistencia 
-        var InfoClient = await _billingGetInfoClient.BillingInfoClient(client, cancellationToken);
-
-        // obtener el proceso de construcción 
-        ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(InfoClient.TypeResolution, InfoClient.Provider);
-
-        // Obtnemos un o una lista de objeto, tupla y validación de facturas
-        IEnumerable<(Domain.Billing.CreateBilling Billing, object Output)> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, InfoClient,  cancellationToken);
-
-        IEnumerable<Domain.Billing.CreateBilling> billingEntitiesProcessed = processedInvoices.Select(p => p.Billing);
-        IEnumerable<object> outputEntitiesProcessed = processedInvoices.Select(p => p.Output);
-
-        // Obtener el sender correcto
-        IBillingSender sender = _billingSenderFactory.Resolve(InfoClient.Provider, InfoClient.TypeResolution);
+        IBillingSender sender = _billingSenderFactory.Resolve((ProviderType)companyProvider.ProviderId, resolutionEntity.ResolutionType);
 
         var billingResults = new List<CreateBillingResultDTO>();
 
-        
         foreach (var processed in processedInvoices)
         {
             var invoiceRequest = new PlemsiInvoiceRequest
             {
-                ApiKey = request.ApiKey,
-                Invoices = new List<object> { processed.Output } 
+                DianResolutionEntity = resolutionEntity,
+                CompanyProviderEntity = companyProvider,
+                Invoices = [processed.Output]
             };
 
-            var responses = await sender.SendAsync(invoiceRequest, InfoClient, cancellationToken);
+            var responses = await sender.SendAsync(invoiceRequest, cancellationToken);
             var result = responses.FirstOrDefault();
 
-            if (result is not null)
+            if (result is null)
             {
-                if (result.Success)
+                _logger.LogWarning("No se recibió respuesta del proveedor para la factura {Number} de la resolución {ResolutionId}.",
+                    processed.Billing.Number, request.Id);
+                billingResults.Add(new CreateBillingResultDTO
                 {
-                   
+                    Status = false,
+                    Message = "No se recibió respuesta del proveedor para la factura.",
+                    Data = null
+                });
+                continue;
+            }
+
+            if (result.Success)
+            {
+                try
+                {
                     await _billingResponseApi.IBillingResponseApi(
                         new List<ApiResponseFERetailPos> { result },
                         new List<Domain.Billing.CreateBilling> { processed.Billing },
+                        resolutionEntity,
+                        companyProvider,
                         cancellationToken
                     );
-                }
-                else
-                {
-                    Console.WriteLine($"Factura fallida: {result.Info}");
-                }
 
-                billingResults.Add(new CreateBillingResultDTO
+                    _logger.LogInformation("Factura {Number} emitida y persistida para la resolución {ResolutionId}.",
+                        processed.Billing.Number, request.Id);
+                }
+                catch (Exception ex)
                 {
-                    Status = result.Success,
-                    Message = result.Success ? "Factura procesada exitosamente" : result.Info,
-                    Data = null
-                });
+                    _logger.LogError(ex, "Error al persistir la factura {Number} de la resolución {ResolutionId}.",
+                        processed.Billing.Number, request.Id);
+                    billingResults.Add(new CreateBillingResultDTO
+                    {
+                        Status = false,
+                        Message = $"La factura fue emitida pero falló la persistencia local: {ex.Message}",
+                        Data = null
+                    });
+                    continue;
+                }
             }
+            else
+            {
+                _logger.LogWarning("Factura {Number} rechazada por el proveedor: {Info}",
+                    processed.Billing.Number, result.Info);
+            }
+
+            billingResults.Add(new CreateBillingResultDTO
+            {
+                Status = result.Success,
+                Message = result.Success ? "Factura procesada exitosamente" : (result.Info ?? "El proveedor rechazó la factura"),
+                Data = null
+            });
         }
 
-        return billingResults;
+        int successCount = billingResults.Count(r => r.Status);
+        _logger.LogInformation("Emisión completada para la resolución {ResolutionId}: {SuccessCount}/{TotalCount} facturas procesadas.",
+            request.Id, successCount, billingResults.Count);
 
+        return CreateBillingCommandResult.Ok(billingResults);
     }
 }

@@ -15,7 +15,7 @@ public class InvoicePosService : IInvoicePos
         try
         {
             await connection.OpenAsync(cancellationToken);
-            string query = $"SELECT v.* FROM v_api_invoice v LEFT JOIN invoice_success i ON v.Resolution = i.verify WHERE i.verify IS NULL AND v.date >= {client.Date.ToShortDateString()} and resolutionType= 'POS' ORDER BY v.number DESC;";
+            string query = $"SELECT v.* FROM v_api_invoice v LEFT JOIN invoice_success i ON v.Resolution = i.verify WHERE i.verify IS NULL AND v.date >=  and resolutionType= 'POS' ORDER BY v.number DESC;";
             MySqlCommand command = new(query, connection);
             using MySqlDataReader reader = command.ExecuteReader();
             while (reader.Read())

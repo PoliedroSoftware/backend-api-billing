@@ -12,13 +12,16 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selec
 
 public class BillingSenderPOS(
     IConfiguration config,
-    IInvoiceLastPos _getLastInvoiceBilling
+    IInvoiceLastPos _getLastInvoiceBilling,
+    IHttpClientFactory _httpClientFactory
     ) : IBillingSender
 
 {
-    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient clientInfo, CancellationToken cancellationToken)
+    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
+
+        using var client = _httpClientFactory.CreateClient();
 
         foreach (var invoice in request.Invoices)
         {
@@ -26,7 +29,7 @@ public class BillingSenderPOS(
             {
                 InvoiceRequestPosDto? invoiceRequestDto = invoice as InvoiceRequestPosDto;  
 
-                int lastNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(clientInfo, cancellationToken);
+                int lastNumber = await _getLastInvoiceBilling.GetInvoiceLastAsync(request.DianResolutionEntity,request.CompanyProviderEntity, cancellationToken);
 
                 if (invoiceRequestDto.number < lastNumber)
                 {
@@ -37,9 +40,6 @@ public class BillingSenderPOS(
                 var jsonContent = JsonConvert.SerializeObject(invoiceRequestDto);
                 var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
-
                 var url = bool.Parse(config["Enviroment:Production"]!)
                     ? config["ApiPlemsi:PosUrl"]
                     : config["ApiPlemsiQa:PosUrl"];
@@ -48,6 +48,8 @@ public class BillingSenderPOS(
                 {
                     Content = stringContent
                 };
+                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.CompanyProviderEntity.ApiKey);
+
                 var response = await client.SendAsync(httpRequest, cancellationToken);
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
                 if (!response.IsSuccessStatusCode)

@@ -1,33 +1,34 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Poliedro.Billing.Application.NotifyResolution.Services;
+
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.BillingCreditNote.Ports;
+
 using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
-using Poliedro.Billing.Domain.InvoiceDetailElectronic.Ports;
+using Poliedro.Billing.Domain.CompanyProvider.DomainService;
+
 using Poliedro.Billing.Domain.InvoicePos.DomainService;
 using Poliedro.Billing.Domain.InvoicePos.DomainService.Impl;
 using Poliedro.Billing.Domain.InvoicePos.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
-using Poliedro.Billing.Domain.NotifyResolution.Services;
+
 using Poliedro.Billing.Domain.PdfInvoice.Service;
-using Poliedro.Billing.Domain.PedingInvoice.DomainPedingInvoice;
+
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.Resolution.DomainService;
 using Poliedro.Billing.Domain.Server.DomainService;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Client.DomainService.Impl;
+using Poliedro.Billing.Infraestructure.Persistence.Mysql.CompanyProvider.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Context;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.DianResolution.DomainService.Impl;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.DianResolutionCreditNote.DomineService.Impl;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoiceDetailElectronic.DomainService.Impl;
+
+
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicePos;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.PedingInvoice.DomainPedingInvoice.Impl;
-using Poliedro.Billing.Infraestructure.Persistence.Mysql.ReferenceCreditNote.DomainService.Impl;
+
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
 
 
@@ -49,11 +50,16 @@ public static class DependencyInjectionService
         services.AddScoped<IClientUpdateService, ClientUpdateService>();
         services.AddScoped<IClientGetAllService, ClientGetAllService>();
         services.AddScoped<IClientGetByIdService, ClientGetByIdService>();
-        services.AddScoped<IClientGetByTokenService, ClientGetByTokenService>();
         services.AddScoped<IClientDeleteService, ClientDeleteService>();
         
         // Composite service that implements IClientDomainService
-        services.AddTransient<IClientDomainService, ClientBillingDomainService>();
+        services.AddScoped<IClientDomainService, ClientBillingDomainService>(); // de Transient a Scoped
+
+        // Company Provider services - specialized implementations
+        services.AddScoped<ICompanyProviderGetByIdService, CompanyProviderGetByIdSevice>(); // existente viejo 
+        services.AddScoped<ICompanyProviderCreateService, CompanyProviderCreateService>();   //  agregado
+        services.AddScoped<ICompanyProviderUpdateService, CompanyProviderUpdateService>();   //  agregado
+        services.AddScoped<ICompanyProviderDeleteService, CompanyProviderDeleteService>();   //  agregado
 
         // DianResolution services - specialized implementations
         services.AddScoped<IDianResolutionExistsService, DianResolutionExistsService>();
@@ -81,14 +87,11 @@ public static class DependencyInjectionService
         services.AddTransient<IInvoicePosDomainService, InvoicePosDomainService>();
         services.AddTransient<IInvoicePosRepository, InvoicePosRepository>();
 
-        services.AddTransient<IPedingInvoiceDomainPedingInvoice, PedingInvoiceDomainPedingInvoice>();
 
         services.AddScoped<IPdfInvoiceService, PdfInvoiceService>();
 
  
-        services.AddScoped<INotifyResolutionAlertService, NotifyResolutionAlertService>();
 
-        services.AddScoped<IInvoiceElectronicRepository, InvoiceDetailElectronicService>();
 
         //services.AddTransient<IInvoicesPendingWithDetailsRepository,InvoicesPendingWithDetailsFERepository>();
 
@@ -100,15 +103,7 @@ public static class DependencyInjectionService
         services.AddTransient<IPrepareItemBilling, PrepareItemElectronic>();
         services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
 
-        //services.AddTransient<IGetLastInvoiceBilling>();
-        services.AddScoped<IDianResolutionCreditNote, DianResolutionCreditNoteDomainService>();
 
-        services.AddTransient<IGetInvoiceReferenceCreditNotePlemsi, GetInvoiceReferenceCreditNotePlemsi>();
-
-        services.AddTransient<IInsertCreditNoteRepository, InsertCreditNotePlemsiRepository>();
-        services.AddTransient<IUpdateCurrentlyNumberCreditNote, UpdateCurrentlyNumberCreditNote>();
-
-        services.AddTransient<IResponsesPlemsiCreditNoteRepository, ResponsesPlemsiCreditNoteRepository>();
 
 
         return services;

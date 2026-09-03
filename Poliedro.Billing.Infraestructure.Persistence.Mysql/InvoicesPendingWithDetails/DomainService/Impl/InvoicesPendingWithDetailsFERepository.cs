@@ -1,24 +1,23 @@
 using MySqlConnector;
 using Poliedro.Billing.Domain.Billing;
-using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
+using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 
-public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetailsStrategy
+public class InvoicesPendingWithDetailsFERepository(IDatabaseUtils databaseUtils) : IInvoicesPendingWithDetailsStrategy
 {
     public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
-    ServerEntity server,
-    ClientEntity clientItem,
-    IDatabaseUtils databaseUtils,
+    ServerEntity _server,
+    DianResolutionEntity _dianResolutionEntity,
     CancellationToken cancellationToken)
     {
         var invoicesMap = new Dictionary<int, CreateBilling>();
-        using MySqlConnection connection = new(databaseUtils.GetConnectionString(server));
+        using MySqlConnection connection = new(databaseUtils.GetConnectionString(_server));
 
         try
         {
@@ -54,12 +53,12 @@ v.custom_field2,
             WHERE i.verify IS NULL
               AND v.transaction_date >= @date
               AND v.totalToPay <> 0"
-                + ((Automatic)clientItem.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
+                + ((Automatic)_dianResolutionEntity.Automatic == Automatic.No ? " AND v.send_dian = 1 " : "")
                 + " ORDER BY v.id ASC";
 
             using (var cmdInvoices = new MySqlCommand(invoicesQuery, connection))
             {
-                cmdInvoices.Parameters.AddWithValue("@date", clientItem.Date.ToString("yyyy-MM-dd"));
+                cmdInvoices.Parameters.AddWithValue("@date", _dianResolutionEntity.ResolutionDate.ToString("yyyy-MM-dd"));
 
                 using var reader = await cmdInvoices.ExecuteReaderAsync(cancellationToken);
                 while (await reader.ReadAsync(cancellationToken))
@@ -111,18 +110,18 @@ v.custom_field2,
                 }
             }
 
-           
+
             if (invoicesMap.Count == 0)
                 return invoicesMap.Values.ToList();
 
-       
+
             var invoiceIds = invoicesMap.Keys.ToList();
             const int chunkSize = 1000;
             for (int i = 0; i < invoiceIds.Count; i += chunkSize)
             {
                 var chunk = invoiceIds.Skip(i).Take(chunkSize).ToList();
 
-              
+
                 var paramNames = chunk.Select((id, idx) => $"@id{idx}").ToList();
                 string inClause = string.Join(", ", paramNames);
 
@@ -145,7 +144,7 @@ v.custom_field2,
                     d.unit_price
                 FROM v_invoice_detail d
                 WHERE d.transaccion IN ({inClause})
-                ORDER BY d.transaccion, d.id ASC"; 
+                ORDER BY d.transaccion, d.id ASC";
 
                 using var cmdDetails = new MySqlCommand(detailsQuery, connection);
                 for (int j = 0; j < chunk.Count; j++)
@@ -160,7 +159,7 @@ v.custom_field2,
 
                     if (!invoicesMap.TryGetValue(transaccion, out var invoice))
                     {
-                        
+
                         continue;
                     }
 
@@ -191,7 +190,7 @@ v.custom_field2,
         }
         catch (Exception ex)
         {
-            throw new Exception("Error connecting to the database", ex);
+            throw new Exception($"Error connecting to the database for resolution {_dianResolutionEntity.ResolutionId} and server {_server.ServerId} ({_server.Ip}/{_server.DatabaseName})", ex);
         }
     }
 
