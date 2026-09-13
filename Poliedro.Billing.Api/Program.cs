@@ -29,6 +29,7 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Api.Observability;
 using Scalar.AspNetCore;
+using Poliedro.Billing.Infrastructure.Providers;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -69,6 +70,7 @@ builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSend
     return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS(concrete, metrics, logger);
 });
 
+builder.Services.AddBillingProviders();
 
 builder.Services.AddRouting(routing => routing.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();

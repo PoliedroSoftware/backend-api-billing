@@ -41,6 +41,7 @@
     <PackageReference Include="KubernetesClient" Version="15.0.1" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.Siigo\Poliedro.Billing.Infraestructure.External.Siigo.csproj" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.Persistence.Mysql\Poliedro.Billing.Infraestructure.Persistence.Mysql.csproj" />
+    <ProjectReference Include="..\Poliedro.Billing.Infrastructure.Providers\Poliedro.Billing.Infrastructure.Providers.csproj" />
   </ItemGroup>
 
 </Project>

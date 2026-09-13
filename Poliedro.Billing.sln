@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poliedro.Billing.Infraestru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Poliedro.Billing.Infrastructure.Providers", "Poliedro.Billing.Infrastructure.Providers\Poliedro.Billing.Infrastructure.Providers.csproj", "{A5392D76-4CA0-4CC7-B329-EAB32C54073B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Providers", "Providers", "{27CACCD9-9D8A-464A-9804-89AB2316D439}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adapter", "Adapter", "{27CACCD9-9D8A-464A-9804-89AB2316D439}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

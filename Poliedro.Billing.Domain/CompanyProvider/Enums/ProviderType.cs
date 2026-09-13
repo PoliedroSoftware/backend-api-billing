@@ -3,6 +3,6 @@
 public enum ProviderType
 {
     PLEMSI = 1,
-    SIIGO = 2,
-    TNS = 3
+    SIIGO = 3,
+    TNS = 2
 }

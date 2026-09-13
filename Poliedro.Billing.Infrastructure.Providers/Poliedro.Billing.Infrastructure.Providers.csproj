@@ -6,10 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Adapter\TNS\" />
-    <Folder Include="Adapter\Siigo\" />
-    <Folder Include="Adapter\Plemsi\" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Poliedro.Billing.Domain\Poliedro.Billing.Domain.csproj" />
+		<ProjectReference Include="..\Poliedro.Billing.Infraestructure.Persistence.Mysql\Poliedro.Billing.Infraestructure.Persistence.Mysql.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Poliedro.Billing.Application\Poliedro.Billing.Application.csproj" />
+		<ProjectReference Include="..\Poliedro.Billing.Domain\Poliedro.Billing.Domain.csproj" />
+	</ItemGroup>
 
 </Project>
