@@ -6,13 +6,13 @@ using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Resolution.Enums;
 
-namespace Poliedro.Billing.Infrastructure.Providers.Providers.Siigo;
+namespace Poliedro.Billing.Infrastructure.Providers.Providers.Plemsi;
 
-public class SiigoBillingProvider : IBillingProvider
+internal class PlemsiBillingPOSProvider : IBillingProvider
 {
     public bool CanHandle(ProviderType provider, ResolutionType resolutionType)
     {
-        return provider == ProviderType.SIIGO;
+        return provider == ProviderType.PLEMSI && resolutionType == ResolutionType.POS;
     }
 
     public Task<ProviderBillingResult> ProcessAsync(IEnumerable<CreateBilling> invoices, DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)

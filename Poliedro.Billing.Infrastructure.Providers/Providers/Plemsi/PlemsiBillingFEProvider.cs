@@ -8,11 +8,11 @@ using Poliedro.Billing.Domain.Resolution.Enums;
 
 namespace Poliedro.Billing.Infrastructure.Providers.Providers.Plemsi;
 
-public class PlemsiBillingProvider : IBillingProvider
+public class PlemsiBillingFEProvider : IBillingProvider
 {
     public bool CanHandle(ProviderType provider, ResolutionType resolutionType)
     {
-        return provider == ProviderType.PLEMSI;
+        return provider == ProviderType.PLEMSI && resolutionType == ResolutionType.FE;
     }
 
     public Task<ProviderBillingResult> ProcessAsync(IEnumerable<CreateBilling> invoices, DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)

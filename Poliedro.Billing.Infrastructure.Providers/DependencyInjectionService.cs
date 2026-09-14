@@ -12,9 +12,9 @@ public static  class DependencyInjectionService
     public static IServiceCollection AddBillingProviders(this IServiceCollection services)
     {
         services.AddScoped<IBillingProviderFactory, BillingProviderFactory>();
-        services.AddScoped<IBillingProvider, PlemsiBillingProvider>();
-        services.AddScoped<IBillingProvider, SiigoBillingProvider>();
-        services.AddScoped<IBillingProvider, TNSBillingProvider>();
+        services.AddScoped<IBillingProvider, PlemsiBillingFEProvider>();
+        services.AddScoped<IBillingProvider, SiigoBillingFEProvider>();
+        services.AddScoped<IBillingProvider, TNSBillingFEProvider>();
 
 
         return services;
