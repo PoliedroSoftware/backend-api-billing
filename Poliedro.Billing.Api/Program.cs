@@ -130,6 +130,14 @@ builder.Services.AddSingleton<IMessageProvider, MessageProvider>();
 builder.Services.AddHealthChecks()
     .AddMySql(builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
+// Configure Kestrel before building the app to avoid modifying the service collection after build
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // Listen HTTP on 5003 and HTTPS on 5004 to match launchSettings.json
+    options.ListenLocalhost(5003);
+    options.ListenLocalhost(5004, listenOptions => listenOptions.UseHttps());
+});
+
 var app = builder.Build();
 
 // Observability: Prometheus HTTP metrics middleware
@@ -195,7 +203,7 @@ app.MapScalarApiReference(options =>
     options
         .WithTitle("Poliedro Billing API")
         .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
-        .WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json");
+        .WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json"); // ...antes en el código
 });
 
 app.Run();
