@@ -1,4 +1,5 @@
-﻿using Poliedro.Billing.Domain.Billing.Ports;
+﻿using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi.TypeTax;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling
@@ -29,17 +30,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                         AllowanceCharges = new(),
                         WithHoldingTaxTotal = new(),
 
-                        TaxTotals = new()
-                        {
-                            new TaxTotalEntity
-                            {
-                                TaxId = 1,         
-                                Percent = 0,
-                                TaxAmount = 0,
-                                TaxableAmount = 0
-                            }
-                        },
-
+                    
                         Description = $"{item.Description} (ENTREGA GRATUITA)",
                         Notes = string.IsNullOrWhiteSpace(item.Notes)
                         ? "Description"
@@ -48,7 +39,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                         TypeItemIdentificationId = 1,
 
                         
-                        PriceAmount = Math.Round((double)item.UnitPriceBeforeDiscount, 2),
+                        PriceAmount = (double)item.UnitPriceBeforeDiscount,
                         BaseQuantity = item.BaseQuantity
                     });
 
@@ -73,20 +64,20 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                         AllowanceChargeReason = "Discount",
                         MultiplierFactorNumeric = (decimal)multiplierFactor,
                         Amount = (decimal)DiscountAmount,
-                        BaseAmount = Math.Round((decimal)subtotal, 2, MidpointRounding.AwayFromZero)
+                        BaseAmount = (decimal)subtotal
                     });
                 }
 
                 
-                double taxableAmount = Math.Round(item.UnitPrice * item.InvoicedQuantity, 2, MidpointRounding.AwayFromZero);
-                double taxAmount = Math.Round(taxableAmount * (item.Percent / 100), 2, MidpointRounding.AwayFromZero);
+                double taxableAmount = item.UnitPrice * item.InvoicedQuantity;
+                double taxAmount = taxableAmount * (item.Percent / 100) ;
 
 
                 var taxTotals = new List<TaxTotalEntity>
             {
                 new TaxTotalEntity
                 {
-                       TaxId = 1,
+                       TaxId = PlemsiTaxMapping.GetPlemsiId(item.TaxTotals?.FirstOrDefault()?.TaxId ?? 18),
                         Percent = item.Percent,
                         TaxAmount = taxAmount,
                         TaxableAmount = taxableAmount
@@ -109,7 +100,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                     : item.Notes,
                     Code = item.Code,
                     TypeItemIdentificationId = 1,
-                    PriceAmount = Math.Round(item.PriceAmount, 2, MidpointRounding.AwayFromZero),
+                    PriceAmount = item.PriceAmount,
                     BaseQuantity = item.BaseQuantity,
                 };
 

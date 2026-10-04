@@ -77,22 +77,22 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     double invoiceBaseTotal = invoice.ItemElectronicEntity.Sum(i => (double)i.LineExtensionAmount);
                     double allowanceTotal = 0;
                     double invoiceTaxExclusiveTotal = invoiceBaseTotal;
-                    double totalTaxes = Math.Round(invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0)), 2, MidpointRounding.AwayFromZero);
-                    double invoiceTaxInclusiveTotal = Math.Round(invoiceBaseTotal + totalTaxes, 2, MidpointRounding.AwayFromZero);
+                    double totalTaxes = invoice.ItemElectronicEntity.Sum(i => (double)(i.TaxTotals?.Sum(t => (double)t.TaxAmount) ?? 0.0));
+                    double invoiceTaxInclusiveTotal = invoiceBaseTotal + totalTaxes;
 
 
                     if (globalDiscount > 0)
                     {
-                        allowanceTotal += Math.Round(globalDiscount, 2);
+                        allowanceTotal += globalDiscount;
                     }
 
 
-                    invoiceBaseTotal = Math.Round(invoiceBaseTotal, 2, MidpointRounding.AwayFromZero);
+                    invoiceBaseTotal = invoiceBaseTotal;
 
 
-                    double totalToPay = invoiceTaxInclusiveTotal - Math.Round(globalDiscount, 2);
+                    double totalToPay = invoiceTaxInclusiveTotal - globalDiscount;
 
-                    allowanceTotal = Math.Round(allowanceTotal, 2, MidpointRounding.AwayFromZero);
+                    allowanceTotal = allowanceTotal;
 
                     if (totalToPay <= 0)
                     {
@@ -148,7 +148,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     double discountPercent = invoiceBaseTotal > 0 && globalDiscount > 0
                         ? (globalDiscount / invoiceBaseTotal) * 100
                         : 0;
-                    double roundedDiscountPercent = Math.Round(discountPercent, 2);
+                    double roundedDiscountPercent = discountPercent;
 
 
                     FERetailelectronicEntity data = new()
@@ -202,7 +202,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                                 AllowanceChargeReason = "Commercial Discount",
                                 AllowancePercent = roundedDiscountPercent,
                                 MultiplierFactorNumeric = roundedDiscountPercent > 0 ? 1 : 0,
-                                Amount = Math.Round((decimal)globalDiscount, 2),
+                                Amount = (decimal)globalDiscount,
                                 BaseAmount = (decimal)invoiceBaseTotal
                             }
                         }
@@ -219,7 +219,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
 
                         allowanceTotal = allowanceTotal,
                         invoiceBaseTotal = invoiceBaseTotal,
-                        invoiceTaxExclusiveTotal = Math.Round(invoiceTaxExclusiveTotal, 1),
+                        invoiceTaxExclusiveTotal = invoiceTaxExclusiveTotal,
                         invoiceTaxInclusiveTotal = invoiceTaxInclusiveTotal,
                         totalToPay = totalToPay,
 

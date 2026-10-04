@@ -6,6 +6,7 @@ using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
+using TaxTotalEntity = Poliedro.Billing.Domain.FERetail.Entity.TaxTotalEntity;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
 
@@ -31,12 +32,12 @@ public class InvoicesPendingWithDetailsFERepository : IInvoicesPendingWithDetail
                 v.contact_name,
                 v.email,
                 v.mobile,
-v.address_line_1,
+                v.address_line_1,
                 v.city,
                 v.state,
                 v.country,
-v.custom_field1,
-v.custom_field2,
+                v.custom_field1,
+                v.custom_field2,
                 v.invoice,
                 v.payment_status,
                 v.transaction_date,
@@ -142,7 +143,8 @@ v.custom_field2,
                     d.line_discount_type,
                     d.percent,
                     d.tax_amount,
-                    d.unit_price
+                    d.unit_price,
+                    d.tax_id
                 FROM v_invoice_detail d
                 WHERE d.transaccion IN ({inClause})
                 ORDER BY d.transaccion, d.id ASC"; 
@@ -180,7 +182,20 @@ v.custom_field2,
                         LineDiscountType = readerDetails["line_discount_type"]?.ToString(),
                         Percent = readerDetails.IsDBNull(readerDetails.GetOrdinal("percent")) ? 0.0 : readerDetails.GetDouble("percent"),
                         TaxAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_amount")) ? 0.0 : readerDetails.GetDouble("tax_amount"),
-                        UnitPrice = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price")) ? 0.0 : readerDetails.GetDouble("unit_price")
+                        UnitPrice = readerDetails.IsDBNull(readerDetails.GetOrdinal("unit_price")) ? 0.0 : readerDetails.GetDouble("unit_price"),
+                        TaxTotals = !readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_id"))
+                            ? new List<TaxTotalEntity>
+                            {
+                                new TaxTotalEntity
+                                {
+                                    TaxId = readerDetails.GetInt32("tax_id"),
+                                    Percent = readerDetails.IsDBNull(readerDetails.GetOrdinal("percent")) ? 0.0 : readerDetails.GetDouble("percent"),
+                                    TaxAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("tax_amount")) ? 0.0 : readerDetails.GetDouble("tax_amount"),
+                                    TaxableAmount = readerDetails.IsDBNull(readerDetails.GetOrdinal("line_extension_amount")) ? 0.0 : readerDetails.GetDouble("line_extension_amount")
+                                }
+                            }
+                            : new List<TaxTotalEntity>()
+
                     };
 
                     invoice.ItemElectronicEntity!.Add(item);
