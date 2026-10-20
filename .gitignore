@@ -481,3 +481,11 @@ global.json
 /.sonarqube/**
 /sonarqubecoverage/*
 *.http
+
+
+# IA 
+.ia/
+
+.idea/
+
+AGENTS.md

@@ -1,4 +1,5 @@
-﻿using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Enums;
+﻿
+using Poliedro.Billing.Domain.Resolution.Enums;
 
 namespace Poliedro.Billing.Domain.InvoicesPendingWithDetails.Ports;
 

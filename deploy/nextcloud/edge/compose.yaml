@@ -1,0 +1,19 @@
+name: poliedro-edge
+services:
+  proxy:
+    image: ${CADDY_IMAGE:?Set the reviewed image digest}
+    restart: unless-stopped
+    network_mode: host
+    mem_limit: 192m
+    env_file:
+      - path: ./.secrets/proxy.env
+        format: raw
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./data:/data
+      - ./config:/config
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"

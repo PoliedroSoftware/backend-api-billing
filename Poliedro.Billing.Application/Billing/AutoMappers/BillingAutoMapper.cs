@@ -14,7 +14,7 @@ public class BillingAutoMapper : Profile
     public BillingAutoMapper()
     {
         CreateMap<CreateBilling, CreateBillingDTO>();//output
-        CreateMap<CreateBillingInputDTO,CreateBilling>();//intput
+        CreateMap<CreateBillingDTO, CreateBilling>();//intput
 
 
         CreateMap<SoftwareManufacturerEntity, SoftwareManufacturerDTO>().ReverseMap();

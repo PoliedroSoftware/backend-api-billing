@@ -14,7 +14,6 @@ public class DianResolutionMapper : Profile
         .ForMember(dest => dest.ResolutionId, opt => opt.Ignore());
         CreateMap<UpdateDianResolutionCommand, DianResolutionEntity>();
         CreateMap<DianResolutionEntity, DianResolutionDto>();
-        CreateMap<DianResolutionCreditNoteEntity, DianResolutionCreditNoteDTO>();
         CreateMap<DeleteDianResolutionCommand, DianResolutionEntity>();
     }
 }

@@ -16,17 +16,6 @@ public class ClientGetByIdService(DataBaseContext context, IClientExistsService 
             return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(id);
 
         return await context.ClientBillingElectronic
-            .Include(c => c.DianResolution)
-            .Include(c => c.Server)
-            .FirstAsync(c => c.ClientBillingElectronicId == id, cancellationToken);
-    }
-
-    public async Task<Result<ClientEntity, Error>> GetByIdAsync(string apiKey, CancellationToken cancellationToken)
-    {
-        return await context.ClientBillingElectronic
-            .Include(c => c.DianResolution)
-            .Include(c => c.Server)
-            .Where(c => c.Active == true)
-            .FirstAsync(c => c.ApiKey == apiKey, cancellationToken);
+            .FirstAsync(c => c.CompanyId == id, cancellationToken);
     }
 }

@@ -10,5 +10,4 @@ public class ServerDto
     public string DbUsername { get; set; } = default!;
     public string DbPassword { get; set; } = default!;
     public DateTime CreationDate { get; set; } = default!;
-    public List<ClientEntity> clients { get; set; } = [];
 }

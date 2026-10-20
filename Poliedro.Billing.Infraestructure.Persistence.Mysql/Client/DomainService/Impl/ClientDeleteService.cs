@@ -11,7 +11,7 @@ public class ClientDeleteService(DataBaseContext context) : IClientDeleteService
 {
     public async Task<Result<VoidResult, Error>> DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var entity = await context.ClientBillingElectronic.FirstOrDefaultAsync(x => x.ClientBillingElectronicId == id, cancellationToken);
+        var entity = await context.ClientBillingElectronic.FirstOrDefaultAsync(x => x.CompanyId == id, cancellationToken);
         if (entity == null)
             return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(id);
 

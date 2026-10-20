@@ -1,0 +1,48 @@
+name: poliedro-billing
+services:
+  mysql:
+    image: mysql:8.0.46
+    restart: unless-stopped
+    mem_limit: 512m
+    command: ["--innodb-buffer-pool-size=134217728", "--max-connections=60", "--performance-schema=OFF", "--mysqlx=OFF", "--event-scheduler=OFF"]
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root
+    ports: ["127.0.0.1:33306:3306"]
+    volumes:
+      - billing_mysql:/var/lib/mysql
+      - ./.secrets/mysql_root:/run/secrets/mysql_root:ro
+      - ./.secrets/init.sql:/docker-entrypoint-initdb.d/01-billing.sql:ro
+      - ./.secrets/mysql-admin.cnf:/run/secrets/mysql-admin.cnf:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "--defaults-extra-file=/run/secrets/mysql-admin.cnf", "ping", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    logging: {driver: json-file, options: {max-size: 10m, max-file: "3"}}
+  api:
+    image: ${BILLING_API_IMAGE:-poliedro-billing-api:latest}
+    build: {context: ., dockerfile: Dockerfile.api}
+    restart: unless-stopped
+    network_mode: host
+    mem_limit: 384m
+    env_file: ./.secrets/api.env
+    environment:
+      ASPNETCORE_URLS: http://127.0.0.1:15068
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on: {mysql: {condition: service_healthy}}
+    volumes: ["./.secrets/api-settings.json:/app/appsettings.json:ro"]
+    logging: {driver: json-file, options: {max-size: 10m, max-file: "3"}}
+  hangfire:
+    image: ${BILLING_HANGFIRE_IMAGE:-poliedro-billing-hangfire:latest}
+    build: {context: ., dockerfile: Dockerfile.hangfire}
+    restart: unless-stopped
+    network_mode: host
+    mem_limit: 256m
+    env_file: ./.secrets/hangfire.env
+    environment:
+      ASPNETCORE_URLS: http://127.0.0.1:15069
+      ASPNETCORE_ENVIRONMENT: Production
+    depends_on: {mysql: {condition: service_healthy}, api: {condition: service_started}}
+    logging: {driver: json-file, options: {max-size: 10m, max-file: "3"}}
+volumes:
+  billing_mysql:

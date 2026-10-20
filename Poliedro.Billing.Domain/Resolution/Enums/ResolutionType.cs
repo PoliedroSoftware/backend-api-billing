@@ -3,6 +3,8 @@
     public enum ResolutionType
     {
         FE,
-        POS
+        POS,
+        CreditNote,
+        DebitNote,
     }
 }

@@ -10,6 +10,4 @@ public class ServerEntity
     public string DbUsername { get; set; } = default!;
     public string DbPassword { get; set; } = default!;
     public uint Port { get; set; } = default!;
-
-    public ICollection<ClientEntity> clientsBillingElectronic { get; set; } = default!;
 }

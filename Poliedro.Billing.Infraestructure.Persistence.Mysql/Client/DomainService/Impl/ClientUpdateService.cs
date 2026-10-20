@@ -11,13 +11,13 @@ public class ClientUpdateService(DataBaseContext context, IClientExistsService e
 {
     public async Task<Result<VoidResult, Error>> UpdateAsync(ClientEntity clientBillingElectronicEntity, CancellationToken cancellationToken)
     {
-        if (!await existsService.EntityExists(clientBillingElectronicEntity.ClientBillingElectronicId, cancellationToken))
-            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(clientBillingElectronicEntity.ClientBillingElectronicId);
+        if (!await existsService.EntityExists(clientBillingElectronicEntity.CompanyId, cancellationToken))
+            return ClientBillingElectronicErrorBuilder.ClientBillingNotFoundException(clientBillingElectronicEntity.CompanyId);
 
         context.ClientBillingElectronic.Update(clientBillingElectronicEntity);
         var result = await context.SaveChangesAsync(cancellationToken) > 0;
         if (!result)
-            return ClientBillingElectronicErrorBuilder.ClientBillingUpdateException(clientBillingElectronicEntity.ClientBillingElectronicId);
+            return ClientBillingElectronicErrorBuilder.ClientBillingUpdateException(clientBillingElectronicEntity.CompanyId);
 
         return VoidResult.Instance;
     }

@@ -1,8 +1,11 @@
 ﻿using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.DomainService;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
+using Poliedro.Billing.Domain.Resolution.Entities;
+using Poliedro.Billing.Domain.Server.DomainService;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
@@ -10,43 +13,60 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
 public class BillingResponseApi(
     IInsertInvoiceFE _insertInvoiceFE,
     IUpdateCurrentlyNumber _updateCurrentlyNumber,
-    IClientDomainService _clientDomainService,
+    IServerGetByIdService _serverGetByIdService,
     IDatabaseUtils _databaseUtils
     ) : IBillingResponseApi
 {
-    public async Task IBillingResponseApi(List<ApiResponseFERetailPos> response, IEnumerable<CreateBilling> processedInvoices, CancellationToken cancellationToken)
+    public async Task IBillingResponseApi(List<ApiResponseFERetailPos> response,
+        IEnumerable<CreateBilling> _processedInvoices,
+        DianResolutionEntity _dianResolutionEntity,
+        CompanyProviderEntity _companyProviderEntity,
+        CancellationToken cancellationToken)
     {
-        var paired = response.Zip(processedInvoices, (resp, invoice) => new { resp, invoice });
+        var paired = response.Zip(_processedInvoices, (resp, invoice) => new { resp, invoice });
 
 
         foreach (var pair in paired)
         {
-            var customerInfo = await _clientDomainService.GetByIdAsync(pair.invoice.CustomerEntity.ApiKey, cancellationToken);
+            var connection = await _serverGetByIdService.GetByIdAsync(_companyProviderEntity.ServiceId, cancellationToken);
 
-            if (customerInfo == null)
+            if (connection.Value is null)
             {
-                Console.WriteLine($"Error Insert Invoice Success", customerInfo);
-                continue;
+                throw new InvalidOperationException(
+                    $"No se encontró el servidor {_companyProviderEntity.ServiceId} del company provider {_companyProviderEntity.CompanyProviderId}.");
             }
 
-            var connectionString = _databaseUtils.GetConnectionString(customerInfo.Value.Server);
+            var connectionString = _databaseUtils.GetConnectionString(connection.Value);
 
-            int NumberInvoice = int.Parse(pair.invoice.Numeration);
+            apiDataPos? responseData = pair.resp.Data;
+
+            if (responseData is null || responseData.Cude is null || responseData.QRCode is null)
+            {
+                throw new InvalidOperationException(
+                    $"La respuesta del proveedor para la factura {pair.invoice.Number} no incluye Cude/QRCode.");
+            }
+
+            if (!int.TryParse(pair.invoice.Numeration, out int NumberInvoice))
+            {
+                throw new InvalidOperationException(
+                    $"La numeración '{pair.invoice.Numeration}' de la factura {pair.invoice.Number} no es un número válido.");
+            }
+
             string CurrentlyDate = DateTime.Now.ToString();
             string LastedInvoiced = pair.invoice.Number;
 
             await _insertInvoiceFE.InsertInvoiceSucces(
                NumberInvoice,
-                pair.resp.Data.Cude!,
-                pair.resp.Data.QRCode!,
+                responseData.Cude,
+                responseData.QRCode,
                connectionString,
-               customerInfo.Value.ProviderId!,
-               customerInfo.Value.DianResolution.ClientBillingElectronicId,
+               (ProviderType)_companyProviderEntity.ProviderId,
+               _companyProviderEntity.CompanyId,
                pair.invoice.Number
                );
 
             await _updateCurrentlyNumber.UpdateCurrentlyNumberAsync(
-            new ParametersCurrentlyNumber(NumberInvoice, CurrentlyDate, customerInfo.Value.ResolutionId, LastedInvoiced),cancellationToken
+            new ParametersCurrentlyNumber(NumberInvoice, CurrentlyDate, _dianResolutionEntity.ResolutionId, LastedInvoiced),cancellationToken
             );
         }
 

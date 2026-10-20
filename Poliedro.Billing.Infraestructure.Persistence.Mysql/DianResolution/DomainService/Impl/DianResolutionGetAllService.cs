@@ -13,7 +13,6 @@ public class DianResolutionGetAllService(DataBaseContext context) : IDianResolut
     public async Task<Result<IEnumerable<DianResolutionEntity>, Error>> GetAllAsync(CancellationToken cancellationToken)
     {
         var entities = await context.DianResolution
-            .Include(c => c.clientsBillingElectronic)
             .Where(c => c.Active == true)
             .ToListAsync(cancellationToken);
 

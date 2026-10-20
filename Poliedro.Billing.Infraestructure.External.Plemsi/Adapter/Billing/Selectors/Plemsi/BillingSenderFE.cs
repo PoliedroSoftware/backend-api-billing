@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 using Poliedro.Billing.Domain.FERetail.Entity;
@@ -10,12 +9,15 @@ using System.Text;
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 public class BillingSenderFE(
     IConfiguration config,
-    IGetLastInvoiceBilling _getLastInvoiceBilling
+    IGetLastInvoiceBilling _getLastInvoiceBilling,
+    IHttpClientFactory _httpClientFactory
     ) : IBillingSender
 {
-    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, BillingInfoClient ClientInfo, CancellationToken cancellationToken)
+    public async Task<List<ApiResponseFERetailPos>> SendAsync(PlemsiInvoiceRequest request, CancellationToken cancellationToken)
     {
         var responses = new List<ApiResponseFERetailPos>();
+
+        using var client = _httpClientFactory.CreateClient();
 
         foreach (var invoice in request.Invoices)
         {
@@ -23,7 +25,7 @@ public class BillingSenderFE(
             {
                 SenderRequestFEDTO? senderRequestDTO = invoice as SenderRequestFEDTO;
 
-                int LastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(ClientInfo, cancellationToken);
+                int LastNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(request.DianResolutionEntity, request.CompanyProviderEntity, cancellationToken);
 
                 if (senderRequestDTO.number < LastNumber)
                 {
@@ -33,9 +35,6 @@ public class BillingSenderFE(
                var jsonContent = JsonConvert.SerializeObject(invoice);
                var stringContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.ApiKey);
-
                 var url = bool.Parse(config["Enviroment:Production"]!)
                 ? config["ApiPlemsi:FEUrl"]
                 : config["ApiPlemsiQa:FEUrl"];
@@ -44,6 +43,7 @@ public class BillingSenderFE(
                 {
                     Content = stringContent
                 };
+                httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", request.CompanyProviderEntity.ApiKey);
 
                 var response = await client.SendAsync(httpRequest, cancellationToken);
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -65,7 +65,7 @@ public class BillingSenderFE(
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Excepci�n procesando factura: {ex.Message}");
+                Console.WriteLine($"[ERROR] Excepción procesando factura: {ex.Message}");
                 continue;
             }
         }

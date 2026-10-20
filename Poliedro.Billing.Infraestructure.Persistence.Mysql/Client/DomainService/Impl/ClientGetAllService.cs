@@ -13,8 +13,6 @@ public class ClientGetAllService(DataBaseContext context) : IClientGetAllService
     public async Task<Result<IEnumerable<ClientEntity>, Error>> GetAllAsync(CancellationToken cancellationToken)
     {
         var entities = await context.ClientBillingElectronic
-            .Include(c => c.DianResolution)
-            .Include(c => c.Server)
             .Where(c => c.Active == true)
             .ToListAsync(cancellationToken);
 

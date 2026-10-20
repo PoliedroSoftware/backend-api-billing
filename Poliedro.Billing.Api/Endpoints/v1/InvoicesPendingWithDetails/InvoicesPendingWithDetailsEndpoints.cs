@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Poliedro.Billing.Api.Common.Helpers;
-using Poliedro.Billing.Application.Billing.Dtos;
+using Poliedro.Billing.Application.Common.Features;
 using Poliedro.Billing.Application.InvoicesPendingWithDetails.Queries.GetAllInvoicesPendingWithDetails;
 
 namespace Poliedro.Billing.Api.Endpoints.v1.InvoicesPendingWithDetails;
@@ -10,31 +9,42 @@ public static class InvoicesPendingWithDetailsEndpoints
 {
     public static RouteGroupBuilder MapInvoicesPendingWithDetailsEndpoints(this RouteGroupBuilder group)
     {
-        group.MapGet("/", GetAllAsync)
-            .WithName("GetInvoicesPendingWithDetails")
+        group.MapGet("/{id}", GetByResolutionId)
+            .WithName("GetInvoicesPendingById")
             .WithTags("InvoicesPendingWithDetails")
-            .WithSummary("Get pending invoices with details by Bearer token")
-            .WithDescription("Retrieves pending invoices with details based on Bearer token")
-            .Produces<IEnumerable<CreateBillingDTO>>(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .WithSummary("Get pending invoices with details by Id")
+            .WithDescription("Retrieves pending invoices with details based on Id")
+            .Produces<InvoicesPendingWithDetailsResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status500InternalServerError);
 
         return group;
     }
 
-    private static async Task<IResult> GetAllAsync(
-        HttpContext context,
-        IMediator mediator)
+    private static async Task<IResult> GetByResolutionId(
+        int id,
+        IMediator mediator,
+        ILoggerFactory loggerFactory)
     {
-        var token = TokenHelper.ExtractBearerToken(context.Request);
-        if (string.IsNullOrEmpty(token))
+        var logger = loggerFactory.CreateLogger("InvoicesPendingWithDetails");
+
+        try
+        {
+            var result = await mediator.Send(new InvoicesPendingWithDetailsQuery(id));
+
+            if (result is null)
+            {
+                return Results.NotFound(ResponseApiService.Response(StatusCodes.Status404NotFound));
+            }
+
+            return Results.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving pending invoices for resolution {ResolutionId}", id);
             return Results.Json(
-                "Authorization header is missing or invalid.",
-                statusCode: StatusCodes.Status401Unauthorized);
-
-        IEnumerable<CreateBillingDTO> invoicesPendingWithDetails = await mediator.Send(new InvoicesPendingWithDetailsQuery(ApiKey: token));
-
-        return Results.Ok(invoicesPendingWithDetails);
+                ResponseApiService.Response(StatusCodes.Status500InternalServerError, "An error occurred processing your request"),
+                statusCode: StatusCodes.Status500InternalServerError);
+        }
     }
 }
