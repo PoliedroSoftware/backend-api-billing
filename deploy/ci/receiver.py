@@ -127,6 +127,11 @@ def main():
             if len(set(names)) != len(names):
                 raise ValueError('Duplicate archive entries')
             tar.extractall(publish, members=members, filter='data')
+        # The deployment directory is private, but image contents must be readable
+        # by the non-root .NET app user. File-only archives create parent directories
+        # under our restrictive umask, so normalize those before Docker COPY.
+        for item in publish.rglob('*'):
+            item.chmod(0o755 if item.is_dir() else 0o644 | (item.stat().st_mode & 0o111))
         assert json.loads((publish / 'appsettings.json').read_text()) == {}
         assert json.loads((publish / 'release.json').read_text()) == {'component': component, 'revision': revision}
         entrypoint, variable, _ = SERVICES[component]

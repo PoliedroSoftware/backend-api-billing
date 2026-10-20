@@ -36,6 +36,7 @@ class ReceiverTests(unittest.TestCase):
                 'appsettings.json': b'{}',
                 'release.json': json.dumps({'component': 'api', 'revision': revision}).encode(),
                 'Poliedro.Billing.Api.dll': b'fake assembly for mocked deployment',
+                'runtimes/linux/native/library.so': b'fake native dependency',
             }.items():
                 member = tarfile.TarInfo(name)
                 member.size = len(content)
@@ -70,6 +71,8 @@ class ReceiverTests(unittest.TestCase):
             self.assertEqual(len(updates), 2)
             self.assertTrue(all(args[-1] == 'api' for args in updates))
             self.assertFalse((root / 'ci-state/api.json').exists())
+            native_dir = next((root / 'releases').glob('api/*/publish/runtimes/linux/native'))
+            self.assertEqual(native_dir.stat().st_mode & 0o777, 0o755)
 
     def test_restricted_key_rejects_arbitrary_shell_command(self):
         with patch.object(receiver.sys, 'argv', ['receiver.py', 'api']), \
