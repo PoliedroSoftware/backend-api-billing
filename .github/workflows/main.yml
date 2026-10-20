@@ -9,7 +9,8 @@ on:
     types: [closed]
     branches:
       - main
-      - 'release/*'          
+      - 'release/*'
+      - '!release/v1.0.0'
       - 'releasecandidate/*'
 
 jobs:

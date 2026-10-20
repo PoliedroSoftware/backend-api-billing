@@ -1,0 +1,63 @@
+{
+    admin 127.0.0.1:2019
+}
+
+nextcloud.holdinglalabranza.com {
+    reverse_proxy 127.0.0.1:11000
+}
+
+billing.holdinglalabranza.com {
+    @documentation {
+        path /scalar/* /swagger/v1/swagger.json
+        method GET HEAD
+    }
+    handle @documentation {
+        reverse_proxy 127.0.0.1:15068
+    }
+    @landing {
+        path /
+        method GET HEAD
+    }
+    handle @landing {
+        redir /scalar/v1 302
+    }
+    @machine header X-Billing-Admin-Key {$BILLING_ADMIN_KEY}
+    handle @machine {
+        reverse_proxy 127.0.0.1:15068
+    }
+    @health {
+        path /health
+        method GET
+    }
+    handle @health {
+        reverse_proxy 127.0.0.1:15068
+    }
+    handle {
+        route {
+            basic_auth {
+                poliedro {$PORTAL_PASSWORD_HASH}
+            }
+            @root path /
+            redir @root /scalar/v1 302
+            reverse_proxy 127.0.0.1:15068
+        }
+    }
+}
+
+hangfire.holdinglalabranza.com {
+    route {
+        @root path /
+        redir @root /hangfire 302
+        @view {
+            method GET HEAD
+            path /hangfire /hangfire/*
+        }
+        reverse_proxy @view 127.0.0.1:15069
+        @statistics {
+            method POST
+            path /hangfire/stats
+        }
+        reverse_proxy @statistics 127.0.0.1:15069
+        respond "El panel permite solo consultas." 403
+    }
+}
