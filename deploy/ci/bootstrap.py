@@ -41,7 +41,8 @@ if not backup.exists():
     (ROOT / '.env').write_text('\n'.join(lines) + '\n')
     shutil.copy2(ROOT / 'compose.ci-candidate.yaml', ROOT / 'compose.yaml')
 run(['docker', 'compose', 'config', '-q'], cwd=ROOT)
-shutil.copy2(SOURCE / 'receiver.py', '/usr/local/sbin/poliedro-ci-receiver')
+Path('/usr/local/sbin/poliedro-ci-receiver').write_text(
+    (SOURCE / 'receiver.py').read_text(), newline='\n')
 os.chmod('/usr/local/sbin/poliedro-ci-receiver', 0o755)
 
 authorized = Path('/root/.ssh/authorized_keys')
