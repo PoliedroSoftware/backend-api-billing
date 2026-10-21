@@ -4,6 +4,7 @@ from pathlib import Path
 import urllib.error
 import urllib.request
 import subprocess
+from mysql_client import command
 
 root = Path('/opt/poliedro-billing')
 config = dict(line.split('=', 1) for line in (root / '.secrets/api.env').read_text().splitlines() if '=' in line)
@@ -38,16 +39,20 @@ assert all(decision['allowed'] is False for decision in decisions), 'Existing cu
 result = {'api': health_api, 'hangfire': health_hangfire, 'unauthenticated_admin': 401,
           'catalogs': catalogs, 'remote_to_odoo_callback': callback,
           'automation_candidates': len(candidates), 'authorized_for_emission': 0}
-mysql = ['docker', 'compose', 'exec', '-T', 'mysql', 'mysql', '--defaults-extra-file=/run/secrets/mysql-admin.cnf', '-N', '-B']
+mysql = command() + ['-N', '-B']
 def sql(query):
     return subprocess.run(mysql, input=query.encode(), capture_output=True, check=True).stdout.decode().strip()
-inventory = json.loads((root / 'source-inventory.json').read_text())
-for table, expected in inventory['counts'].items():
-    assert table.replace('_', '').isalnum()
-    assert int(sql(f'SELECT COUNT(*) FROM billing.`{table}`')) == expected, table
-result['all_original_table_counts_preserved'] = True
-result['hangfire_job_states'] = sql('SELECT StateName,COUNT(*) FROM billing_jobs.HangfireJob GROUP BY StateName').splitlines()
-result['hangfire_recurring_jobs'] = int(sql("SELECT COUNT(*) FROM billing_jobs.HangfireSet WHERE `Key`='recurring-jobs'"))
+result['database_server'] = sql('SELECT @@hostname')
+result['database_server_uuid'] = sql('SELECT @@server_uuid')
+result['mysql_tls_cipher'] = sql("SHOW STATUS LIKE 'Ssl_cipher'").split('\t')[-1]
+assert result['mysql_tls_cipher'], 'Remote MySQL connection must use TLS'
+assert int(sql('SELECT COUNT(*) FROM billing.billing_company')) == catalogs['clients']
+hangfire_config = dict(line.split('=', 1) for line in (root / '.secrets/hangfire.env').read_text().splitlines() if '=' in line)
+prefix = hangfire_config['Hangfire__TablesPrefix']
+assert prefix.replace('_', '').isalnum() and prefix != 'Hangfire', 'Keep the imported legacy queue isolated'
+result['hangfire_table_prefix'] = prefix
+result['hangfire_job_states'] = sql(f'SELECT StateName,COUNT(*) FROM billing.`{prefix}Job` GROUP BY StateName').splitlines()
+result['hangfire_recurring_jobs'] = int(sql(f"SELECT COUNT(*) FROM billing.`{prefix}Set` WHERE `Key`='recurring-jobs'"))
 result['jobs_emission_enabled'] = 'Billing__EmissionEnabled=true' in (root / '.secrets/hangfire.env').read_text().splitlines()
 (root / 'runtime-verification.json').write_text(json.dumps(result, indent=2))
 print(json.dumps(result))

@@ -132,7 +132,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 builder.Services.AddSingleton<IMessageProvider, MessageProvider>();
 builder.Services.AddHealthChecks()
-    .AddMySql(builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
+    .AddMySql(Environment.GetEnvironmentVariable("MYSQL_CONNECTION")
+        ?? builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
 var app = builder.Build();
 
