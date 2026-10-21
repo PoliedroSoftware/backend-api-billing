@@ -35,8 +35,8 @@ public class GetAllTaxTotalsBilling : IGetAllTaxTotalsBilling
         {
             TaxId = kvp.Key.TaxId,
             Percent = kvp.Key.Percent,
-            TaxAmount = Math.Round(kvp.Value.TaxAmount, 2, MidpointRounding.AwayFromZero),
-            TaxableAmount = Math.Round(kvp.Value.TaxableAmount, 2, MidpointRounding.AwayFromZero)
+            TaxAmount = kvp.Value.TaxAmount,
+            TaxableAmount = kvp.Value.TaxableAmount,
         }).ToList();
 
         return await Task.FromResult(allTaxTotals);

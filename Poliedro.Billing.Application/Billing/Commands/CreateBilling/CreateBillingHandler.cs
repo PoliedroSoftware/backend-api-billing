@@ -8,6 +8,7 @@ using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 using Poliedro.Billing.Domain.CompanyProvider.DomainService;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.CompanyProvider.Enums;
+using Poliedro.Billing.Domain.Client.DomainService;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.Resolution.DomainService;
 using Poliedro.Billing.Domain.Resolution.Entities;
@@ -21,7 +22,9 @@ public class CreateBillingHandler(
     IBillingSenderFactory _billingSenderFactory,
     IBillingResponseApi _billingResponseApi,
     IMapper mapper,
-    ILogger<CreateBillingHandler> _logger
+    ILogger<CreateBillingHandler> _logger,
+    IClientGetByIdService _clientGetByIdService,
+    IBillingLicenseAuthorizer _licenseAuthorizer
     ) : IRequestHandler<CreateBillingCommand, CreateBillingCommandResult>
 {
     public async Task<CreateBillingCommandResult> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
@@ -50,6 +53,14 @@ public class CreateBillingHandler(
             return CreateBillingCommandResult.NotFound($"No se encontró el company provider {resolutionEntity.CompanyProviderId} de la resolución {request.Id}.");
         }
 
+        var client = await _clientGetByIdService.GetByIdAsync(companyProvider.CompanyId, cancellationToken);
+        if (!resolutionEntity.Active || companyProvider.Active != 1 || client.Value is not { Active: true })
+            return new(false, 403, "El cliente, proveedor o resolución está inactivo.", null);
+
+        var license = await _licenseAuthorizer.AuthorizeAsync(companyProvider.CompanyId, companyProvider.CompanyProviderId, cancellationToken);
+        if (!license.Allowed)
+            return new(false, 403, "La licencia de facturación no está habilitada: " + license.Code, null);
+
         if (string.IsNullOrWhiteSpace(companyProvider.ApiKey))
         {
             _logger.LogWarning("Company provider {CompanyProviderId} sin ApiKey configurada.",
@@ -72,6 +83,12 @@ public class CreateBillingHandler(
 
         foreach (var processed in processedInvoices)
         {
+            license = await _licenseAuthorizer.AuthorizeAsync(companyProvider.CompanyId, companyProvider.CompanyProviderId, cancellationToken);
+            if (!license.Allowed)
+            {
+                billingResults.Add(new CreateBillingResultDTO { Status = false, Message = "Licencia suspendida o no disponible.", Data = null });
+                break;
+            }
             var invoiceRequest = new PlemsiInvoiceRequest
             {
                 DianResolutionEntity = resolutionEntity,

@@ -29,9 +29,15 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Adapter;
 using Poliedro.Billing.Api.Observability;
 using Scalar.AspNetCore;
+using Poliedro.Billing.Api.Administration;
+using Poliedro.Billing.Domain.Billing.Ports;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
+builder.Services.Configure<BillingAdministrationOptions>(config.GetSection("BillingAdministration"));
+builder.Services.AddHttpClient<IBillingLicenseAuthorizer, OdooBillingLicenseAuthorizer>(client =>
+    client.Timeout = TimeSpan.FromSeconds(5))
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false });
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -170,21 +176,29 @@ app.UseCors("PoliedroBilling");
 
 // Map Minimal API Endpoints BEFORE OpenAPI/Scalar
 var apiV1 = app.MapGroup("api/v1");
+app.MapBillingAdministration();
 
 apiV1.MapGroup("/billing").MapBillingEndpoints();
-apiV1.MapGroup("/client").MapClientEndpoints();
-apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
+var clientEndpoints = apiV1.MapGroup("/client").MapClientEndpoints();
+var resolutionEndpoints = apiV1.MapGroup("/dianresolution").MapDianResolutionEndpoints();
 apiV1.MapGroup("/Controllers/v1/FERetail").MapFERetailEndpoints();
 apiV1.MapGroup("/getinvoice").MapGetInvoiceEndpoints();
 apiV1.MapGroup("/invoicespendingwithdetails").MapInvoicesPendingWithDetailsEndpoints();
 app.MapGroup("api/billing").MapPdfInvoiceEndpoints();
-apiV1.MapGroup("/server").MapServerEndpoints();
+var serverEndpoints = apiV1.MapGroup("/server").MapServerEndpoints();
 app.MapGroup("api/v1/billing/invoices").MapSiigoEndpoints();
 apiV1.MapGroup("/invoice").MapSuccessInvoiceEndpoints();
 app.MapGroup("api/v1/billing/sales/create").MapTnsEndpoints();
 apiV1.MapGroup("/customers").MapCustomersIdEndpoints();
 apiV1.MapGroup("/location").MapLocationEndpoints();
-apiV1.MapGroup("/companyProvider").MapCompanyProviderEndpoints();
+var providerEndpoints = apiV1.MapGroup("/companyProvider").MapCompanyProviderEndpoints();
+if (config.GetValue<bool>("BillingAdministration:Enabled"))
+{
+    clientEndpoints.AddEndpointFilter<BillingAdminFilter>();
+    resolutionEndpoints.AddEndpointFilter<BillingAdminFilter>();
+    serverEndpoints.AddEndpointFilter<BillingAdminFilter>();
+    providerEndpoints.AddEndpointFilter<BillingAdminFilter>();
+}
 
 // Configure Swagger and Scalar
 app.UseSwagger();
