@@ -32,6 +32,7 @@ public static class BillingAdministrationEndpoints
             await db.Server.AsNoTracking().OrderBy(s => s.ServerId)
                 .Select(s => new { s.ServerId, s.DatabaseName }).ToListAsync(ct));
         group.MapPost("/clients", UpsertClient);
+        group.MapGet("/clients/{id:int}/resolutions", ClientResolutionStatus.Get);
         group.MapPost("/providers", UpsertProvider);
         group.MapGet("/automation/resolutions", async (DataBaseContext db, CancellationToken ct) =>
             await AutomationCandidates(db).ToListAsync(ct));

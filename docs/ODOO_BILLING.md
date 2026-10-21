@@ -143,3 +143,18 @@ y exclusión de claves en el catálogo. El esquema se eliminó al terminar.
 Antes de instalar en `odoo_dev`: respaldo de base/filestore, ensayo en copia con
 cron/correo/WhatsApp neutralizados y comprobación HTTP del callback. Los datos
 sintéticos solo pertenecen a la copia; no deben sincronizarse al MySQL real.
+
+## Consulta de resoluciones por cliente
+
+`GET /api/v1/admin/clients/{id}/resolutions` exige la misma clave administrativa.
+Devuelve las resoluciones FE/POS marcadas activas del cliente, incluyendo las vencidas
+identificadas como tales, rangos y numeraci?n registrada en Billing. Consulta Plemsi
+por prefijo y comprueba tambi?n el n?mero de resoluci?n y estado Emitted antes de
+mostrar el ?ltimo consecutivo encontrado. No expone claves ni datos del comprador.
+La consulta externa tiene un l?mite de seis segundos y muestra estado no disponible
+o no encontrado cuando no puede confirmar el documento en la p?gina m?s reciente.
+La fecha/hora es la del documento, sin asumir zona horaria ni confundir updatedAt
+con la emisi?n. `date_current` se conserva como actualizaci?n hist?rica de Billing.
+
+En Odoo, ?Ver resoluci?n y ?ltima emisi?n? abre una consulta temporal por cliente,
+con actualizaci?n manual. No modifica resoluciones, numeraci?n, licencias ni facturas.
