@@ -68,8 +68,10 @@ y licencias, sin ejecutar envíos fiscales desde su interfaz administrativa.
 
 ## Despliegue actual: droplet Nextcloud y Odoo local
 
-API, Hangfire y MySQL están en `/opt/poliedro-billing` del droplet
-`nextcloud-holdinglalabranza` (`143.198.12.27`). Odoo sigue en `odoo_dev` local.
+API y Hangfire están en `/opt/poliedro-billing` del droplet
+`nextcloud-holdinglalabranza` (`143.198.12.27`). MySQL está en Oracle, sistema
+`poliedroDB`, accesible por `150.136.181.118:3306/billing` con TLS.
+Odoo sigue en `odoo_dev` local.
 Odoo consulta Billing por HTTPS. El retorno de licencias hacia Odoo local continúa
 por SSH; ver [operación y recuperación](../deploy/nextcloud/README.md).
 
@@ -91,13 +93,15 @@ La empresa Poliedro Software tiene el producto de licencia y planes mensual/anua
 Se cargaron 18 clientes y 23 servidores como catálogo, sin crear ventas ni licencias
 comerciales automáticamente. Hay que indicar precio, vigencia y contrato de cada
 cliente para habilitar su emisión en este nuevo despliegue. Las credenciales y
-resoluciones existentes conservan sus datos. No se modificó la base de origen.
+resoluciones existentes conservan sus datos. Las tablas de negocio de Oracle
+se conservaron; se añadieron solamente las tablas de la cola nueva.
 El catálogo contiene NIT ausentes, marcadores `[NULL]` y un NIT repetido: esas
 identidades requieren conciliación antes del alta de licencias. Se conservan los
 datos recibidos; no se inventa un documento o contacto para resolver el conflicto.
 
-Hangfire utiliza `billing_jobs`, una base vacía independiente del histórico
-restaurado. Consulta elegibilidad antes de buscar facturas; la API vuelve a
+Hangfire utiliza las tablas `PoliedroJobs*` dentro de `billing` en Oracle,
+independientes del histórico `Hangfire*`. Conserva la cola del droplet y muestra
+los nombres de clientes en sus trabajos. Consulta elegibilidad antes de buscar facturas; la API vuelve a
 autorizar antes de cada emisión. No se usaron envíos fiscales en las pruebas.
 
 **Este equipo debe estar encendido, con la sesión y Odoo disponibles.** Si se
@@ -139,3 +143,18 @@ y exclusión de claves en el catálogo. El esquema se eliminó al terminar.
 Antes de instalar en `odoo_dev`: respaldo de base/filestore, ensayo en copia con
 cron/correo/WhatsApp neutralizados y comprobación HTTP del callback. Los datos
 sintéticos solo pertenecen a la copia; no deben sincronizarse al MySQL real.
+
+## Consulta de resoluciones por cliente
+
+`GET /api/v1/admin/clients/{id}/resolutions` exige la misma clave administrativa.
+Devuelve las resoluciones FE/POS marcadas activas del cliente, incluyendo las vencidas
+identificadas como tales, rangos y numeraci?n registrada en Billing. Consulta Plemsi
+por prefijo y comprueba tambi?n el n?mero de resoluci?n y estado Emitted antes de
+mostrar el ?ltimo consecutivo encontrado. No expone claves ni datos del comprador.
+La consulta externa tiene un l?mite de seis segundos y muestra estado no disponible
+o no encontrado cuando no puede confirmar el documento en la p?gina m?s reciente.
+La fecha/hora es la del documento, sin asumir zona horaria ni confundir updatedAt
+con la emisi?n. `date_current` se conserva como actualizaci?n hist?rica de Billing.
+
+En Odoo, ?Ver resoluci?n y ?ltima emisi?n? abre una consulta temporal por cliente,
+con actualizaci?n manual. No modifica resoluciones, numeraci?n, licencias ni facturas.

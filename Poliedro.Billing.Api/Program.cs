@@ -132,9 +132,31 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehaviour<,>));
 builder.Services.AddSingleton<IMessageProvider, MessageProvider>();
 builder.Services.AddHealthChecks()
-    .AddMySql(builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
+    .AddMySql(Environment.GetEnvironmentVariable("MYSQL_CONNECTION")
+        ?? builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
 var app = builder.Build();
+
+// Additive, idempotent schema setup for the shared administrative database.
+await using (var schemaScope = app.Services.CreateAsyncScope())
+{
+    var database = schemaScope.ServiceProvider.GetRequiredService<Poliedro.Billing.Infraestructure.Persistence.Mysql.Context.DataBaseContext>();
+    await database.Database.ExecuteSqlRawAsync("""
+        CREATE TABLE IF NOT EXISTS billing_emission_failure (
+            id BIGINT NOT NULL AUTO_INCREMENT,
+            company_id INT NOT NULL,
+            resolution_id INT NOT NULL,
+            client_name VARCHAR(200) NOT NULL,
+            invoice_number VARCHAR(100) NOT NULL,
+            prefix VARCHAR(30) NOT NULL,
+            document_type VARCHAR(20) NOT NULL,
+            reason VARCHAR(2000) NOT NULL,
+            failed_at DATETIME(6) NOT NULL,
+            PRIMARY KEY (id),
+            INDEX ix_billing_emission_failure_company_date (company_id, failed_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        """);
+}
 
 // Observability: Prometheus HTTP metrics middleware
 app.UsePrometheusMetrics()

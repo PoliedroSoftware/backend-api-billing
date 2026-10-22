@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 using Poliedro.Billing.Domain.CompanyProvider.DomainService;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
@@ -24,7 +25,8 @@ public class CreateBillingHandler(
     IMapper mapper,
     ILogger<CreateBillingHandler> _logger,
     IClientGetByIdService _clientGetByIdService,
-    IBillingLicenseAuthorizer _licenseAuthorizer
+    IBillingLicenseAuthorizer _licenseAuthorizer,
+    IEmissionFailureRepository _emissionFailures
     ) : IRequestHandler<CreateBillingCommand, CreateBillingCommandResult>
 {
     public async Task<CreateBillingCommandResult> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
@@ -109,13 +111,29 @@ public class CreateBillingHandler(
                 Invoices = [processed.Output!]
             };
 
-            var responses = await sender.SendAsync(invoiceRequest, cancellationToken);
+            List<ApiResponseFERetailPos> responses;
+            try
+            {
+                responses = await sender.SendAsync(invoiceRequest, cancellationToken);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
+            {
+                var reason = SafeReason(ex.Message);
+                await RecordFailureAsync(companyProvider.CompanyId, client.Value?.Name, resolutionEntity,
+                    processed.Billing, reason, cancellationToken);
+                _logger.LogError(ex, "Error enviando factura {Number} a DIAN para la resolución {ResolutionId}.",
+                    processed.Billing.Number, request.Id);
+                billingResults.Add(new CreateBillingResultDTO { Status = false, Message = reason, Data = null });
+                continue;
+            }
             var result = responses.FirstOrDefault();
 
             if (result is null)
             {
                 _logger.LogWarning("No se recibió respuesta del proveedor para la factura {Number} de la resolución {ResolutionId}.",
                     processed.Billing.Number, request.Id);
+                await RecordFailureAsync(companyProvider.CompanyId, client.Value?.Name, resolutionEntity,
+                    processed.Billing, "No se recibió respuesta del proveedor; verificar en Plemsi antes de reintentar.", cancellationToken);
                 billingResults.Add(new CreateBillingResultDTO
                 {
                     Status = false,
@@ -157,6 +175,8 @@ public class CreateBillingHandler(
             {
                 _logger.LogWarning("Factura {Number} rechazada por el proveedor: {Info}",
                     processed.Billing.Number, result.Info);
+                await RecordFailureAsync(companyProvider.CompanyId, client.Value?.Name, resolutionEntity,
+                    processed.Billing, SafeReason(result.Info), cancellationToken);
             }
 
             billingResults.Add(new CreateBillingResultDTO
@@ -172,5 +192,25 @@ public class CreateBillingHandler(
             request.Id, successCount, billingResults.Count);
 
         return CreateBillingCommandResult.Ok(billingResults);
+    }
+
+    private Task RecordFailureAsync(int companyId, string? clientName, DianResolutionEntity resolution,
+        Domain.Billing.CreateBilling invoice, string? reason, CancellationToken cancellationToken) =>
+        _emissionFailures.RecordAsync(new EmissionFailure
+        {
+            CompanyId = companyId,
+            ResolutionId = resolution.ResolutionId,
+            ClientName = string.IsNullOrWhiteSpace(clientName) ? "Cliente sin nombre" : clientName[..Math.Min(clientName.Length, 200)],
+            InvoiceNumber = invoice.Number[..Math.Min(invoice.Number.Length, 100)],
+            Prefix = (invoice.Prefix ?? resolution.Prefix ?? "")[..Math.Min((invoice.Prefix ?? resolution.Prefix ?? "").Length, 30)],
+            DocumentType = resolution.ResolutionType.ToString()[..Math.Min(resolution.ResolutionType.ToString().Length, 20)],
+            Reason = SafeReason(reason),
+            FailedAt = DateTime.UtcNow
+        }, cancellationToken);
+
+    private static string SafeReason(string? reason)
+    {
+        var value = string.IsNullOrWhiteSpace(reason) ? "El proveedor no informó el motivo." : reason.Trim();
+        return value.Length <= 2000 ? value : value[..2000];
     }
 }
