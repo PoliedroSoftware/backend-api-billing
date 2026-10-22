@@ -19,6 +19,7 @@ public class DataBaseContext(DbContextOptions options) : DbContext(options)
     public DbSet<InvoiceEntity> Invoices { get; set; }
 
     public DbSet<ProviderEntity> ProviderEntities { get; set; }
+    public DbSet<Poliedro.Billing.Domain.Billing.EmissionFailure> EmissionFailures { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,5 +34,6 @@ public class DataBaseContext(DbContextOptions options) : DbContext(options)
         new CompanyProviderConfiguration(modelBuilder.Entity<CompanyProviderEntity>());
         new ClientBillingElectronicConfiguration(modelBuilder.Entity<ClientEntity>());
         new ProviderElectronicConfiguration(modelBuilder.Entity<ProviderEntity>());
+        new EmissionFailureConfiguration().Configure(modelBuilder.Entity<Poliedro.Billing.Domain.Billing.EmissionFailure>());
     }
 }

@@ -12,14 +12,14 @@ public class PrepareBillingPOS(
     IMapper _mapper
     ) : ICreateBilling
 {
-    public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(
+    public async Task<IEnumerable<BillingPreparationResult>> CreateInvoicesAsync(
         IEnumerable<CreateBilling> invoices,
         DianResolutionEntity dianResolutionEntity,
         CompanyProviderEntity companyProviderEntity,
         CancellationToken cancellationToken)
     {
 
-        var results = new List<(CreateBilling Billing, object Output)>();
+        var results = new List<BillingPreparationResult>();
         int lastInvoiceNumber;
 
         try
@@ -143,12 +143,13 @@ public class PrepareBillingPOS(
                 };
                 var dto = _mapper.Map<InvoiceRequestPosDto>(Data);
 
-                results.Add((invoice, dto));
+                results.Add(new(invoice, dto, null));
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error procesando factura {invoice.Number}: {ex.Message}");
+                results.Add(new(invoice, null, $"Factura {invoice.Number} no emitida: {ex.Message}"));
             }
         }
         return results;

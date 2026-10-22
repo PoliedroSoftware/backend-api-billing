@@ -1,116 +1,83 @@
-# Billing en el droplet Nextcloud
+# Billing y Hangfire: droplet con MySQL en Oracle
 
-Desplegado el 19 de octubre de 2026 en `143.198.12.27`, directorio
-`/opt/poliedro-billing`. Desde el 20 de octubre comparte HTTPS con Nextcloud
-mediante Caddy en `/opt/poliedro-edge`; se conservan los datos y servicios internos.
-No se usa AWS ni se cambia la base de origen registrada como `billing` en DBeaver.
+La API y Hangfire se ejecutan en `/opt/poliedro-billing` del droplet
+`nextcloud-holdinglalabranza` (`143.198.12.27`). MySQL se mantiene en Oracle Cloud,
+cuenta `poliedrosoftware`, regi?n `us-ashburn-1`, sistema `poliedroDB`.
+El balanceador `lbmysql` publica `150.136.181.118:3306` hacia `10.0.1.13:3306`.
 
-## Servicios y transporte
+## Conexiones actuales
 
-| Servicio | Dirección en el droplet | Memoria máxima |
-|---|---|---|
-| MySQL 8.0.46 | 127.0.0.1:33306 | 512 MiB |
-| API .NET 10 | 127.0.0.1:15068 | 384 MiB |
-| Hangfire .NET 10 | 127.0.0.1:15069 | 256 MiB |
-| Retorno privado hacia Odoo local | 127.0.0.1:18070 → equipo local:8070 | — |
+- API: `https://billing.holdinglalabranza.com/scalar/v1`.
+- Hangfire: `https://hangfire.holdinglalabranza.com/hangfire/recurring`.
+- Ambos servicios usan `150.136.181.118:3306/billing` con TLS obligatorio.
+- Hangfire usa `Hangfire__TablesPrefix=PoliedroJobs`: sus 12 tablas se mantienen
+  separadas de las tablas hist?ricas `Hangfire*` de Billing. No conectar el
+  trabajador nuevo al prefijo hist?rico, pues podr?a reactivar trabajos antiguos.
+- Cada trabajo muestra el nombre del cliente y su resoluci?n. El ID interno
+  permanece estable para que un cambio de nombre no duplique la programaci?n.
+- Odoo sigue en `odoo_dev` local. El retorno de autorizaci?n usa el t?nel SSH
+  hacia `127.0.0.1:18070`. Sin Odoo disponible se deniegan nuevas emisiones.
 
-Los puertos de backend son loopback. El acceso público autenticado ahora es:
+El firewall de DigitalOcean permite TCP saliente solamente hacia
+`150.136.181.118/32:3306` para esta conexi?n. La lista de seguridad p?blica del
+balanceador Oracle ya permit?a 3306; no se a?adieron reglas redundantes all?.
 
-- API y documentación: https://billing.holdinglalabranza.com/scalar/v1
-- Hangfire: https://hangfire.holdinglalabranza.com/hangfire
+`compose.yaml` contiene solamente API y Hangfire. No crea un servidor MySQL ni
+un volumen de base de datos local. Las im?genes y la configuraci?n privada
+siguen fuera de los artefactos de aplicaci?n; CI conserva esos ajustes.
 
-Ver [configuración HTTPS, credenciales y reversión](edge/README.md).
-El archivo `tunnel.ps1` conecta por SSH los puertos
-15068/15069 al equipo local y publica el retorno 18070 solo en loopback remoto.
-La tarea de Windows `Poliedro Billing SSH Tunnel` inicia con la sesión, reconecta
-ante cortes y usa la identidad SSH existente. No hay contraseñas en argumentos.
-La documentación Scalar de Billing es pública; sus operaciones requieren
-credenciales. Hangfire es visible sin contraseña
-en modo consulta y bloquea las acciones de ejecutar/eliminar trabajos.
-El túnel sigue siendo necesario para el retorno privado de autorización hacia Odoo local.
+## Operaci?n
 
-La API usa `billing_app`, con SELECT/INSERT/UPDATE/DELETE sobre `billing`.
-Hangfire usa `billing_jobs` y una base separada del mismo nombre. No se reejecuta
-el histórico de 4.957 trabajos que permanece en la copia original de `billing`.
-Los trabajos nuevos guardan IDs de resolución, no claves Plemsi ni facturas.
-
-La conexión MySQL de Hangfire requiere `Allow User Variables=True`: la consulta
-de tareas recurrentes usa `@rownum`. Sin esta opción la portada puede responder
-HTTP 200 mientras `/hangfire/recurring` falla con HTTP 500.
-`repair_dashboard.py` aplica la opción conservando un respaldo privado y recrea
-solo Hangfire. La verificación HTTPS incluye secciones del panel, CSS/JS y el POST
-de consulta de estadísticas con su token CSRF.
-Referencia: [opciones oficiales de MySqlConnector](https://mysqlconnector.net/connection-options/).
-
-## Estado y operación
-
-```powershell
-Get-ScheduledTask -TaskName 'Poliedro Billing SSH Tunnel'
-Start-ScheduledTask -TaskName 'Poliedro Billing SSH Tunnel'
-curl.exe http://127.0.0.1:15068/health
-curl.exe http://127.0.0.1:15069/health
-ssh -i "$env:USERPROFILE\.ssh\id_rsa" root@143.198.12.27
-```
-
-Dentro del servidor:
+En el droplet:
 
 ```bash
 cd /opt/poliedro-billing
 docker compose ps
-docker compose logs --tail=50 api hangfire
-docker compose up -d
+python3 verify_runtime.py
+python3 /opt/poliedro-edge/verify.py
 python3 backup_database.py
 ```
 
-`verify_runtime.py` verifica salud, autenticación, retorno hacia Odoo, conteos de la
-copia inicial y ausencia inicial de licencias autorizadas. Es una comprobación
-de puesta en marcha: sus aserciones de conteos/licencias deben revisarse cuando
-se incorporen clientes o contratos reales. `verify_mysql_admin.py` prueba altas y
-activación en un esquema temporal exclusivo y elimina solo ese esquema al terminar.
+`mysql_client.py` usa un contenedor de cliente MySQL de corta duraci?n, con un
+m?ximo de 128 MiB y sin volumen de datos. Lee `.secrets/oracle-mysql.cnf`, privado
+y con `ssl-mode=REQUIRED`. No se coloca la contrase?a en argumentos ni en Git.
 
-`Billing__EmissionEnabled=true` está configurado tras las pruebas iniciales.
-Cada resolución exige `automatic=1`, vigencia, cliente/proveedor activos y licencia
-Odoo autorizada. Los cinco candidatos iniciales no tienen licencia; por tanto no
-consultan pendientes ni emiten. Reconciliación y revisión de pendientes cada cinco
-minutos. No hay reintentos automáticos de un lote fallido; revisar resultados del
-proveedor y persistencia antes de un reintento manual. Una suspensión no revierte
-una factura ya enviada. El nuevo despliegue no sustituye automáticamente otros
-emisores que sigan funcionando con la base de origen.
+El respaldo diario de las 07:17 UTC incluye la base `billing` de Oracle y por
+lo tanto tambi?n las tablas `PoliedroJobs*`. Se guarda comprimido y con permisos
+privados en `backups/`. No hay transferencia autom?tica fuera del servidor ni
+borrado autom?tico de archivos: supervisar su espacio y retenci?n.
 
-## Respaldo y recuperación
+`verify_runtime.py` consulta salud de API/Hangfire, autenticaci?n, identidad del
+MySQL remoto, TLS, cat?logo de clientes, cola con su prefijo y callback Odoo.
+Su aserci?n de cero licencias autorizadas corresponde a la puesta en marcha;
+revisarla al habilitar contratos comerciales reales.
 
-Respaldo inicial de Odoo y MySQL en el equipo local:
-`C:/Poliedro/odoo/backups/billing-20261019131515` (ACL restringida).
-La copia `billing.sql` tiene SHA-256 registrado en `source-inventory.json`;
-la restauración verificó la huella y los conteos de las 18 tablas.
-Evidencias sin secretos: `restore-verification.json`, `runtime-verification.json`
-y `mysql-admin-verification.json` en el directorio remoto.
+## Migraci?n y recuperaci?n
 
-`/etc/cron.d/poliedro-billing-backup` genera diariamente a las 07:17 UTC un dump
-comprimido de `billing` y `billing_jobs`, con permisos privados, en `backups/`.
-No hay borrado automático ni copia automática fuera del droplet: supervisar espacio
-y copiar respaldos fuera del servidor. La copia inicial también está en el equipo local.
-La base y el filestore originales de Odoo se conservaron antes de instalar.
+La migraci?n de octubre de 2026 conserva respaldos en el equipo local:
+`C:/Poliedro/odoo/backups/billing-migration-20261020/oracle-cutover`.
+La evidencia privada de operaci?n y configuraci?n anterior est? en
+`/opt/poliedro-billing/backups/oracle-cutover-20261021`.
 
-Para recuperar, restaurar primero en otro esquema/volumen vacío y comprobar conteos;
-actualizar las conexiones solo después de la verificación. `restore_and_verify.py`
-rechaza expresamente una base `billing` que ya contenga tablas. No ejecutar
-`docker compose down -v`: eliminaría el volumen de MySQL.
+Antes de retirar el servidor local se detuvieron los trabajadores, se copiaron
+sus 12 tablas al prefijo nuevo y se compararon conteos y sumas de comprobaci?n.
+El campo FLOAT de programaci?n `HangfireSet.Score` se conserv? mediante valores
+decimales exactos porque su representaci?n en mysqldump puede redondearse.
+Las tablas de negocio y el hist?rico original en Oracle no se sobrescribieron.
 
-Secretos de operación en `.secrets` (directorio 0700). Los archivos montados tienen
-lectura para el UID del contenedor, sin acceso a través del directorio para otros
-usuarios del host. No imprimirlos, versionarlos ni incluirlos en imágenes.
-`prepare_payload.py` crea un paquete privado fuera de Git, omitiendo todos los
-appsettings publicados y colocando la configuración remota por montaje/env.
-El paquete contiene el respaldo de datos y debe tratarse como confidencial.
+Los scripts `prepare_payload.py`, `restore_and_verify.py` y `configure_runtime.py`
+pertenecen al despliegue inicial con MySQL local. No ejecutarlos sobre esta
+instalaci?n para restaurar ni cambiar las conexiones actuales. Para recuperar,
+restaurar primero el respaldo en un destino aislado, verificarlo y actualizar
+las conexiones privadas despu?s. El volumen local retirado se recupera desde
+los respaldos, no mediante `docker compose up`.
 
-## Validación realizada
+## Acceso y facturaci?n
 
-- API: 17 pruebas (16 nuevas y el placeholder original); sin llamadas reales a Plemsi.
-- Odoo: 8 pruebas aisladas, más callback HTTP activo/suspendido/suscripción pausada.
-- Hangfire: 6 pruebas de contrato, denegación, pendientes vacíos y fallo parcial.
-- MySQL real: alta y reintento de cliente/proveedor, cambio de active con lectura SQL.
-- Odoo local: 121 movimientos, 31 publicados, 3 pagos, 0 ventas; sin cambios contables.
-- Dependencias heredadas aún emiten advertencias de compatibilidad y seguridad al
-  compilar (.NET/EF/Pomelo, AutoMapper, KubernetesClient y Prometheus). El aislamiento
-  de red no sustituye su actualización; no se presenta este despliegue como auditado.
+Scalar/OpenAPI y el panel Hangfire son p?blicos por solicitud del usuario.
+La administraci?n/escritura de Billing exige credenciales. Hangfire est? en
+modo consulta y bloquea ejecutar/eliminar trabajos desde el panel.
+Cada emisi?n exige cliente y resoluci?n activos y una licencia v?lida en Odoo.
+Ver [m?dulo Odoo](../../docs/ODOO_BILLING.md) y
+[proxy HTTPS](edge/README.md). No se emiten documentos fiscales para verificar
+un despliegue.

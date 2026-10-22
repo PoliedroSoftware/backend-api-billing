@@ -26,7 +26,7 @@ public class BillingGuardTests
         // Null factories/senders intentionally fail if the rejection ever reaches preparation or emission.
         var handler = new CreateBillingHandler(new Resolution(resolutionActive), new Provider(providerActive),
             null!, null!, null!, null!, NullLogger<CreateBillingHandler>.Instance,
-            new Client(clientActive), authorizer);
+            new Client(clientActive), authorizer, null!);
         var result = await handler.Handle(new CreateBillingCommand(1, []), default);
         Assert.False(result.Success);
         Assert.Equal(403, result.StatusCode);
