@@ -75,7 +75,7 @@ public class CreateBillingHandler(
 
         ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(resolutionEntity.ResolutionType, (ProviderType)companyProvider.ProviderId);
 
-        IEnumerable<(Domain.Billing.CreateBilling Billing, object Output)> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, resolutionEntity, companyProvider, cancellationToken);
+        IEnumerable<Domain.Billing.BillingPreparationResult> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, resolutionEntity, companyProvider, cancellationToken);
 
         IBillingSender sender = _billingSenderFactory.Resolve((ProviderType)companyProvider.ProviderId, resolutionEntity.ResolutionType);
 
@@ -83,6 +83,19 @@ public class CreateBillingHandler(
 
         foreach (var processed in processedInvoices)
         {
+            if (processed.Error is not null)
+            {
+                _logger.LogWarning("Factura {Number} no emitida: {Error}",
+                    processed.Billing.Number, processed.Error);
+                billingResults.Add(new CreateBillingResultDTO
+                {
+                    Status = false,
+                    Message = processed.Error,
+                    Data = null
+                });
+                continue;
+            }
+
             license = await _licenseAuthorizer.AuthorizeAsync(companyProvider.CompanyId, companyProvider.CompanyProviderId, cancellationToken);
             if (!license.Allowed)
             {
@@ -93,7 +106,7 @@ public class CreateBillingHandler(
             {
                 DianResolutionEntity = resolutionEntity,
                 CompanyProviderEntity = companyProvider,
-                Invoices = [processed.Output]
+                Invoices = [processed.Output!]
             };
 
             var responses = await sender.SendAsync(invoiceRequest, cancellationToken);

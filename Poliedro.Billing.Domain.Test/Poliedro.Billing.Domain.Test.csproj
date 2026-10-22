@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Poliedro.Billing.Domain\Poliedro.Billing.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

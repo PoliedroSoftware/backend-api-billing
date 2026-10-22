@@ -17,13 +17,13 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
         IConfiguration _config
     ) : ICreateBilling
     {
-        public async Task<IEnumerable<(CreateBilling Billing, object Output)>> CreateInvoicesAsync(
+        public async Task<IEnumerable<BillingPreparationResult>> CreateInvoicesAsync(
             IEnumerable<CreateBilling> invoices,
             DianResolutionEntity dianResolutionEntity,
             CompanyProviderEntity companyProviderEntity,
             CancellationToken cancellationToken)
         {
-            var results = new List<(CreateBilling Billing, object Output)>();
+            var results = new List<BillingPreparationResult>();
             int lastInvoiceNumber;
 
             try
@@ -240,11 +240,12 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     };
 
                     var dto = _mapper.Map<SenderRequestFEDTO>(data);
-                    results.Add((invoice, dto));
+                    results.Add(new(invoice, dto, null));
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error procesando factura {invoice.Number}: {ex.Message}");
+                    results.Add(new(invoice, null, $"Factura {invoice.Number} no emitida: {ex.Message}"));
                 }
             }
 

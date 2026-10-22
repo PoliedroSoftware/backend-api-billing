@@ -2,6 +2,7 @@
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi.TypeTax;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using ItemPriceNotInformedException = Poliedro.Billing.Domain.Billing.ItemPriceNotInformedException;
 
 namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling
 {
@@ -20,12 +21,37 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
             if (items == null || items.Count == 0)
                 return itemsInvoiceResponse;
 
+            // Sin precio no se puede emitir: la DIAN rechaza la línea con FAW03
+            // ("precio referencial no informado"), incluso en muestras o regalos.
+            var itemsWithoutPrice = items
+                .Where(item => !ItemPriceReader.TryResolveReferenceUnitPrice(item, out _))
+                .Select(DescribeItem)
+                .ToList();
+
+            if (itemsWithoutPrice.Count > 0)
+                throw new ItemPriceNotInformedException(itemsWithoutPrice);
+
             foreach (var item in items)
             {
                 double quantity = item.InvoicedQuantity;
-                double grossUnitPrice = item.UnitPriceBeforeDiscount ?? item.UnitPrice;
+
+                ItemPriceReader.TryResolveReferenceUnitPrice(item, out double referenceUnitPrice);
+
+                // El precio de referencia se declara sobre el bruto (antes de descuento).
+                double grossUnitPrice = referenceUnitPrice;
                 double grossAmount = Round(grossUnitPrice * quantity);
-                double netAmount = Round(item.UnitPrice * quantity);
+
+                // Si el origen no informó el precio neto pero la línea sí tiene valor,
+                // el precio resuelto desde el valor de línea es el neto (no hay descuento).
+                double netUnitPrice = item.UnitPrice;
+                if (netUnitPrice <= 0 &&
+                    item.LineExtensionAmount > 0 &&
+                    (item.LineDiscountAmount ?? 0) <= 0)
+                {
+                    netUnitPrice = referenceUnitPrice;
+                }
+
+                double netAmount = Round(netUnitPrice * quantity);
 
                 double? sourceDiscountPercentage = LineDiscountReader
                     .ToPercentage(item.LineDiscountType, item.LineDiscountAmount, grossUnitPrice);
@@ -47,7 +73,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
 
                 if (isFreeItem)
                 {
-                    itemsInvoiceResponse.Add(BuildFreeOfChargeItem(item, grossUnitPrice, quantity));
+                    itemsInvoiceResponse.Add(BuildFreeOfChargeItem(item, referenceUnitPrice, quantity));
                     continue;
                 }
 
@@ -74,6 +100,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                 var itemInvoice = Clone(item);
 
                 itemInvoice.UnitMeasureId = item.UnitMeasureId > 0 ? item.UnitMeasureId : DefaultUnitMeasureId;
+                itemInvoice.PriceAmount = referenceUnitPrice;
                 itemInvoice.LineExtensionAmount = netAmount;
                 itemInvoice.FreeOfChargeIndicator = false;
                 itemInvoice.AllowanceCharges = allowanceCharges;
@@ -93,7 +120,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
         /// Un ítem con valor de línea 0 debe declararse como entrega gratuita: sin valor,
         /// sin descuentos y conservando el precio unitario para DIAN.
         /// </summary>
-        private static ItemElectronicEntity BuildFreeOfChargeItem(ItemElectronicEntity item, double grossUnitPrice, double quantity)
+        private static ItemElectronicEntity BuildFreeOfChargeItem(ItemElectronicEntity item, double referenceUnitPrice, double quantity)
         {
             var freeItem = Clone(item);
 
@@ -107,7 +134,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
             freeItem.Description = $"{item.Description} {FreeOfChargeSuffix}";
             freeItem.Notes = string.IsNullOrWhiteSpace(item.Notes) ? DefaultNote : item.Notes;
             freeItem.TypeItemIdentificationId = ItemIdentificationId;
-            freeItem.PriceAmount = Round(grossUnitPrice);
+            freeItem.PriceAmount = referenceUnitPrice;
 
             return freeItem;
         }
@@ -225,6 +252,12 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
             UnitPrice = item.UnitPrice,
             Subtotal = item.Subtotal
         };
+
+        private static string DescribeItem(ItemElectronicEntity item)
+        {
+            string description = string.IsNullOrWhiteSpace(item.Description) ? "sin descripción" : item.Description.Trim();
+            return $"código {item.Code} ({description})";
+        }
 
         private static double Round(double value) => Math.Round(value, 2, MidpointRounding.AwayFromZero);
     }
