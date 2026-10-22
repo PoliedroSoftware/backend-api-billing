@@ -30,6 +30,7 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDeta
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInvoice;
 
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
+using Poliedro.Billing.Infraestructure.Persistence.Mysql.EmissionFailures;
 
 
 
@@ -43,6 +44,7 @@ public static class DependencyInjectionService
         services.AddDbContext<DataBaseContext>(
             options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)
         ));
+        services.AddScoped<IEmissionFailureRepository, EmissionFailureRepository>();
         
         // Client services - specialized implementations
         services.AddScoped<IClientExistsService, ClientExistsService>();

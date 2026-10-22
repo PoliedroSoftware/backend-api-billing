@@ -33,6 +33,18 @@ public static class BillingAdministrationEndpoints
                 .Select(s => new { s.ServerId, s.DatabaseName }).ToListAsync(ct));
         group.MapPost("/clients", UpsertClient);
         group.MapGet("/clients/{id:int}/resolutions", ClientResolutionStatus.Get);
+        group.MapGet("/clients/{id:int}/emission-failures", async (int id, int? limit, DataBaseContext db, CancellationToken ct) =>
+        {
+            if (!await db.ClientBillingElectronic.AsNoTracking().AnyAsync(c => c.CompanyId == id, ct))
+                return Results.NotFound();
+            var take = Math.Clamp(limit ?? 100, 1, 500);
+            var rows = await db.EmissionFailures.AsNoTracking().Where(f => f.CompanyId == id)
+                .OrderByDescending(f => f.FailedAt).ThenByDescending(f => f.Id).Take(take)
+                .Select(f => new { f.Id, f.CompanyId, f.ClientName, f.ResolutionId, f.DocumentType,
+                    f.Prefix, f.InvoiceNumber, f.Reason, f.FailedAt })
+                .ToListAsync(ct);
+            return Results.Ok(new { companyId = id, count = rows.Count, failures = rows });
+        });
         group.MapPost("/providers", UpsertProvider);
         group.MapGet("/automation/resolutions", async (DataBaseContext db, CancellationToken ct) =>
             await AutomationCandidates(db).ToListAsync(ct));
