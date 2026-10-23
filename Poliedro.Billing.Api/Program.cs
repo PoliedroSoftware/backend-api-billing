@@ -124,12 +124,20 @@ if (config.GetValue("Database:InitializeEmissionFailureSchema", true))
             invoice_number VARCHAR(100) NOT NULL,
             prefix VARCHAR(30) NOT NULL,
             document_type VARCHAR(20) NOT NULL,
+            commercial_message VARCHAR(500) NOT NULL DEFAULT '',
             reason VARCHAR(2000) NOT NULL,
             failed_at DATETIME(6) NOT NULL,
             PRIMARY KEY (id),
             INDEX ix_billing_emission_failure_company_date (company_id, failed_at)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         """);
+    var hasCommercialMessage = await database.Database.SqlQueryRaw<int>("""
+        SELECT COUNT(*) AS `Value` FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = 'billing_emission_failure'
+          AND column_name = 'commercial_message'
+        """).SingleAsync();
+    if (hasCommercialMessage == 0)
+        await database.Database.ExecuteSqlRawAsync("ALTER TABLE billing_emission_failure ADD COLUMN commercial_message VARCHAR(500) NOT NULL DEFAULT '' AFTER document_type");
 }
 
 // Observability: Prometheus HTTP metrics middleware

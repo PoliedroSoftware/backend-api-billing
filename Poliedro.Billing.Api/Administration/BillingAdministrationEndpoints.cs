@@ -41,7 +41,7 @@ public static class BillingAdministrationEndpoints
             var rows = await db.EmissionFailures.AsNoTracking().Where(f => f.CompanyId == id)
                 .OrderByDescending(f => f.FailedAt).ThenByDescending(f => f.Id).Take(take)
                 .Select(f => new { f.Id, f.CompanyId, f.ClientName, f.ResolutionId, f.DocumentType,
-                    f.Prefix, f.InvoiceNumber, f.Reason, f.FailedAt })
+                    f.Prefix, f.InvoiceNumber, f.CommercialMessage, f.Reason, f.FailedAt })
                 .ToListAsync(ct);
             return Results.Ok(new { companyId = id, count = rows.Count, failures = rows });
         });

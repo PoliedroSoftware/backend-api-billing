@@ -221,9 +221,31 @@ public class CreateBillingHandler(
             InvoiceNumber = invoice.Number[..Math.Min(invoice.Number.Length, 100)],
             Prefix = (invoice.Prefix ?? resolution.Prefix ?? "")[..Math.Min((invoice.Prefix ?? resolution.Prefix ?? "").Length, 30)],
             DocumentType = resolution.ResolutionType.ToString()[..Math.Min(resolution.ResolutionType.ToString().Length, 20)],
+            CommercialMessage = Commercialize(reason),
             Reason = SafeReason(reason),
             FailedAt = DateTime.UtcNow
         }, cancellationToken);
+
+    private static string Commercialize(string? reason)
+    {
+        var value = (reason ?? "").Trim().ToLowerInvariant();
+        if (value.Contains("no se recibió respuesta") || value.Contains("no se recibio respuesta")
+            || value.Contains("timeout") || value.Contains("timed out") || value.Contains("time-out"))
+            return "No recibimos confirmación de la factura. Verifique su estado en Plemsi antes de intentar enviarla de nuevo.";
+        if (value.Contains("unauthorized") || value.Contains("forbidden") || value.Contains("api key")
+            || value.Contains("apikey") || value.Contains("token") || value.Contains("401"))
+            return "No fue posible validar el acceso al proveedor de facturación. El equipo de soporte debe revisar la conexión.";
+        if (value.Contains("reject") || value.Contains("rechaz") || value.Contains("dian"))
+            return "La factura no fue aceptada por el proveedor o la DIAN. Revise el detalle técnico antes de corregirla y reenviarla.";
+        if (value.Contains("invalid") || value.Contains("validation") || value.Contains("validaci")
+            || value.Contains("obligatorio") || value.Contains("requerido") || value.Contains("no válido")
+            || value.Contains("no valido"))
+            return "La factura contiene información que requiere revisión. Consulte el detalle técnico para identificar el dato que debe corregirse.";
+        if (value.Contains("connection") || value.Contains("conexi") || value.Contains("socket")
+            || value.Contains("network") || value.Contains("red"))
+            return "No fue posible conectar con el proveedor de facturación. Verifique el estado del servicio antes de reenviar.";
+        return "No se pudo confirmar la emisión de esta factura. El equipo de soporte debe revisar el detalle técnico antes de reenviarla.";
+    }
 
     private static string SafeReason(string? reason)
     {

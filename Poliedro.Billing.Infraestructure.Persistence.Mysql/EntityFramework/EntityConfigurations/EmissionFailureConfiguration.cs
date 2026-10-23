@@ -16,6 +16,7 @@ public sealed class EmissionFailureConfiguration : IEntityTypeConfiguration<Emis
         builder.Property(x => x.InvoiceNumber).HasColumnName("invoice_number").HasMaxLength(100);
         builder.Property(x => x.Prefix).HasColumnName("prefix").HasMaxLength(30);
         builder.Property(x => x.DocumentType).HasColumnName("document_type").HasMaxLength(20);
+        builder.Property(x => x.CommercialMessage).HasColumnName("commercial_message").HasMaxLength(500);
         builder.Property(x => x.Reason).HasColumnName("reason").HasMaxLength(2000);
         builder.Property(x => x.FailedAt).HasColumnName("failed_at").HasColumnType("datetime(6)");
         builder.HasIndex(x => new { x.CompanyId, x.FailedAt }).HasDatabaseName("ix_billing_emission_failure_company_date");
