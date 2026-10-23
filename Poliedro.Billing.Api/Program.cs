@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Poliedro.Billing.Api;
 using Poliedro.Billing.Api.Common.Configurations;
 using Poliedro.Billing.Api.Endpoints.v1.Billing;
@@ -59,23 +59,6 @@ builder.Services
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
-{
-    var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderFE>();
-    var metrics = sp.GetRequiredService<Poliedro.Billing.Api.Observability.Providers.IProviderMetrics>();
-    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorFE>>();
-    return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorFE(concrete, metrics, logger);
-});
-
-builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
-{
-    var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderPOS>();
-    var metrics = sp.GetRequiredService<Poliedro.Billing.Api.Observability.Providers.IProviderMetrics>();
-    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS>>();
-    return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS(concrete, metrics, logger);
-});
-
-
 builder.Services.AddRouting(routing => routing.LowercaseUrls = true);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -97,19 +80,9 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Ingrese el token JWT en el siguiente formato: Bearer {token}"
     });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new List<string>()
-        }
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>()
     });
 
     options.CustomSchemaIds(type => type.FullName);
@@ -138,8 +111,9 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // Additive, idempotent schema setup for the shared administrative database.
-await using (var schemaScope = app.Services.CreateAsyncScope())
+if (config.GetValue("Database:InitializeEmissionFailureSchema", true))
 {
+    await using var schemaScope = app.Services.CreateAsyncScope();
     var database = schemaScope.ServiceProvider.GetRequiredService<Poliedro.Billing.Infraestructure.Persistence.Mysql.Context.DataBaseContext>();
     await database.Database.ExecuteSqlRawAsync("""
         CREATE TABLE IF NOT EXISTS billing_emission_failure (
@@ -233,3 +207,5 @@ app.MapScalarApiReference(options =>
 });
 
 app.Run();
+
+public partial class Program { }

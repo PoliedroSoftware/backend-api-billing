@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.Common.Results.Errors;
+using Poliedro.Billing.Domain.Common.Results.Errors;
 using System.Net;
 
 namespace Poliedro.Billing.Application.DianResolution.Errors

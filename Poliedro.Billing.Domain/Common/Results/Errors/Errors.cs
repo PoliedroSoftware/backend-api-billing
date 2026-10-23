@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 
 namespace Poliedro.Billing.Domain.Common.Results.Errors;
 

@@ -1,4 +1,4 @@
-﻿using MySqlConnector;
+using MySqlConnector;
 using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.Server.Entities;
 

@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.FERetail.Commands.CreateFERetail;
+using Poliedro.Billing.Application.FERetail.Commands.CreateFERetail;
 
 namespace Poliedro.Billing.Application.FERetail.Commands.CreateFERetail.Command
 {

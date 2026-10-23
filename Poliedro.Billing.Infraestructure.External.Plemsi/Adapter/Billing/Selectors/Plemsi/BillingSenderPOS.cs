@@ -2,14 +2,19 @@ using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Poliedro.Billing.Application.Billing.Dtos.Plemsi.POS;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Contracts.POS;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Contracts.Responses;
+using Poliedro.Billing.Domain.Resolution.Enums;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
 
+[BillingSenderAdapter(1, ResolutionType.POS)]
 public class BillingSenderPOS(
     IConfiguration config,
     IInvoiceLastPos _getLastInvoiceBilling,

@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Common.Enum;
+namespace Poliedro.Billing.Domain.Common.Enum;
 
 public enum Automatic
 {

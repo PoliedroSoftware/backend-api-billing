@@ -1,4 +1,4 @@
-﻿
+
 using Poliedro.Billing.Domain.CompanyProvider.Enums;
 
 namespace Poliedro.Billing.Domain.CompanyProvider.Entities;

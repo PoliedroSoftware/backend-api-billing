@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Poliedro.Billing.Application.Client.Commands.CreateClient;
 using Poliedro.Billing.Application.Client.Commands.UpdateClient;
 using Poliedro.Billing.Application.Client.Dtos;

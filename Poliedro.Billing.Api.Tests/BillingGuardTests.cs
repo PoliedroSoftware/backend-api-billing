@@ -1,4 +1,5 @@
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -15,6 +16,38 @@ namespace Poliedro.Billing.Api.Tests;
 
 public class BillingGuardTests
 {
+    [Fact]
+    public async Task Missing_invoice_collection_returns_bad_request_before_dependencies_are_called()
+    {
+        var resolution = new Moq.Mock<IDianResolutionGetByIdService>(Moq.MockBehavior.Strict);
+        var handler = new CreateBillingHandler(resolution.Object, null!, null!, null!, null!, null!,
+            NullLogger<CreateBillingHandler>.Instance, null!, null!, null!);
+
+        var result = await handler.Handle(new CreateBillingCommand(1, null!), default);
+
+        Assert.False(result.Success);
+        Assert.Equal(400, result.StatusCode);
+        resolution.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task Missing_resolution_returns_not_found_without_loading_provider_or_client()
+    {
+        var resolution = new Moq.Mock<IDianResolutionGetByIdService>(Moq.MockBehavior.Strict);
+        resolution.Setup(x => x.GetByIdAsync(404, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Poliedro.Billing.Domain.Common.Results.Result<Poliedro.Billing.Domain.Resolution.Entities.DianResolutionEntity, Error>
+                .Failure(Error.CreateInstance("not_found", "Resolution missing", System.Net.HttpStatusCode.NotFound)));
+        var handler = new CreateBillingHandler(resolution.Object, null!, null!, null!, null!, null!,
+            NullLogger<CreateBillingHandler>.Instance, null!, null!, null!);
+
+        var result = await handler.Handle(new CreateBillingCommand(404, []), default);
+
+        Assert.False(result.Success);
+        Assert.Equal(404, result.StatusCode);
+        Assert.Contains("404", result.Message);
+        resolution.VerifyAll();
+    }
+
     [Theory]
     [InlineData(false, true, true, true)]
     [InlineData(true, false, true, true)]

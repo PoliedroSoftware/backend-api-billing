@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Infraestructure.External.TNS.ConfigModels;
+using Poliedro.Billing.Infraestructure.External.TNS.ConfigModels;
 
 namespace Poliedro.Billing.Infraestructure.External.TNS.Services
 {

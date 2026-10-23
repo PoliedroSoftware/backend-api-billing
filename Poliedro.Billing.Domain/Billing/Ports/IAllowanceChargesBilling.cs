@@ -1,4 +1,4 @@
-﻿
+
 using Poliedro.Billing.Domain.FERetail.Entity;
 
 namespace Poliedro.Billing.Domain.Billing.Ports;

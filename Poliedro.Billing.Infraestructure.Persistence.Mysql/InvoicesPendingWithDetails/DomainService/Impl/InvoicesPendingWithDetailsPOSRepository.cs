@@ -1,5 +1,5 @@
-﻿
-using MySqlConnector;
+
+using System.Data.Common;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
@@ -8,7 +8,7 @@ using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.InvoicesPendingWithDetails.DomainService.Impl;
-public class InvoicesPendingWithDetailsPOSRepository(IDatabaseUtils databaseUtils) : IInvoicesPendingWithDetailsStrategy
+public class InvoicesPendingWithDetailsPOSRepository(IServerDatabaseConnectionFactory connectionFactory) : IInvoicesPendingWithDetailsStrategy
 {
     public async Task<IEnumerable<CreateBilling>> GetAllInvoicePendingWithDetails(
     ServerEntity _server,
@@ -18,7 +18,7 @@ public class InvoicesPendingWithDetailsPOSRepository(IDatabaseUtils databaseUtil
         var dianResolution = _dianResolutionEntity;
 
         var invoicesMap = new Dictionary<int, CreateBilling>();
-        using MySqlConnection connection = new(databaseUtils.GetConnectionString(_server));
+        using DbConnection connection = connectionFactory.Create(_server);
 
         try
         {
@@ -54,36 +54,40 @@ public class InvoicesPendingWithDetailsPOSRepository(IDatabaseUtils databaseUtil
             AND resolutionType= 'POS'
             ORDER BY v.number ASC";
 
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@date", dianResolution.ResolutionDate.ToString("yyyy-MM-dd"));
+            using var command = connection.CreateCommand();
+            command.CommandText = query;
+            var dateParameter = command.CreateParameter();
+            dateParameter.ParameterName = "@date";
+            dateParameter.Value = dianResolution.ResolutionDate.ToString("yyyy-MM-dd");
+            command.Parameters.Add(dateParameter);
             using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
             while (await reader.ReadAsync(cancellationToken))
             {
-                int invoiceId = reader.GetInt32("invoice_id");
+                int invoiceId = reader.GetInt32(reader.GetOrdinal("invoice_id"));
 
                 if (!invoicesMap.TryGetValue(invoiceId, out var invoice))
                 {
-                    var number = reader.IsDBNull(reader.GetOrdinal("number")) ? null : reader.GetString("number");
+                    var number = reader.IsDBNull(reader.GetOrdinal("number")) ? null : reader.GetString(reader.GetOrdinal("number"));
 
                     if (string.IsNullOrEmpty(number))
                         continue;
 
                     invoice = new CreateBilling
                     {
-                        Date = reader.IsDBNull(reader.GetOrdinal("Date")) ? DateTime.MinValue : reader.GetDateTime("Date"),
+                        Date = reader.IsDBNull(reader.GetOrdinal("Date")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("Date")),
                         // Time is intentionally not mapped: the column is a MySQL TIME (TimeSpan) while the
                         // model expects DateTime, and this temporal endpoint does not consume Time (the FE
                         // strategy omits it as well).
                         Number = number,
-                        Prefix = reader.IsDBNull(reader.GetOrdinal("prefix")) ? null : reader["prefix"].ToString(),
-                        Resolution = reader.IsDBNull(reader.GetOrdinal("Resolution")) ? null : reader["Resolution"].ToString(),
-                        Notes = reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader["note"].ToString(),
-                        AllowanceTotal = reader.IsDBNull(reader.GetOrdinal("allowanceTotal")) ? 0L : Convert.ToInt64(reader["allowanceTotal"]),
-                        InvoiceBaseTotal = reader.IsDBNull(reader.GetOrdinal("invoiceBaseTotal")) ? 0L : Convert.ToInt64(reader["invoiceBaseTotal"]),
-                        InvoiceTaxExclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxExclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxExclusiveTotal"]),
-                        InvoiceTaxInclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxInclusiveTotal")) ? 0L : Convert.ToInt64(reader["invoiceTaxInclusiveTotal"]),
-                        TotalToPay = reader.IsDBNull(reader.GetOrdinal("totalToPay")) ? 0L : Convert.ToInt64(reader["totalToPay"]),
+                        Prefix = reader.IsDBNull(reader.GetOrdinal("prefix")) ? null : reader.GetValue(reader.GetOrdinal("prefix")).ToString(),
+                        Resolution = reader.IsDBNull(reader.GetOrdinal("Resolution")) ? null : reader.GetValue(reader.GetOrdinal("Resolution")).ToString(),
+                        Notes = reader.IsDBNull(reader.GetOrdinal("note")) ? null : reader.GetValue(reader.GetOrdinal("note")).ToString(),
+                        AllowanceTotal = reader.IsDBNull(reader.GetOrdinal("allowanceTotal")) ? 0L : Convert.ToInt64(reader.GetValue(reader.GetOrdinal("allowanceTotal"))),
+                        InvoiceBaseTotal = reader.IsDBNull(reader.GetOrdinal("invoiceBaseTotal")) ? 0L : Convert.ToInt64(reader.GetValue(reader.GetOrdinal("invoiceBaseTotal"))),
+                        InvoiceTaxExclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxExclusiveTotal")) ? 0L : Convert.ToInt64(reader.GetValue(reader.GetOrdinal("invoiceTaxExclusiveTotal"))),
+                        InvoiceTaxInclusiveTotal = reader.IsDBNull(reader.GetOrdinal("invoiceTaxInclusiveTotal")) ? 0L : Convert.ToInt64(reader.GetValue(reader.GetOrdinal("invoiceTaxInclusiveTotal"))),
+                        TotalToPay = reader.IsDBNull(reader.GetOrdinal("totalToPay")) ? 0L : Convert.ToInt64(reader.GetValue(reader.GetOrdinal("totalToPay"))),
                         ItemElectronicEntity = new List<ItemElectronicEntity>()
                     };
 
@@ -93,12 +97,12 @@ public class InvoicesPendingWithDetailsPOSRepository(IDatabaseUtils databaseUtil
 
                 var item = new ItemElectronicEntity
                 {
-                    Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader["description"].ToString(),
-                    Code = int.TryParse(reader["code"]?.ToString(), out var codeValue) ? codeValue : (int?)null,
-                    BaseQuantity = reader.IsDBNull(reader.GetOrdinal("base_quantity")) ? 0.0 : reader.GetDouble("base_quantity"),
-                    InvoicedQuantity = reader.IsDBNull(reader.GetOrdinal("invoiced_quantity")) ? 0.0 : reader.GetDouble("invoiced_quantity"),
-                    PriceAmount = reader.IsDBNull(reader.GetOrdinal("price_amount")) ? 0.0 : reader.GetDouble("price_amount"),
-                    Subtotal = reader.IsDBNull(reader.GetOrdinal("subtotal")) ? 0.0 : reader.GetDouble("subtotal")
+                    Description = reader.IsDBNull(reader.GetOrdinal("description")) ? null : reader.GetValue(reader.GetOrdinal("description")).ToString(),
+                    Code = int.TryParse(reader.GetValue(reader.GetOrdinal("code"))?.ToString(), out var codeValue) ? codeValue : (int?)null,
+                    BaseQuantity = reader.IsDBNull(reader.GetOrdinal("base_quantity")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("base_quantity")),
+                    InvoicedQuantity = reader.IsDBNull(reader.GetOrdinal("invoiced_quantity")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("invoiced_quantity")),
+                    PriceAmount = reader.IsDBNull(reader.GetOrdinal("price_amount")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("price_amount")),
+                    Subtotal = reader.IsDBNull(reader.GetOrdinal("subtotal")) ? 0.0 : reader.GetDouble(reader.GetOrdinal("subtotal"))
                 };
 
                 invoice.ItemElectronicEntity!.Add(item);

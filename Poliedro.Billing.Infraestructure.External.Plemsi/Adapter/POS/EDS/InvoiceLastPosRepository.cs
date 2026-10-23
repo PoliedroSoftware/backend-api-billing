@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -6,13 +7,12 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
 
-public class InvoiceLastPosRepository(IConfiguration config) : IInvoiceLastPos
+public class InvoiceLastPosRepository(IConfiguration config, HttpClient? httpClient = null) : IInvoiceLastPos
 {
-    private static readonly HttpClient client = new();
+    private readonly HttpClient _client = httpClient ?? new HttpClient();
 
     public async Task<int> GetInvoiceLastAsync(
         DianResolutionEntity dianResolutionEntity,
@@ -20,11 +20,9 @@ public class InvoiceLastPosRepository(IConfiguration config) : IInvoiceLastPos
         CancellationToken cancellationToken)
     {
 
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
-
         bool isProduction = bool.Parse(config["Enviroment:Production"]!);
 
-        string baseUrl;
+        string? baseUrl;
 
         if (!Enum.TryParse(dianResolutionEntity.MultipleResolution.ToString(),
             out MultipleResolution resolution))
@@ -47,10 +45,14 @@ public class InvoiceLastPosRepository(IConfiguration config) : IInvoiceLastPos
                 break;
         }
 
+        if (string.IsNullOrWhiteSpace(baseUrl))
+            throw new InvalidOperationException("No está configurada la URL de consulta de consecutivos POS en Plemsi.");
+
         string ApiUrl = $"{baseUrl}{dianResolutionEntity.Prefix}";
 
-        HttpResponseMessage Response =
-            await client.GetAsync(ApiUrl, cancellationToken);
+        using var request = new HttpRequestMessage(HttpMethod.Get, ApiUrl);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", companyProviderEntity.ApiKey);
+        using HttpResponseMessage Response = await _client.SendAsync(request, cancellationToken);
 
         if (!Response.IsSuccessStatusCode)
         {

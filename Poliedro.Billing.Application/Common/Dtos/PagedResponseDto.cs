@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.Common.Dtos;
+namespace Poliedro.Billing.Application.Common.Dtos;
 
 public class PagedResponseDto<T>
 {

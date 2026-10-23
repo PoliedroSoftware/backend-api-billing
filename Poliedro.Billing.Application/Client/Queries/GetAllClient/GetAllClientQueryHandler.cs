@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Poliedro.Billing.Application.Client.Dtos;
 using Poliedro.Billing.Domain.Client.DomainService;

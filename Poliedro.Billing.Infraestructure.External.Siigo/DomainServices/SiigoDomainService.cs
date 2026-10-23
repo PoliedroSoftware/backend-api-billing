@@ -1,9 +1,9 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
-using Poliedro.Billing.Domain.Siigo.DomainServices;
-using Poliedro.Billing.Domain.Siigo.Models;
-using Poliedro.Billing.Domain.Siigo.ResponseModels;
+using Poliedro.Billing.Application.Siigo.Ports;
+using Poliedro.Billing.Application.Siigo.Contracts.Models;
+using Poliedro.Billing.Application.Siigo.Contracts.Responses;
 using Poliedro.Billing.Infraestructure.External.Siigo.ConfigModels;
 using Poliedro.Billing.Infraestructure.External.Siigo.Services;
 using System.Net.Http.Headers;
@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Poliedro.Billing.Infraestructure.External.Siigo.DomainServices
 {
-    public class SiigoDomainService(ISettingsService settingsService) : ISiigoDomainService
+    public class SiigoDomainService(ISettingsService settingsService) : ISiigoGateway
     {
 
         public async Task<Result<ApiResponseSiigo, Error>> CreateAndSendDianAsync(List<Invoice> request, string token, CancellationToken cancellationToken)

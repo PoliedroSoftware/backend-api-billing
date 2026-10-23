@@ -1,4 +1,4 @@
-﻿
+
 using AutoMapper;
 using MediatR;
 using Poliedro.Billing.Application.CompanyProvider.Dtos;

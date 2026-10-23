@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.CompanyProvider.Enums;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
 namespace Poliedro.Billing.Application.CompanyProvider.Dtos;
 
 public record CompanyProviderDto

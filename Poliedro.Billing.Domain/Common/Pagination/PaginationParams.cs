@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Common.Pagination;
+namespace Poliedro.Billing.Domain.Common.Pagination;
 
 
 public class PaginationParams

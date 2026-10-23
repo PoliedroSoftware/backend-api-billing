@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Poliedro.Billing.Application.FERetail.Commands.CreateFERetail.Command;
 using Poliedro.Billing.Application.FERetail.Commands.CreateFERetail;
 //using Poliedro.Billing.Application.Controllers.v1.FERetail;

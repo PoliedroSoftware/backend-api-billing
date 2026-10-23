@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.GetInvoice.DomainGetInvoice;
@@ -6,21 +6,19 @@ using Poliedro.Billing.Domain.GetInvoice.Entities;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.GetInvoice;
 
-public class GetInvoiceDomainGetInvoice(IConfiguration config) : IGetInvoiceDomainGetInvoice
+public class GetInvoiceDomainGetInvoice(IConfiguration config, HttpClient client) : IGetInvoiceDomainGetInvoice
 {
     public async Task<GetInvoiceEntity?> GetByIdAsync(string cufe, string token, CancellationToken cancellationToken)
     {
         try
         {
-            using var client = new HttpClient();
-
             string bearerToken = token.Trim();
             if (!bearerToken.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
             {
                 bearerToken = $"Bearer {bearerToken}";
             }
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase).Trim());
+            var authorization = new AuthenticationHeaderValue("Bearer", bearerToken.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase).Trim());
 
             string baseUrl = config["ApiPlemsi:GetInvoice"] ?? throw new InvalidOperationException("ApiPlemsi:GetInvoice configuration is missing");
             string url = baseUrl + cufe.Trim();
@@ -28,6 +26,7 @@ public class GetInvoiceDomainGetInvoice(IConfiguration config) : IGetInvoiceDoma
 
             using var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            request.Headers.Authorization = authorization;
 
             var response = await client.SendAsync(request, cancellationToken);
 

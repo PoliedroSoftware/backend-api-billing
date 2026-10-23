@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Poliedro.Billing.Application.Location.Dtos;
 using Poliedro.Billing.Domain.Location.Entities;
 

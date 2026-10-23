@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Poliedro.Billing.Application.Billing.Dtos;
 
 namespace Poliedro.Billing.Application.Billing.Commands.CreateBilling;

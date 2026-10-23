@@ -1,8 +1,8 @@
-﻿namespace Poliedro.Billing.Domain.FERetail.Entity;
+namespace Poliedro.Billing.Domain.FERetail.Entity;
 
 public class DiscrepancyEntity
 {
-    public int? Code;
+    public int? Code { get; set; }
 
-    public string? Description;
+    public string? Description { get; set; }
 }

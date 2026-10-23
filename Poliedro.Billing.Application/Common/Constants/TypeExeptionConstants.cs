@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.Common.Constants;
+namespace Poliedro.Billing.Application.Common.Constants;
 
 public static class TypeExeptionConstants
 {

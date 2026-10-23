@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Api.Common.Configurations;
+using Poliedro.Billing.Api.Common.Configurations;
 
 namespace Poliedro.Billing.Api;
 

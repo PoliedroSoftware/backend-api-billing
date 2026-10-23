@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.SuccessInvoice.Ports;
+namespace Poliedro.Billing.Domain.SuccessInvoice.Ports;
 
 public record SuccessInvoiceQueryParameters(
      string Token,

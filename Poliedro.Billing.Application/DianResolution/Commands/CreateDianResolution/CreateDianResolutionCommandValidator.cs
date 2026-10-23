@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Poliedro.Billing.Domain.Ports;
 
 namespace Poliedro.Billing.Application.DianResolution.Commands.CreateDianResolution

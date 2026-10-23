@@ -1,4 +1,4 @@
-﻿
+
 namespace Poliedro.Billing.Domain.Client.Entities;
 
 public class ClientEntity

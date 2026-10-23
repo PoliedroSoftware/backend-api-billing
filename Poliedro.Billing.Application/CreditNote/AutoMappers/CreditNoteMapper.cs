@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote;
 using Poliedro.Billing.Application.CreditNote.Dtos;
 using Poliedro.Billing.Domain.CreditNote.Entity;

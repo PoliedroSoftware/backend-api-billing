@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using AutoMapper;
 using System.Collections.Generic;
 using Poliedro.Billing.Application.SuccessInvoice.Dtos;

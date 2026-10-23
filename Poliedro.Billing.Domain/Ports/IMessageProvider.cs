@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Ports;
+namespace Poliedro.Billing.Domain.Ports;
 
 public interface IMessageProvider
 {

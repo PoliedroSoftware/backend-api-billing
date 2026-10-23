@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Poliedro.Billing.Application.Server.Commands.UpdateServer;
 using Poliedro.Billing.Domain.Ports;
 using System.Net;

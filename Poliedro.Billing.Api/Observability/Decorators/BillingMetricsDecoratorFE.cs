@@ -1,6 +1,8 @@
-using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Contracts.Responses;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Api.Observability.Providers;
 

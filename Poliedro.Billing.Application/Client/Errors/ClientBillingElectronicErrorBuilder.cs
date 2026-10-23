@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.Common.Constants;
+using Poliedro.Billing.Application.Common.Constants;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 using System.Net;
 

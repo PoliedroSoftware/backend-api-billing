@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Common.Models;
+namespace Poliedro.Billing.Domain.Common.Models;
 
 public class BaseResponseModel
 {

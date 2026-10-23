@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.SendEmail.Dtos;
+using Poliedro.Billing.Application.SendEmail.Dtos;
 using System.Text;
 namespace Poliedro.Billing.Application.Helper.EmailBuilder;
 public static class FailedBillingMessageBuilder

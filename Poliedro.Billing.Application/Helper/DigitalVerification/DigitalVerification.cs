@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.Helper.DigitalVerification;
+namespace Poliedro.Billing.Application.Helper.DigitalVerification;
 
 public static class DigitalVerification
 {

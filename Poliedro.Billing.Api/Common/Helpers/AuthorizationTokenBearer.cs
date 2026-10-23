@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Api.Common.Helpers
+namespace Poliedro.Billing.Api.Common.Helpers
 {
     public static class TokenHelper
     {

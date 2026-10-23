@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Domain.CustomersId.Entities;
 
 namespace Poliedro.Billing.Application.CustomersId.Queries.CustomersbyId;

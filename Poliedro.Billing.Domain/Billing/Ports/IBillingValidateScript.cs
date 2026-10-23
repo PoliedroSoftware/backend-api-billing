@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.Common.Enum;
+using Poliedro.Billing.Domain.Common.Enum;
 namespace Poliedro.Billing.Domain.Billing.Ports;
 public interface IBillingValidateScript
 {

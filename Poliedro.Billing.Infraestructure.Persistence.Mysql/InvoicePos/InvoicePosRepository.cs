@@ -11,10 +11,10 @@ public class InvoicePosRepository : IInvoicePosRepository
     private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient;
 
-    public InvoicePosRepository(IConfiguration configuration)
+    public InvoicePosRepository(IConfiguration configuration, HttpClient? httpClient = null)
     {
         _configuration = configuration;
-        _httpClient = new HttpClient();
+        _httpClient = httpClient ?? new HttpClient();
     }
 
     public async Task<IEnumerable<InvoicePosEntity>> GetAllAsync(string? prefix, CancellationToken cancellationToken)

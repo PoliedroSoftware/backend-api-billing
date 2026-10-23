@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Infraestructure.External.TNS.ConfigModels
+namespace Poliedro.Billing.Infraestructure.External.TNS.ConfigModels
 {
     public class AppSettings
     {

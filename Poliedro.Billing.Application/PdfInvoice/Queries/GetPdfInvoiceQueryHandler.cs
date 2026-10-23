@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Domain.PdfInvoice.Service;
 
 namespace Poliedro.Billing.Application.PdfInvoice.Queries;

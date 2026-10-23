@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote
+namespace Poliedro.Billing.Application.CreditNote.Commands.CreateCreditNote
 {
     public record ItemElectronicEntity(
         int UnitMeasureId,

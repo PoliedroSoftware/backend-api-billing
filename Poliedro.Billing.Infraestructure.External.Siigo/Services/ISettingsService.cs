@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Infraestructure.External.Siigo.ConfigModels;
+using Poliedro.Billing.Infraestructure.External.Siigo.ConfigModels;
 
 namespace Poliedro.Billing.Infraestructure.External.Siigo.Services
 {

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -6,7 +7,6 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 

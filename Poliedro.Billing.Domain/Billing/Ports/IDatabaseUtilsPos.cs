@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.Server.Entities;
+using Poliedro.Billing.Domain.Server.Entities;
 
 namespace Poliedro.Billing.Domain.Billing.Ports
 {

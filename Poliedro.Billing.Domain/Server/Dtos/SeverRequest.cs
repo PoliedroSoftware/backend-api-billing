@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Server.Dtos;
+namespace Poliedro.Billing.Domain.Server.Dtos;
 
 public class SeverRequest
 {

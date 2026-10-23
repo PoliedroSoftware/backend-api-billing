@@ -1,12 +1,18 @@
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
+using Poliedro.Billing.Domain.CompanyProvider.Enums;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Contracts;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Contracts.Responses;
+using Poliedro.Billing.Domain.Resolution.Enums;
+using Poliedro.Billing.Infraestructure.External.Plemsi.Contracts.FE;
 using System.Net.Http.Headers;
 using System.Text;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
+[BillingSenderAdapter(1, ResolutionType.FE)]
 public class BillingSenderFE(
     IConfiguration config,
     IGetLastInvoiceBilling _getLastInvoiceBilling,

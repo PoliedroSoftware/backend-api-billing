@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Application.CompanyProvider.Commands.CreateCompanyProvider;
 using Poliedro.Billing.Application.CompanyProvider.Commands.DeleteCompanyProvider;
 using Poliedro.Billing.Application.CompanyProvider.Commands.UpdateCompanyProvider;

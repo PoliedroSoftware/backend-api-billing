@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Domain.CompanyProvider.DomainService;
 
 namespace Poliedro.Billing.Application.CompanyProvider.Commands.DeleteCompanyProvider;

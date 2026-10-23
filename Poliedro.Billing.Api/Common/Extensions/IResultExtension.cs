@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace Poliedro.Billing.Api.Common.Extensions;

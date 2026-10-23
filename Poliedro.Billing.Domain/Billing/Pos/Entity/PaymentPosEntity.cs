@@ -1,4 +1,4 @@
-﻿
+
 
 namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
 public class PaymentPosEntity

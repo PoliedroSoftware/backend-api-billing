@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.GetInvoice.Dtos
+namespace Poliedro.Billing.Application.GetInvoice.Dtos
 {
     public record PaginationGetInvoiceDto<T>
     (

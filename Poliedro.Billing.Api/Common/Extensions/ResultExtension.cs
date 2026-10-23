@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.Common.Results;
+using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 
 namespace Poliedro.Billing.Api.Common.Extensions;

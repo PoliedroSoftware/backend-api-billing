@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.SendEmail.Dtos;
+namespace Poliedro.Billing.Application.SendEmail.Dtos;
 public record BillingErrorDto(
     string? Prefix,
     string? Number,

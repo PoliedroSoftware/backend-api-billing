@@ -1,8 +1,9 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Application.FERetail.Commands.CreateFERetail.Command;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
 using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.Billing;
 
 namespace Poliedro.Billing.Application.FERetail.Commands.CreateFERetail;
 
@@ -33,7 +34,7 @@ public record CreateFERetailCommand(
     List<TaxTotal> AllHoldingsTaxTotals,
     List<CustomSubtotal> CustomSubtotals,
     decimal FinalTotalToPay
-) : IRequest<Result<ApiResponseFERetailPos, Error>>;
+) : IRequest<Result<BillingProviderResponse, Error>>;
 
 //public record OrderReference(string IdOrder);
 

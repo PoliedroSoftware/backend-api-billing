@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.CreditNote.Entity;
+namespace Poliedro.Billing.Domain.CreditNote.Entity;
 
 public class ApiResponseCreditNote
 {

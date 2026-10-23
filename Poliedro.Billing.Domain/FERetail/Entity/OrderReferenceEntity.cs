@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.FERetail.Entity;
+namespace Poliedro.Billing.Domain.FERetail.Entity;
 
 public class OrderReferenceEntity
 {

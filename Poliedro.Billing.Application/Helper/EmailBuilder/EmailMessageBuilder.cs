@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.SendEmail.Dtos;
+using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Domain.Client.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 

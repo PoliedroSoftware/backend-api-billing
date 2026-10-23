@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Poliedro.Billing.Application.Server.Commands.CreateServer;
 using Poliedro.Billing.Application.Server.Commands.UpdateServer;
 using Poliedro.Billing.Application.Server.Dtos;
@@ -11,7 +11,9 @@ public class ServerMapper : Profile
     public ServerMapper()
     {
        
-        CreateMap<ServerEntity, ServerDto>().ReverseMap();
+        CreateMap<ServerEntity, ServerDto>()
+            .ForMember(destination => destination.CreationDate, options => options.Ignore())
+            .ReverseMap();
         CreateMap<ServerEntity, CreateServerCommand>().ReverseMap()
             .ForMember(dest => dest.DatabaseName, opt => opt.MapFrom(src => src.DatabaseName))
             .ForMember(dest => dest.DbUsername, opt => opt.MapFrom(src => src.DbUsername))

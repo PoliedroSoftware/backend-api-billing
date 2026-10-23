@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.SuccessInvoice.Entities;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using System.Net.Http.Headers;

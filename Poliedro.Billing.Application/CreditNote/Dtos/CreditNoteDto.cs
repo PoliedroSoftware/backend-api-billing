@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.DianResolution.Dtos;
+using Poliedro.Billing.Application.DianResolution.Dtos;
 using Poliedro.Billing.Application.Server.Dtos;
 
 namespace Poliedro.Billing.Application.CreditNote.Dtos

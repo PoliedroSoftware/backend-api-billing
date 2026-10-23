@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.FERetail.Ports;
+namespace Poliedro.Billing.Domain.FERetail.Ports;
 
 public interface ISendMessage
 {

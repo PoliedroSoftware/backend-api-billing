@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Application.SuccessInvoice.Dtos;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 

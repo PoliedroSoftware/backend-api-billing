@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Api.Common.Helpers;
 using Poliedro.Billing.Application.Common.Dtos;
 using Poliedro.Billing.Application.Location.Dtos;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 namespace Poliedro.Billing.Application.SuccessInvoice.Dtos;
 public record SuccessInvoiceDto(
     string _Id,

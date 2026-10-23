@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.CompanyProvider.Entities;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 namespace Poliedro.Billing.Domain.Billing.Ports;
 public interface IGetLastInvoiceBilling

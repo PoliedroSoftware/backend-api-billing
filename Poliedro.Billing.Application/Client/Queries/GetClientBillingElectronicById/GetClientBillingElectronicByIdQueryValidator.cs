@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace Poliedro.Billing.Application.Client.Queries.GetClientBillingElectronicById;
 

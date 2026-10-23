@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Domain.CustomersId.Ports;
 using Poliedro.Billing.Domain.CustomersId.Entities;
 using Microsoft.Extensions.Logging;

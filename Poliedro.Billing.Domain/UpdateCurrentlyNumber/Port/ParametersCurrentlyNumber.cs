@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
+namespace Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
 public record ParametersCurrentlyNumber(
     int Invoice,
     string? CurrentlyDate,

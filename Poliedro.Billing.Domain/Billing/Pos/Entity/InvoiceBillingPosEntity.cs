@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
+namespace Poliedro.Billing.Domain.Billing.Pos.Entity;
 public class InvoiceBillingPosEntity
 {
     public int number { get; set; }

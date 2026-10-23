@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Application.Client.Dtos;
 using Poliedro.Billing.Application.DianResolution.Dtos;
 using Poliedro.Billing.Domain.Common.Results;

@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Billing;
+namespace Poliedro.Billing.Domain.Billing;
 
 public class ApiDataPos
 {

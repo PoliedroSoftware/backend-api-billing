@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Poliedro.Billing.Application.DianResolution.Commands.UpdateDianResolution;
 using Poliedro.Billing.Domain.Ports;
 

@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
 using Poliedro.Billing.Domain.Common.Results;
 using Poliedro.Billing.Domain.Common.Results.Errors;
-using Poliedro.Billing.Domain.TNS.DomainServices;
-using Poliedro.Billing.Domain.TNS.Models;
-using Poliedro.Billing.Domain.TNS.ResponseModels;
+using Poliedro.Billing.Application.TNS.Ports;
+using Poliedro.Billing.Application.TNS.Contracts.Models;
+using Poliedro.Billing.Application.TNS.Contracts.Responses;
 using Poliedro.Billing.Infraestructure.External.TNS.ConfigModels;
 using Poliedro.Billing.Infraestructure.External.TNS.Services;
 using System.Net.Http.Headers;
@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Poliedro.Billing.Infraestructure.External.TNS.DomainServices
 {
-    public class TNSDomainService(ISettingsService settingsService) : ITNSDomainService
+    public class TNSDomainService(ISettingsService settingsService) : ITNSGateway
     {
 
         public async Task<Result<ApiResponseTNS, Error>> CreateAsync(List<Order> request, string codigosucursal, string token, CancellationToken cancellationToken)
@@ -48,7 +48,7 @@ namespace Poliedro.Billing.Infraestructure.External.TNS.DomainServices
                 httpRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(config.mediaType));
                 httpRequest.Headers.Add("User-Agent", "MyApp/1.0");
 
-                HttpResponseMessage response = await client.SendAsync(httpRequest);
+                HttpResponseMessage response = await client.SendAsync(httpRequest, cancellationToken);
                
                 if (response.IsSuccessStatusCode)
                 {
@@ -57,7 +57,7 @@ namespace Poliedro.Billing.Infraestructure.External.TNS.DomainServices
 
                     if (responseApi is not null && responseApi.Status)
                     {
-                        responseTNS.Status = responseTNS.Status;
+                        responseTNS.Status = true;
                         responseTNS.Message = responseApi.Message;
                         responseTNS.Data.Add(responseApi.Data);
                     }

@@ -1,4 +1,4 @@
-﻿
+
 
 namespace Poliedro.Billing.Domain.Common.Results;
 

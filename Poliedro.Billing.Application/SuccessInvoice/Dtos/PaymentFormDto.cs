@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.SuccessInvoice.Dtos;
+namespace Poliedro.Billing.Application.SuccessInvoice.Dtos;
 
 public record PaymentFormDto(
     List<int>? Payment_Form_Ids,

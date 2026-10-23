@@ -1,6 +1,6 @@
-﻿using MySqlConnector;
+using MySqlConnector;
 using Poliedro.Billing.Domain.Billing.Ports;
-using Poliedro.Billing.Domain.Client.Enums;
+
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
 {
@@ -11,7 +11,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
                string? cude,
                string? QRCode,
                string connectionString,
-               ProviderType providerType,
+               int providerId,
                int ClientBillingElectronicId,
                string invoiceResolution)
         {
@@ -20,7 +20,7 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
             string insertDataQuery = "INSERT INTO invoice_success (invoice, providerid, dateregister, cude, qrCode, client_id, verify) VALUES (@Invoice, @Providerid, @DateRegister, @cude, @qrcode, @client_id, @verify)";
             await using MySqlCommand insertDataCommand = new(insertDataQuery, connection);
             insertDataCommand.Parameters.AddWithValue("@Invoice", invoice);
-            insertDataCommand.Parameters.AddWithValue("@Providerid", (int)providerType);
+            insertDataCommand.Parameters.AddWithValue("@Providerid", (int)providerId);
             insertDataCommand.Parameters.AddWithValue("@DateRegister", DateTime.Now);
             insertDataCommand.Parameters.AddWithValue("@cude", cude);
             insertDataCommand.Parameters.AddWithValue("@qrcode", QRCode);

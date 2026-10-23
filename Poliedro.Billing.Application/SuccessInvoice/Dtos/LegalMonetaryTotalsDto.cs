@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.SuccessInvoice.Dtos;
+namespace Poliedro.Billing.Application.SuccessInvoice.Dtos;
 
 public record LegalMonetaryTotalsDto(
     string Line_Extension_Amount,

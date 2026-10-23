@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.SuccessInvoice.Entities;
+namespace Poliedro.Billing.Domain.SuccessInvoice.Entities;
 
 public record ApiResponseWrapper<T>(
     int Code,

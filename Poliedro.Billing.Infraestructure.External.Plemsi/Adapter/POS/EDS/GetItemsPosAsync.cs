@@ -1,51 +1,51 @@
-﻿using MySqlConnector;
+using System.Data.Common;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.FERetail.Ports;
 
-namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS
+namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.POS.EDS;
+
+public class GetItem(IRelationalConnectionFactory connectionFactory) : IGetItemPos
 {
-    public class GetItem : IGetItemPos
+    public async Task<List<ItemsInvoiceEntity>> GetItemsAsync(int invoiceItem, string connectionString)
     {
-        public async Task<List<ItemsInvoiceEntity>> GetItemsAsync(int invoiceItem, string connectionString)
+        var invoices = new List<ItemsInvoiceEntity>();
+        await using var connection = connectionFactory.Create(connectionString);
+        try
         {
-            List<ItemsInvoiceEntity> invoices = new();
-            using (MySqlConnection connection = new(connectionString))
+            await connection.OpenAsync();
+            await using var command = connection.CreateCommand();
+            command.CommandText = """
+                SELECT * FROM v_api_item WHERE resolution =
+                  (SELECT resolution FROM v_api_invoice v WHERE RIGHT(v.number, 6) = @InvoiceItem Limit 1)
+                """;
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = "@InvoiceItem";
+            parameter.Value = invoiceItem;
+            command.Parameters.Add(parameter);
+
+            await using DbDataReader reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
-                try
-                {
-                    await connection.OpenAsync();
-                    string query = "SELECT * FROM v_api_item WHERE resolution = " +
-                                   "(SELECT resolution FROM v_api_invoice v WHERE RIGHT(v.number, 6) = @InvoiceItem Limit 1)";
+                if (reader.GetDecimal(5) <= 0)
+                    continue;
 
-                    using MySqlCommand command = new(query, connection);
-                    command.Parameters.AddWithValue("@InvoiceItem", invoiceItem);
-
-                    using MySqlDataReader reader = await command.ExecuteReaderAsync();
-                    while (await reader.ReadAsync())
-                    {
-                        if (reader.GetDecimal(5) > 0)
-                        {
-                            ItemsInvoiceEntity invoice = new()
-                            {
-                                Resolution = reader.GetString(0),
-                                Description = reader.GetString(1),
-                                Code = reader.GetString(2),
-                                BaseQuantity = reader.GetDouble(3),
-                                InvoicedQuantity = reader.GetDouble(4),
-                                PriceAmount = reader.GetDecimal(5),
-                                Subtotal = reader.GetDouble(6)
-                            };
-                            invoices.Add(invoice);
-                        }
-                    }
-                }
-                catch (Exception ex)
+                invoices.Add(new ItemsInvoiceEntity
                 {
-                    Console.WriteLine("Error: " + ex.Message);
-                }
+                    Resolution = reader.GetString(0),
+                    Description = reader.GetString(1),
+                    Code = reader.GetString(2),
+                    BaseQuantity = reader.GetDouble(3),
+                    InvoicedQuantity = reader.GetDouble(4),
+                    PriceAmount = reader.GetDecimal(5),
+                    Subtotal = reader.GetDouble(6)
+                });
             }
-            return invoices;
         }
-
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error: " + ex.Message);
+        }
+        return invoices;
     }
 }

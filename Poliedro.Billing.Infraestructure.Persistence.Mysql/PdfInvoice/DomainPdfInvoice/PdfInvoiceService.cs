@@ -6,11 +6,12 @@ namespace Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPd
 
 public class PdfInvoiceService : IPdfInvoiceService
 {
-    private readonly HttpClient _httpClient = new HttpClient();
+    private readonly HttpClient _httpClient;
     private readonly string _apiUrl;
 
-    public PdfInvoiceService(IConfiguration configuration)
+    public PdfInvoiceService(IConfiguration configuration, HttpClient? httpClient = null)
     {
+        _httpClient = httpClient ?? new HttpClient();
         _apiUrl = configuration["ApiPlemsi:PdfInvoiceUrl"]
                   ?? throw new ArgumentNullException("PdfInvoiceUrl is missing in appsettings.json");
     }

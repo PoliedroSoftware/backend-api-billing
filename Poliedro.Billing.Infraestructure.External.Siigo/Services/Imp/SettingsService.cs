@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Infraestructure.External.Siigo.ConfigModels;
 
 namespace Poliedro.Billing.Infraestructure.External.Siigo.Services.Imp

@@ -1,4 +1,4 @@
-﻿
+
 namespace Poliedro.Billing.Application.Client.Dtos
 {
     public class ClientDto

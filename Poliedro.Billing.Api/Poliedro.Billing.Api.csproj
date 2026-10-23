@@ -23,14 +23,20 @@
     <PackageReference Include="AspNetCore.HealthChecks.UI.InMemory.Storage" Version="9.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.MySql.Storage" Version="9.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.21">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Scalar.AspNetCore" Version="1.2.45" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.21">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.21" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.18.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.3.1" />
     <PackageReference Include="prometheus-net" Version="8.2.1" />
     <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
+    <PackageReference Include="KubernetesClient" Version="21.0.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,7 +44,6 @@
     <ProjectReference Include="..\Poliedro.Billing.Domain\Poliedro.Billing.Domain.csproj" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.Plemsi\Poliedro.Billing.Infraestructure.External.Plemsi.csproj" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.TNS\Poliedro.Billing.Infraestructure.External.TNS.csproj" />
-    <PackageReference Include="KubernetesClient" Version="15.0.1" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.Siigo\Poliedro.Billing.Infraestructure.External.Siigo.csproj" />
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.Persistence.Mysql\Poliedro.Billing.Infraestructure.Persistence.Mysql.csproj" />
   </ItemGroup>

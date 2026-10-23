@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.SendEmail.Dtos;
+using Poliedro.Billing.Application.SendEmail.Dtos;
 
 namespace Poliedro.Billing.Application.SendEmail.Ports;
 public interface IEmailBodyRenderer

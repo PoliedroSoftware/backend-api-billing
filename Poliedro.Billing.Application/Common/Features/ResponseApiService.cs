@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.Common.Models;
+using Poliedro.Billing.Domain.Common.Models;
 
 namespace Poliedro.Billing.Application.Common.Features;
 

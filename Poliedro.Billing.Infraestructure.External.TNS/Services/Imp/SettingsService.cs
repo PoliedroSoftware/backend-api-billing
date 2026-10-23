@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Infraestructure.External.TNS.ConfigModels;
 
 namespace Poliedro.Billing.Infraestructure.External.TNS.Services.Imp

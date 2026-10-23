@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.SendEmail;
+namespace Poliedro.Billing.Application.SendEmail;
 public class EmailErrorHandler
 {
     public void Handle(Exception ex)

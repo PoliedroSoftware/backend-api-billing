@@ -2,6 +2,7 @@ using Prometheus;
 using Poliedro.Billing.Api.Observability.Pipeline;
 using Poliedro.Billing.Api.Observability.Providers;
 using MediatR;
+using Poliedro.Billing.Application.Billing.Services.Factories;
 
 namespace Poliedro.Billing.Api.Observability;
 
@@ -38,8 +39,8 @@ public static class ObservabilityServiceExtensions
     /// </summary>
     public static IServiceCollection AddObservability(this IServiceCollection services)
     {
-        // Registrar IProviderMetrics para Plemsi
-        services.AddSingleton<IProviderMetrics, PlemsiMetrics>();
+        // Decorate every configured provider adapter through the neutral Application contract.
+        services.AddScoped<IBillingProviderAdapterFactory, BillingMetricsProviderAdapterFactory>();
 
         // Registrar Pipeline Behavior para instrumentación de handlers
         services.AddScoped(

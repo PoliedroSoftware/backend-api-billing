@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.Net.Mail;
 using System.Net;
 using Poliedro.Billing.Application.SendEmail.Dtos;

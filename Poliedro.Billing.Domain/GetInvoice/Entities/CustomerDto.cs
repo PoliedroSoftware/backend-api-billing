@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Poliedro.Billing.Domain.GetInvoice.Entities;
 public class CustomerDto

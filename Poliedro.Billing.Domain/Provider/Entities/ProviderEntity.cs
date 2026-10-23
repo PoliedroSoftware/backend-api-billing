@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Domain.Provider.Entities;
+namespace Poliedro.Billing.Domain.Provider.Entities;
 
 public class ProviderEntity
 {

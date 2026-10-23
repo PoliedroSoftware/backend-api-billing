@@ -1,5 +1,3 @@
-﻿using Poliedro.Billing.Domain.Client.Enums;
-
 namespace Poliedro.Billing.Domain.Billing.Ports;
 
 public interface IInsertInvoicePos
@@ -9,7 +7,7 @@ public interface IInsertInvoicePos
            string? cude,
            string? QRCode,
            string connectionString,
-           ProviderType providerType,
+           int providerId,
            int ClientBillingElectronicId,
            string invoiceResolution);
 }

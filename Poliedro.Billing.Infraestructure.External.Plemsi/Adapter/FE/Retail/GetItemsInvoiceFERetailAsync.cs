@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.FERetail.Ports;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;

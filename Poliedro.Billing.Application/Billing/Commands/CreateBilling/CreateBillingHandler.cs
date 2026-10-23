@@ -1,16 +1,15 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Poliedro.Billing.Application.Billing.Dtos;
-using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
+using Poliedro.Billing.Application.Billing.Services.Factories;
+using Poliedro.Billing.Application.Billing.Services.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.Billing;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Sender.Plemsi;
 using Poliedro.Billing.Domain.CompanyProvider.DomainService;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.Client.DomainService;
-using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.Resolution.DomainService;
 using Poliedro.Billing.Domain.Resolution.Entities;
 
@@ -20,8 +19,8 @@ public class CreateBillingHandler(
     IDianResolutionGetByIdService _dianResolutionGetByIdService,
     ICompanyProviderGetByIdService _companyProviderGetByIdService,
     IGetProcessorBilling _createBillingFactory,
-    IBillingSenderFactory _billingSenderFactory,
-    IBillingResponseApi _billingResponseApi,
+    IBillingProviderAdapterFactory _billingProviderAdapterFactory,
+    IBillingEmissionResultRecorder _billingEmissionResultRecorder,
     IMapper mapper,
     ILogger<CreateBillingHandler> _logger,
     IClientGetByIdService _clientGetByIdService,
@@ -63,23 +62,44 @@ public class CreateBillingHandler(
         if (!license.Allowed)
             return new(false, 403, "La licencia de facturación no está habilitada: " + license.Code, null);
 
-        if (string.IsNullOrWhiteSpace(companyProvider.ApiKey))
-        {
-            _logger.LogWarning("Company provider {CompanyProviderId} sin ApiKey configurada.",
-                companyProvider.CompanyProviderId);
-            return CreateBillingCommandResult.BadRequest($"El company provider {companyProvider.CompanyProviderId} no tiene una ApiKey configurada.");
-        }
-
         _logger.LogInformation("Iniciando emisión de {Count} facturas para la resolución {ResolutionId} (provider {ProviderId}).",
             request.Invoices.Count(), request.Id, companyProvider.ProviderId);
 
         var billingEntities = mapper.Map<IEnumerable<Domain.Billing.CreateBilling>>(request.Invoices);
 
-        ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(resolutionEntity.ResolutionType, (ProviderType)companyProvider.ProviderId);
+        var providerId = companyProvider.ProviderId;
+        IBillingProviderAdapter providerAdapter;
+        try
+        {
+            providerAdapter = _billingProviderAdapterFactory.Resolve(providerId);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "No hay adaptador de facturación configurado para el proveedor {ProviderId}.", companyProvider.ProviderId);
+            return CreateBillingCommandResult.BadRequest("El proveedor de facturación configurado no está disponible.");
+        }
 
-        IEnumerable<Domain.Billing.BillingPreparationResult> processedInvoices = await processor.CreateInvoicesAsync(billingEntities, resolutionEntity, companyProvider, cancellationToken);
+        var configurationValidation = providerAdapter.ValidateConfiguration(companyProvider);
+        if (!configurationValidation.IsValid)
+        {
+            _logger.LogWarning("Configuración inválida para proveedor {ProviderId}, company provider {CompanyProviderId}: {Reason}",
+                companyProvider.ProviderId, companyProvider.CompanyProviderId, configurationValidation.Error);
+            return CreateBillingCommandResult.BadRequest(configurationValidation.Error ?? "La configuración del proveedor no es válida.");
+        }
 
-        IBillingSender sender = _billingSenderFactory.Resolve((ProviderType)companyProvider.ProviderId, resolutionEntity.ResolutionType);
+        ICreateBilling processor = await _createBillingFactory.GetProcessorAsync(resolutionEntity.ResolutionType);
+        IReadOnlyList<Domain.Billing.BillingPreparationResult> processedInvoices;
+        try
+        {
+            var lastInvoiceNumber = await providerAdapter.GetLastNumberAsync(resolutionEntity, companyProvider, cancellationToken);
+            processedInvoices = (await processor.CreateInvoicesAsync(
+                billingEntities, resolutionEntity, companyProvider, lastInvoiceNumber, cancellationToken)).ToArray();
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError(ex, "No hay numerador configurado para proveedor {ProviderId} y documento {DocumentType}.", providerId, resolutionEntity.ResolutionType);
+            return CreateBillingCommandResult.BadRequest("No está configurada la numeración para el proveedor de facturación.");
+        }
 
         var billingResults = new List<CreateBillingResultDTO>();
 
@@ -104,17 +124,14 @@ public class CreateBillingHandler(
                 billingResults.Add(new CreateBillingResultDTO { Status = false, Message = "Licencia suspendida o no disponible.", Data = null });
                 break;
             }
-            var invoiceRequest = new PlemsiInvoiceRequest
-            {
-                DianResolutionEntity = resolutionEntity,
-                CompanyProviderEntity = companyProvider,
-                Invoices = [processed.Output!]
-            };
-
-            List<ApiResponseFERetailPos> responses;
+            IReadOnlyList<Domain.Billing.BillingProviderResponse> responses;
             try
             {
-                responses = await sender.SendAsync(invoiceRequest, cancellationToken);
+                responses = await providerAdapter.SendAsync(new BillingProviderSubmission(
+                    resolutionEntity,
+                    companyProvider,
+                    resolutionEntity.ResolutionType,
+                    [processed.Output!]), cancellationToken);
             }
             catch (Exception ex) when (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested)
             {
@@ -133,7 +150,7 @@ public class CreateBillingHandler(
                 _logger.LogWarning("No se recibió respuesta del proveedor para la factura {Number} de la resolución {ResolutionId}.",
                     processed.Billing.Number, request.Id);
                 await RecordFailureAsync(companyProvider.CompanyId, client.Value?.Name, resolutionEntity,
-                    processed.Billing, "No se recibió respuesta del proveedor; verificar en Plemsi antes de reintentar.", cancellationToken);
+                    processed.Billing, "No se recibió respuesta del proveedor; verificar el estado con el proveedor antes de reintentar.", cancellationToken);
                 billingResults.Add(new CreateBillingResultDTO
                 {
                     Status = false,
@@ -147,8 +164,8 @@ public class CreateBillingHandler(
             {
                 try
                 {
-                    await _billingResponseApi.IBillingResponseApi(
-                        new List<ApiResponseFERetailPos> { result },
+                    await _billingEmissionResultRecorder.RecordAsync(
+                        new List<Domain.Billing.BillingProviderResponse> { result },
                         new List<Domain.Billing.CreateBilling> { processed.Billing },
                         resolutionEntity,
                         companyProvider,
@@ -174,15 +191,15 @@ public class CreateBillingHandler(
             else
             {
                 _logger.LogWarning("Factura {Number} rechazada por el proveedor: {Info}",
-                    processed.Billing.Number, result.Info);
+                    processed.Billing.Number, result.Message);
                 await RecordFailureAsync(companyProvider.CompanyId, client.Value?.Name, resolutionEntity,
-                    processed.Billing, SafeReason(result.Info), cancellationToken);
+                    processed.Billing, SafeReason(result.Message), cancellationToken);
             }
 
             billingResults.Add(new CreateBillingResultDTO
             {
                 Status = result.Success,
-                Message = result.Success ? "Factura procesada exitosamente" : (result.Info ?? "El proveedor rechazó la factura"),
+                Message = result.Success ? "Factura procesada exitosamente" : (result.Message ?? "El proveedor rechazó la factura"),
                 Data = null
             });
         }

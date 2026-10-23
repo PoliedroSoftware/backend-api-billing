@@ -1,4 +1,4 @@
-﻿
+
 using AutoMapper;
 using Poliedro.Billing.Application.CompanyProvider.Dtos;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
@@ -24,7 +24,9 @@ public class CompanyProviderMapper: Profile
      ))
      .ReverseMap();
 
-        CreateMap<CreateCompanyProviderDto, CompanyProviderEntity>();   // ← NUEVO
-        CreateMap<UpdateCompanyProviderDto, CompanyProviderEntity>();   // ← NUEVO
+        CreateMap<CreateCompanyProviderDto, CompanyProviderEntity>()
+            .ForMember(destination => destination.CompanyProviderId, options => options.Ignore());
+        CreateMap<UpdateCompanyProviderDto, CompanyProviderEntity>()
+            .ForMember(destination => destination.CompanyProviderId, options => options.Ignore());
     }   
 }

@@ -7,15 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.11.0" />
-    <PackageReference Include="MediatR" Version="12.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
-    <PackageReference Include="PDFsharp" Version="6.1.1" />
+    <PackageReference Include="FluentValidation" Version="12.2.0" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.13" />
+    <PackageReference Include="PDFsharp" Version="6.5.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Methods\Billing\Prepare\TNS\" />
-    <Folder Include="Common\Methods\Billing\Prepare\Siigo\" />
   </ItemGroup>
 
 </Project>

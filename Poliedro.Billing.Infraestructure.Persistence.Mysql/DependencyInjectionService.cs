@@ -5,7 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Domain.Billing.Ports;
 
 using Poliedro.Billing.Domain.Client.DomainService;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
+using Poliedro.Billing.Domain.Common.Methods.Billing.Preparation.ElectronicBilling;
+using Poliedro.Billing.Domain.FERetail.Ports;
 using Poliedro.Billing.Domain.CompanyProvider.DomainService;
 
 using Poliedro.Billing.Domain.InvoicePos.DomainService;
@@ -31,6 +32,8 @@ using Poliedro.Billing.Infraestructure.Persistence.Mysql.PdfInvoice.DomainPdfInv
 
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.Server.DomainService.Impl;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql.EmissionFailures;
+using Poliedro.Billing.Application.Billing.Services.Ports;
+using Poliedro.Billing.Infraestructure.Persistence.Mysql.Billing;
 
 
 
@@ -41,10 +44,16 @@ public static class DependencyInjectionService
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION") ?? configuration.GetConnectionString("MysqlConnection");
+        var configuredVersion = configuration["Database:ServerVersion"];
+        var serverVersion = ResolveServerVersion(configuredVersion, connectionString);
         services.AddDbContext<DataBaseContext>(
-            options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)
+            options => options.UseMySql(connectionString, serverVersion
         ));
         services.AddScoped<IEmissionFailureRepository, EmissionFailureRepository>();
+        services.AddTransient<IBillingEmissionResultRecorder, BillingEmissionResultRecorder>();
+        services.AddTransient<IInvoiceEmissionStore, MySqlInvoiceEmissionStore>();
+        services.AddScoped<IServerDatabaseConnectionFactory, MySqlServerDatabaseConnectionFactory>();
+        services.AddScoped<IRelationalConnectionFactory, MySqlServerDatabaseConnectionFactory>();
         
         // Client services - specialized implementations
         services.AddScoped<IClientExistsService, ClientExistsService>();
@@ -102,12 +111,22 @@ public static class DependencyInjectionService
         services.AddTransient<IInvoicesPendingWithDetailsStrategyFactory, InvoicesPendingWithDetailsStrategyFactory>();
 
         
-        services.AddTransient<IPrepareItemBilling, PrepareItemElectronic>();
-        services.AddTransient<IGetAllTaxTotalsBilling, GetAllTaxTotalsBilling>();
 
 
 
 
         return services;
+    }
+
+    private static ServerVersion ResolveServerVersion(string? configuredVersion, string? connectionString)
+    {
+        if (string.IsNullOrWhiteSpace(configuredVersion))
+            return ServerVersion.AutoDetect(connectionString);
+
+        const string mariaDbSuffix = "-mariadb";
+        var isMariaDb = configuredVersion.EndsWith(mariaDbSuffix, StringComparison.OrdinalIgnoreCase);
+        var versionText = isMariaDb ? configuredVersion[..^mariaDbSuffix.Length] : configuredVersion;
+        var version = Version.Parse(versionText);
+        return isMariaDb ? new MariaDbServerVersion(version) : new MySqlServerVersion(version);
     }
 }

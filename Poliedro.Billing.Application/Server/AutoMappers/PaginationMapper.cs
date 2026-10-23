@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Poliedro.Billing.Application.Server.Dtos;
 using Poliedro.Billing.Domain.Common.Pagination;
 using Poliedro.Billing.Domain.Server.Entities;

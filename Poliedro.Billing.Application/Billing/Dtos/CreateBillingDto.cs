@@ -1,4 +1,4 @@
-﻿namespace Poliedro.Billing.Application.Billing.Dtos;
+namespace Poliedro.Billing.Application.Billing.Dtos;
 public record CreateBillingDTO(
         DateTime Date,
         DateTime Time,

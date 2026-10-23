@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.FERetail.Entity;
+using Poliedro.Billing.Domain.FERetail.Entity;
 namespace Poliedro.Billing.Domain.FERetail.Ports;
 
 public interface IGetItemFE

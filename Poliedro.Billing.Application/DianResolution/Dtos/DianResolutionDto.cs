@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.Resolution.Enums;
+using Poliedro.Billing.Domain.Resolution.Enums;
 
 namespace Poliedro.Billing.Application.DianResolution.Dtos;
 

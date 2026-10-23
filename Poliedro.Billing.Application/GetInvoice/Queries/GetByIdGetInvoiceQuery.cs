@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Poliedro.Billing.Application.GetInvoice.Dtos;
 
 namespace Poliedro.Billing.Application.GetInvoice.Queries;

@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.CompanyProvider.Entities;
+using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using System;
 using System.Collections.Generic;
 using System.Text;

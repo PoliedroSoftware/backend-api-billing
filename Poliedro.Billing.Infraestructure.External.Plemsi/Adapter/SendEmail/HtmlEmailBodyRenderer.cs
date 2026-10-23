@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Application.SendEmail.Dtos;
+using Poliedro.Billing.Application.SendEmail.Dtos;
 using Poliedro.Billing.Application.SendEmail.Ports;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.SendEmail;

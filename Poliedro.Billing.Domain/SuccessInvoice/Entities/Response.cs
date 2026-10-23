@@ -1,4 +1,4 @@
-﻿using Poliedro.Billing.Domain.InvoicePos.Entities;
+using Poliedro.Billing.Domain.InvoicePos.Entities;
 
 namespace Poliedro.Billing.Domain.SuccessInvoice.Entities;
 
