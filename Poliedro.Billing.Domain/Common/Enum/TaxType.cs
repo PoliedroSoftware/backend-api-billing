@@ -3,9 +3,9 @@
 public enum TaxType
 {
     IVA = 1,
-    INC = 2,
+    INC = 4,
     IC = 3,
-    ICA = 4,
+    ICA = 2,
     ReteIVA = 5,
     ReteRenta = 6,
     ReteICA = 7,
@@ -16,13 +16,13 @@ public enum TaxType
     INCombustibles = 12,
     SobretasaCombustibles = 13,
     Sordicom = 14,
-    ICPorcentual = 15,
-    ICDatos = 16,
-    IVAEINC = 17,
-    NoAplica = 18,
-    ICL = 19,
-    INPP = 20,
-    IBUA = 21,
-    ICUI = 22,
-    ADV = 23
+    ICPorcentual = 16,
+    ICDatos = 17,
+    IVAEINC = 18,
+    NoAplica = 19,
+    ICL = 20,
+    INPP = 21,
+    IBUA = 22,
+    ICUI = 23,
+    ADV = 24
 }
