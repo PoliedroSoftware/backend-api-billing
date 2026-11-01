@@ -9,7 +9,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
     public class PrepareItemElectronic : IPrepareItemBilling
     {
         private const int DefaultUnitMeasureId = 70;
-        private const int DefaultTaxId = 18;
+        private const int DefaultTaxId = 19;
         private const int ItemIdentificationId = 1;
         private const string DefaultNote = "Description";
         private const string FreeOfChargeSuffix = "(ENTREGA GRATUITA)";
