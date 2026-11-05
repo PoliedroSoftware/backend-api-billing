@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Provider\TNS\" />
+    <Folder Include="Provider\Siigo\" />
+    <Folder Include="Provider\Plemsi\" />
+  </ItemGroup>
+
+</Project>

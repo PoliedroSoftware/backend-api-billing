@@ -135,6 +135,9 @@ builder.Services.AddHealthChecks()
     .AddMySql(Environment.GetEnvironmentVariable("MYSQL_CONNECTION")
         ?? builder.Configuration.GetConnectionString("MysqlConnection"), name: "sql", tags: ["ready"]);
 
+
+
+
 var app = builder.Build();
 
 // Additive, idempotent schema setup for the shared administrative database.

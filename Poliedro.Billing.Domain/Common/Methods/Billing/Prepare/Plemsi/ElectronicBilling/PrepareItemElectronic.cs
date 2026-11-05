@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
-using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi.TypeTax;
 using Poliedro.Billing.Domain.Billing.Ports;
+using Poliedro.Billing.Domain.Billing.TypeTax;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using ItemPriceNotInformedException = Poliedro.Billing.Domain.Billing.ItemPriceNotInformedException;
 

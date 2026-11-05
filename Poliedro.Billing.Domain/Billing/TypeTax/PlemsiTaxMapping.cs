@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi.TypeTax;
+namespace Poliedro.Billing.Domain.Billing.TypeTax;
 
 public static class PlemsiTaxMapping
 {
