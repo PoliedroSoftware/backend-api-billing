@@ -1,9 +1,8 @@
 ﻿using Poliedro.Billing.Application.Billing.Ports.Providers;
 using Poliedro.Billing.Domain.CompanyProvider.Enums;
-using Poliedro.Billing.Domain.InvoicesPendingWithDetails.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Poliedro.Billing.Domain.Resolution.Enums;
+
+
 
 namespace Poliedro.Billing.Infraestructure.External.Provider.Factory
 {
