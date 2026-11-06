@@ -10,9 +10,9 @@ namespace Poliedro.Billing.Infraestructure.External.Provider.Provider.Plemsi
 {
     public class PlemsiBillingPOSProvider : IBillingProvider
     {
-        public bool CanHandle(ProviderType providerType, ResolutionType resolutionType)
+        public bool CanHandle(ProviderType provider, ResolutionType resolutionType)
         {
-            throw new NotImplementedException();
+            return provider == ProviderType.PLEMSI && resolutionType == ResolutionType.POS;
         }
 
         public Task<ProviderBillingResult> ProcessAsync(IEnumerable<CreateBilling> invoices, DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)

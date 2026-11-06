@@ -23,6 +23,7 @@ using Poliedro.Billing.Application;
 using Poliedro.Billing.Application.Common.Behaviors;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Infraestructure.External.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Provider;
 using Poliedro.Billing.Infraestructure.External.Siigo;
 using Poliedro.Billing.Infraestructure.External.TNS;
 using Poliedro.Billing.Infraestructure.Persistence.Mysql;
@@ -47,7 +48,6 @@ builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
 
 
-
 builder.Services
     .AddWebApi()
     .AddApplication()
@@ -55,6 +55,7 @@ builder.Services
     .AddExternalPlemsi(builder.Configuration)
     .AddExternalTns(builder.Configuration)
     .AddExternalSiigo(builder.Configuration)
+     .AddBillingProviders()
     .AddPersistence(builder.Configuration);
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();

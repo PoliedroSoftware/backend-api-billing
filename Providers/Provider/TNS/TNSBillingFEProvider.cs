@@ -11,9 +11,9 @@ namespace Poliedro.Billing.Infraestructure.External.Provider.Provider.TNS;
 
 public class TNSBillingFEProvider : IBillingProvider
 {
-    public bool CanHandle(ProviderType providerType, ResolutionType resolutionType)
+    public bool CanHandle(ProviderType provider, ResolutionType resolutionType)
     {
-        throw new NotImplementedException();
+        return provider == ProviderType.TNS && resolutionType == ResolutionType.FE;
     }
 
     public Task<ProviderBillingResult> ProcessAsync(IEnumerable<CreateBilling> invoices, DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)

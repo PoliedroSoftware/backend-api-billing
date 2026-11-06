@@ -5,17 +5,14 @@ using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.CompanyProvider.Enums;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using Poliedro.Billing.Domain.Resolution.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Poliedro.Billing.Infraestructure.External.Provider.Provider.Siigo
 {
     public class SiigoBillingFEProvider : IBillingProvider
     {
-        public bool CanHandle(ProviderType providerType, ResolutionType resolutionType)
+        public bool CanHandle(ProviderType provider, ResolutionType resolutionType)
         {
-            throw new NotImplementedException();
+            return provider == ProviderType.SIIGO && resolutionType == ResolutionType.FE;
         }
 
         public Task<ProviderBillingResult> ProcessAsync(IEnumerable<CreateBilling> invoices, DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)
