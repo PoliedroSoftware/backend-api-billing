@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Provider\TNS\" />
-    <Folder Include="Provider\Siigo\" />
-    <Folder Include="Provider\Plemsi\" />
+    <ProjectReference Include="..\Poliedro.Billing.Application\Poliedro.Billing.Application.csproj" />
   </ItemGroup>
 
 </Project>
