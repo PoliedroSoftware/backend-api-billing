@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Poliedro.Billing.Application\Poliedro.Billing.Application.csproj" />
+    <ProjectReference Include="..\Poliedro.Billing.Infraestructure.External.Plemsi\Poliedro.Billing.Infraestructure.External.Plemsi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Provider\Plemsi\Helpers\" />
+    <Folder Include="Provider\Plemsi\Wrapper\" />
   </ItemGroup>
 
 </Project>

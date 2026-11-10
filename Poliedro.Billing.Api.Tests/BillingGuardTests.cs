@@ -1,4 +1,6 @@
+using AutoMapper;
 using Microsoft.Extensions.Logging.Abstractions;
+using Poliedro.Billing.Application.Billing.AutoMappers;
 using Poliedro.Billing.Application.Billing.Commands.CreateBilling;
 using Poliedro.Billing.Application.Billing.Dtos;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -15,6 +17,9 @@ namespace Poliedro.Billing.Api.Tests;
 
 public class BillingGuardTests
 {
+    private static readonly IMapper Mapper =
+        new MapperConfiguration(config => config.AddProfile(new BillingAutoMapper())).CreateMapper();
+
     [Theory]
     [InlineData(false, true, true, true)]
     [InlineData(true, false, true, true)]
@@ -25,7 +30,7 @@ public class BillingGuardTests
         var authorizer = new Authority(licenseActive);
         // Null factories/senders intentionally fail if the rejection ever reaches preparation or emission.
         var handler = new CreateBillingHandler(new Resolution(resolutionActive), new Provider(providerActive),
-            null!, NullLogger<CreateBillingHandler>.Instance, new Client(clientActive), authorizer, null!);
+            null!, NullLogger<CreateBillingHandler>.Instance, new Client(clientActive), authorizer, null!, Mapper);
         var result = await handler.Handle(new CreateBillingCommand(1, []), default);
         Assert.False(result.Success);
         Assert.Equal(403, result.StatusCode);

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using Poliedro.Billing.Application.Billing.Ports.Providers;
 using Poliedro.Billing.Domain.Billing;
@@ -18,7 +19,8 @@ public class CreateBillingHandler(
     ILogger<CreateBillingHandler> _logger,
     IClientGetByIdService _clientGetByIdService,
     IBillingLicenseAuthorizer _licenseAuthorizer,
-    IEmissionFailureRepository _emissionFailures
+    IEmissionFailureRepository _emissionFailures,
+    IMapper _mapper
     ) : IRequestHandler<CreateBillingCommand, CreateBillingCommandResult>
 {
     public async Task<CreateBillingCommandResult> Handle(CreateBillingCommand request, CancellationToken cancellationToken)
@@ -71,15 +73,30 @@ public class CreateBillingHandler(
             (ProviderType)companyProvider.ProviderId,
             resolutionEntity.ResolutionType);
 
+        
+        var invoices = _mapper.Map<List<Domain.Billing.CreateBilling>>(request.Invoices);
 
         var result = await provider.ProcessAsync(
-        (IEnumerable<Domain.Billing.CreateBilling>)request.Invoices,
-        resolution.Value,
-        companyProvider,
-        cancellationToken);
+            invoices,
+            resolution.Value,
+            companyProvider,
+            cancellationToken);
 
+        var results = result.Results
+            .Select(item => new Dtos.CreateBillingResultDTO
+            {
+                Status = item.Success,
+                Message = item.Message ?? string.Empty,
+                Data = item.InvoiceNumber
+            })
+            .ToList();
 
-        return CreateBillingCommandResult.Ok((IEnumerable<Dtos.CreateBillingResultDTO>)result);
+        if (!result.Success)
+        {
+            return new CreateBillingCommandResult(false, 400, result.Message, results);
+        }
+
+        return CreateBillingCommandResult.Ok(results);
 
     }
 

@@ -1,14 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Poliedro.Billing.Application.Billing.Services.Factories.Plemsi;
 using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
-using Poliedro.Billing.Application.SendEmail;
 using Poliedro.Billing.Application.SendEmail.Ports;
 using Poliedro.Billing.Domain.Billing.Ports;
-
 using Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.ElectronicBilling;
-using Poliedro.Billing.Domain.Common.Methods.Billing.Validate;
 using Poliedro.Billing.Domain.Common.Methods.Billing.Validate.Plemsi;
 using Poliedro.Billing.Domain.CreditNote.Ports;
 using Poliedro.Billing.Domain.CustomersId.Ports;
@@ -18,10 +14,6 @@ using Poliedro.Billing.Domain.Location.Ports;
 using Poliedro.Billing.Domain.Ports;
 using Poliedro.Billing.Domain.SuccessInvoice.Ports;
 using Poliedro.Billing.Domain.UpdateCurrentlyNumber.Port;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
-using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi;
-
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.CustomersId;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.FE.Retail;
 using Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.GetInvoice;
@@ -72,15 +64,11 @@ namespace Poliedro.Billing.Infraestructure.External.Plemsi
             services.AddTransient<IGetInvoiceDomainGetInvoice, GetInvoiceDomainGetInvoice>();
 
             // Factor�a y strategies
-            services.AddScoped<IGetProcessorBilling, BillingPrepareFactory>();
             services.AddTransient<PrepareBillingFE>();
             services.AddTransient<PrepareBillingPOS>();
 
-            // Registrar concrete implementations para que el decorador pueda resolverlas
-            services.AddTransient<BillingSenderFE>();
-            services.AddTransient<BillingSenderPOS>();
 
-            services.AddScoped<IBillingSenderFactory, BillingSenderFactory>();
+
             services.AddTransient<IBillingResponseApi, BillingResponseApi>();
 
             // Domain adapters / stubs

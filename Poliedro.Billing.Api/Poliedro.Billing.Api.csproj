@@ -44,4 +44,8 @@
     <ProjectReference Include="..\Poliedro.Billing.Infraestructure.Persistence.Mysql\Poliedro.Billing.Infraestructure.Persistence.Mysql.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Observability\Decorators\" />
+  </ItemGroup>
+
 </Project>

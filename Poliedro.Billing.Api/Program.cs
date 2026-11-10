@@ -60,21 +60,6 @@ builder.Services
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
-builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
-{
-    var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderFE>();
-    var metrics = sp.GetRequiredService<Poliedro.Billing.Api.Observability.Providers.IProviderMetrics>();
-    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorFE>>();
-    return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorFE(concrete, metrics, logger);
-});
-
-builder.Services.AddTransient<Poliedro.Billing.Domain.Billing.Ports.IBillingSender>(sp =>
-{
-    var concrete = sp.GetRequiredService<Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Selectors.Plemsi.BillingSenderPOS>();
-    var metrics = sp.GetRequiredService<Poliedro.Billing.Api.Observability.Providers.IProviderMetrics>();
-    var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS>>();
-    return new Poliedro.Billing.Api.Observability.Decorators.BillingMetricsDecoratorPOS(concrete, metrics, logger);
-});
 
 
 builder.Services.AddRouting(routing => routing.LowercaseUrls = true);
