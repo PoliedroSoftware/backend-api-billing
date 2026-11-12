@@ -1,19 +1,16 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.Resolution.Entities;
 
-namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
+namespace Poliedro.Billing.Infraestructure.External.Provider.Provider.Plemsi.Helpers
 {
     public class PrepareBillingFE(
         IPrepareItemBilling _prepareItemElectronic,
         IGetAllTaxTotalsBilling _getAllTaxTotals,
-        IGetLastInvoiceBilling _getLastInvoiceBilling,
         ICalculateCheckDigits _calculateCheckDigits,
-        IMapper _mapper,
         IConfiguration _config
     ) : ICreateBilling
     {
@@ -24,27 +21,6 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
             CancellationToken cancellationToken)
         {
             var results = new List<BillingPreparationResult>();
-            int lastInvoiceNumber;
-
-            try
-            {
-                lastInvoiceNumber = await _getLastInvoiceBilling.GetLastInvoiceNumberAsync(dianResolutionEntity,companyProviderEntity, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al obtener último número de factura: {ex.Message}");
-                return results;
-            }
-
-            bool expirated = lastInvoiceNumber + invoices.Count() > dianResolutionEntity.FinalRange ||
-                             DateTime.Now > dianResolutionEntity.ExpirationDate;
-            if (expirated)
-            {
-                Console.WriteLine("El rango de numeración ha sido superado o la resolución ha expirado.");
-                return results;
-            }
-
-            int invoiceCounter = lastInvoiceNumber;
 
             foreach (var invoice in invoices)
             {
@@ -118,7 +94,6 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                     invoice.FinalTotalToPay = totalToPay;
 
 
-                    int invoiceNumber = invoiceCounter++;
                     string formattedDate = DateTime.Now.ToString("yyyy-MM-dd");
                     string currentTime = DateTime.Now.ToString("HH:mm:ss");
 
@@ -126,7 +101,6 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         .IGetAllTaxTotalsBillingAsync(invoice.ItemElectronicEntity);
                     invoice.Prefix = dianResolutionEntity.Prefix;
                     invoice.CustomerEntity.ApiKey = companyProviderEntity.ApiKey;
-                    invoice.Numeration = invoiceNumber.ToString();
 
 
                   
@@ -159,7 +133,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         date = formattedDate,
                         time = currentTime,
                         prefix = invoice.Prefix,
-                        number = invoiceNumber,
+                        number = 0, // lo asigna la capa externa del proveedor justo antes del envío
                         orderReference = new OrderReferenceEntity { IdOrder = "COT2022043155" },
                         send_email = true,
                         attachment1 = new AttachmentEntity
@@ -239,8 +213,8 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         finalTotalToPay = totalToPay
                     };
 
-                    var dto = _mapper.Map<SenderRequestFEDTO>(data);
-                    results.Add(new(invoice, dto, null));
+                    // El mapeo al DTO de Plemsi se hace después de asignar el consecutivo.
+                    results.Add(new(invoice, data, null));
                 }
                 catch (Exception ex)
                 {

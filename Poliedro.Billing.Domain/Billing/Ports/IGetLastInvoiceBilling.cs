@@ -3,5 +3,9 @@ using Poliedro.Billing.Domain.Resolution.Entities;
 namespace Poliedro.Billing.Domain.Billing.Ports;
 public interface IGetLastInvoiceBilling
 {
-    Task<int> GetLastInvoiceNumberAsync(DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken);
+    /// <summary>
+    /// Devuelve el último número emitido en el proveedor para el prefijo de la resolución.
+    /// Si aún no hay documentos emitidos devuelve 0.
+    /// </summary>
+    Task<int> GetLastEmittedNumberAsync(DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken);
 }

@@ -16,7 +16,7 @@ public class GetLastInvoiceBillingPlemsi(
     
     ) : IGetLastInvoiceBilling
 {
-    public async Task<int>  GetLastInvoiceNumberAsync(DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)
+    public async Task<int> GetLastEmittedNumberAsync(DianResolutionEntity dianResolutionEntity, CompanyProviderEntity companyProviderEntity, CancellationToken cancellationToken)
     {
         using var client = httpClientFactory.CreateClient();
 
@@ -67,10 +67,10 @@ public class GetLastInvoiceBillingPlemsi(
             var jObject = JObject.Parse(JsonResponse);
             var Documents = jObject["data"]?["docs"];
 
+            // Sin documentos emitidos todavía: el prefijo arranca en su rango inicial.
             if (Documents == null || !Documents.HasValues)
             {
-                throw new InvalidOperationException(
-                    "Plemsi respondió correctamente, pero no se encontraron documentos para determinar el consecutivo.");
+                return 0;
             }
 
             int maxUsed = 0;
@@ -85,12 +85,7 @@ public class GetLastInvoiceBillingPlemsi(
                 }
             }
 
-            if (maxUsed <= 0)
-            {
-                throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
-            }
-
-            return maxUsed + 1;
+            return maxUsed;
 
         }
         catch (JsonException ex)

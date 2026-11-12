@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Poliedro.Billing.Application.Billing.Ports.Providers;
-using Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+using Poliedro.Billing.Application.Billing.Ports.Providers.Plemsi;
+using Poliedro.Billing.Domain.Billing.Ports;
 using Poliedro.Billing.Infraestructure.External.Provider.Factory;
 using Poliedro.Billing.Infraestructure.External.Provider.Provider.Plemsi;
+using Poliedro.Billing.Infraestructure.External.Provider.Provider.Plemsi.Helpers;
 using Poliedro.Billing.Infraestructure.External.Provider.Provider.Plemsi.Senders;
 using Poliedro.Billing.Infraestructure.External.Provider.Provider.Siigo;
 using Poliedro.Billing.Infraestructure.External.Provider.Provider.TNS;
@@ -18,7 +20,10 @@ namespace Poliedro.Billing.Infraestructure.External.Provider
             services.AddScoped<IBillingProviderFactory, BillingProviderFactory>();
 
             // Dependencias específicas de Plemsi FE
-            services.AddScoped<PrepareBillingFE>();
+            services.AddScoped<ICreateBilling, PrepareBillingFE>();
+
+            // El consecutivo es propio de cada proveedor
+            services.AddScoped<IConsecutiveProvider, PlemsiConsecutiveProvider>();
 
             // Senders específicos de proveedores
             services.AddScoped<ISenderPlemsi, PlemsiFESender>();

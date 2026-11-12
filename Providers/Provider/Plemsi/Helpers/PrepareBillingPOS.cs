@@ -6,7 +6,7 @@ using Poliedro.Billing.Domain.Billing.Pos.Entity;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.FERetail.Entity;
 using Poliedro.Billing.Domain.Resolution.Entities;
-namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi;
+namespace Poliedro.Billing.Infraestructure.External.Provider.Provider.Plemsi.Helpers;
 public class PrepareBillingPOS(
     IInvoiceLastPos _getLastInvoiceBilling,
     IMapper _mapper

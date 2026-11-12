@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Provider\Plemsi\Helpers\" />
     <Folder Include="Provider\Plemsi\Wrapper\" />
   </ItemGroup>
 
