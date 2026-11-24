@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Poliedro.Billing.Domain.Billing;
 using Poliedro.Billing.Domain.Billing.Ports;
@@ -160,8 +160,8 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         time = currentTime,
                         prefix = invoice.Prefix,
                         number = invoiceNumber,
-                        orderReference = new OrderReferenceEntity { IdOrder = "COT2022043155" },
-                        send_email = true,
+                        orderReference = invoice.OrderReference,
+                        send_email = invoice.SendEmail ?? true,
                         attachment1 = new AttachmentEntity
                         {
                             FileName = "prueba.xml",
@@ -192,7 +192,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         {
                             PaymentFormId = invoice.PaymentEntity.PaymentFormId,
                             PaymentMethodId = 10,
-                            PaymentDueDate = formattedDate,
+                            PaymentDueDate = invoice.PaymentEntity.PaymentDueDate ?? formattedDate,
                             DurationMeasure = "30"
                         },
 

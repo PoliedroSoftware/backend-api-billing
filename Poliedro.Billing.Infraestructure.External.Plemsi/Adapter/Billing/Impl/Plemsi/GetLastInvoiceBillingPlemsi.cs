@@ -6,7 +6,7 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using System.Net.Http.Headers;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
@@ -67,22 +67,28 @@ public class GetLastInvoiceBillingPlemsi(
             var jObject = JObject.Parse(JsonResponse);
             var Documents = jObject["data"]?["docs"];
 
-            if (Documents == null || !Documents.HasValues)
+            if (Documents is not JArray documents)
             {
-                throw new InvalidOperationException(
-                    "Plemsi respondió correctamente, pero no se encontraron documentos para determinar el consecutivo.");
+                throw new InvalidOperationException("Plemsi no devolvió una lista de documentos válida.");
+            }
+
+            if (documents.Count == 0)
+            {
+                // Resolución sin documentos emitidos: el primer consecutivo es el rango inicial.
+                if (dianResolutionEntity.InitialRange <= 0)
+                    throw new InvalidOperationException("La resolución no tiene un rango inicial válido.");
+                return dianResolutionEntity.InitialRange;
             }
 
             int maxUsed = 0;
 
-            foreach (var Doc in Documents)
+            foreach (var Doc in documents)
             {
                 string? numberStr = Doc["number"]?.ToString();
 
-                if (int.TryParse(numberStr, out int num) && num > maxUsed)
-                {
-                    maxUsed = num;
-                }
+                if (!int.TryParse(numberStr, out int num) || num <= 0)
+                    throw new InvalidOperationException("Plemsi devolvió un documento sin consecutivo válido.");
+                maxUsed = Math.Max(maxUsed, num);
             }
 
             if (maxUsed <= 0)
@@ -90,7 +96,7 @@ public class GetLastInvoiceBillingPlemsi(
                 throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
             }
 
-            return maxUsed + 1;
+            return checked(maxUsed + 1);
 
         }
         catch (JsonException ex)

@@ -14,12 +14,16 @@ public sealed class OdooBillingLicenseAuthorizer(HttpClient http, IOptions<Billi
         var settings = options.Value;
         if (!settings.Enabled) return new(true, "legacy");
         if (!settings.IsConfigured) return new(false, "license_not_configured");
+        var licenseUrl = settings.CompanyLicenseUrls.TryGetValue(companyId, out var companyUrl)
+            ? companyUrl : settings.LicenseUrl;
+        if (!BillingAdministrationOptions.IsValidLicenseUrl(licenseUrl))
+            return new(false, "license_not_configured");
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, settings.LicenseUrl);
+            using var request = new HttpRequestMessage(HttpMethod.Post, licenseUrl);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", settings.ApiKey);
             // Odoo 19 selects a stateless multi-database request using this header, not ?db alone.
-            var query = QueryHelpers.ParseQuery(new Uri(settings.LicenseUrl).Query);
+            var query = QueryHelpers.ParseQuery(new Uri(licenseUrl).Query);
             if (query.TryGetValue("db", out var database) && !string.IsNullOrWhiteSpace(database))
                 request.Headers.Add("X-Odoo-Database", database.ToString());
             request.Content = JsonContent.Create(new { companyId, companyProviderId });

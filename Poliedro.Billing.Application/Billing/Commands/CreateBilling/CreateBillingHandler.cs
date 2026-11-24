@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Poliedro.Billing.Application.Billing.Dtos;
@@ -151,9 +151,10 @@ public class CreateBillingHandler(
                         processed.Billing.Number, request.Id);
                     billingResults.Add(new CreateBillingResultDTO
                     {
-                        Status = false,
+                        Status = true,
                         Message = $"La factura fue emitida pero falló la persistencia local: {ex.Message}",
-                        Data = null
+                        Data = new { Number = processed.Billing.Numeration ?? processed.Billing.Number, Prefix = resolutionEntity.Prefix,
+                            Cufe = result.Data?.Cude, Persisted = false }
                     });
                     continue;
                 }
@@ -170,7 +171,8 @@ public class CreateBillingHandler(
             {
                 Status = result.Success,
                 Message = result.Success ? "Factura procesada exitosamente" : (result.Info ?? "El proveedor rechazó la factura"),
-                Data = null
+                Data = result.Success ? new { Number = processed.Billing.Numeration ?? processed.Billing.Number, Prefix = resolutionEntity.Prefix,
+                    Cufe = result.Data?.Cude, Persisted = true } : null
             });
         }
 
