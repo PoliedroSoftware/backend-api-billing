@@ -77,11 +77,14 @@ public class GetLastInvoiceBillingPlemsi(
             foreach (var Doc in documents)
             {
                 // Plemsi can return rejected attempts or documents from other resolutions.
-                // Only an emitted invoice in this exact resolution consumes a DIAN number.
+                // An emitted invoice consumes its number; a later provider deletion does not
+                // release a number once Plemsi assigned it a CUDE.
                 if (Doc["state"] is null || Doc["prefix"] is null || Doc["resolution_number"] is null)
                     throw new InvalidOperationException("Plemsi devolvió un documento sin datos suficientes para validar la resolución.");
 
-                if (!string.Equals(Doc["state"]?.ToString(), "Emitted", StringComparison.OrdinalIgnoreCase)
+                bool consumed = string.Equals(Doc["state"]?.ToString(), "Emitted", StringComparison.OrdinalIgnoreCase)
+                    || !string.IsNullOrWhiteSpace(Doc["cude"]?.ToString());
+                if (!consumed
                     || !string.Equals(Doc["prefix"]?.ToString(), dianResolutionEntity.Prefix, StringComparison.OrdinalIgnoreCase)
                     || !string.Equals(Doc["resolution_number"]?.ToString(), dianResolutionEntity.ResolutionNumber, StringComparison.Ordinal))
                     continue;

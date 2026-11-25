@@ -6,6 +6,24 @@ namespace Poliedro.Billing.Api.Tests;
 public class ClientResolutionStatusTests
 {
     [Fact]
+    public void DeletedDocumentWithCudeStillConsumesItsConsecutive()
+    {
+        var row = new ResolutionStatus { Prefix = "FE", ResolutionNumber = "123" };
+        using var json = JsonDocument.Parse("""
+            {"data":{"docs":[
+              {"state":"Deleted","cude":"already-assigned","prefix":"FE","resolution_number":"123","number":"31","date":"2026-10-22","time":"09:30:00"},
+              {"state":"Emitted","cude":"older","prefix":"FE","resolution_number":"123","number":"30","date":"2026-10-20","time":"15:04:02"}
+            ]}}
+            """);
+
+        ClientResolutionStatus.ApplyDocuments(row, json.RootElement);
+
+        Assert.Equal(31, row.LastInvoiceNumber);
+        Assert.Equal("2026-10-22 09:30:00", row.LastInvoiceDateTime);
+        Assert.Equal("confirmed", row.LookupStatus);
+    }
+
+    [Fact]
     public void UsesOnlyEmittedDocumentsOfExactResolutionAndPreservesDocumentTime()
     {
         var row = new ResolutionStatus { Prefix = "FE", ResolutionNumber = "123" };
