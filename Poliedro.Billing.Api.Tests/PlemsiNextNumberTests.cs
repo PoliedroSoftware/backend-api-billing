@@ -10,16 +10,18 @@ public class PlemsiNextNumberTests
 {
     [Theory]
     [InlineData("{\"data\":{\"docs\":[]}}", 100, 100)]
-    [InlineData("{\"data\":{\"docs\":[{\"number\":\"103\"},{\"number\":\"105\"}]}}", 100, 106)]
-    public async Task UsesConfirmedEmptyRangeOrLargestDocument(string response, int initial, int expected)
+    [InlineData("{\"data\":{\"docs\":[{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"103\"},{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"105\"}]}}", 100, 106)]
+    [InlineData("{\"data\":{\"docs\":[{\"state\":\"Error\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"105\"},{\"state\":\"Emitted\",\"prefix\":\"OTHER\",\"resolution_number\":\"123\",\"number\":\"999\"},{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"OLD\",\"number\":\"888\"}]}}", 100, 100)]
+    public async Task UsesOnlyEmittedDocumentsInExactResolution(string response, int initial, int expected)
         => Assert.Equal(expected, await Query(response, initial));
 
     [Theory]
     [InlineData("{}")]
     [InlineData("{\"data\":{\"docs\":null}}")]
     [InlineData("{\"data\":{\"docs\":{}}}")]
-    [InlineData("{\"data\":{\"docs\":[{\"number\":\"invalid\"}]}}")]
-    [InlineData("{\"data\":{\"docs\":[{\"number\":\"10\"},{\"number\":\"invalid\"}]}}")]
+    [InlineData("{\"data\":{\"docs\":[{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"invalid\"}]}}")]
+    [InlineData("{\"data\":{\"docs\":[{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"10\"},{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"invalid\"}]}}")]
+    [InlineData("{\"data\":{\"docs\":[{\"number\":\"10\"}]}}")]
     [InlineData("not json")]
     public async Task InvalidResponseNeverRestartsNumbering(string response)
         => await Assert.ThrowsAsync<InvalidOperationException>(() => Query(response, 1));
@@ -36,7 +38,7 @@ public class PlemsiNextNumberTests
             ["ApiPlemsi:FELastInvoiceUrl"] = "https://example.invalid/documents?prefix=",
         }).Build();
         return new GetLastInvoiceBillingPlemsi(config, new Factory(response)).GetLastInvoiceNumberAsync(
-            new DianResolutionEntity { InitialRange = initial, Prefix = "QA" },
+            new DianResolutionEntity { InitialRange = initial, Prefix = "QA", ResolutionNumber = "123" },
             new CompanyProviderEntity { ApiKey = "synthetic-test-key" }, default);
     }
 

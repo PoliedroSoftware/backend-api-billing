@@ -72,30 +72,32 @@ public class GetLastInvoiceBillingPlemsi(
                 throw new InvalidOperationException("Plemsi no devolvió una lista de documentos válida.");
             }
 
-            if (documents.Count == 0)
-            {
-                // Resolución sin documentos emitidos: el primer consecutivo es el rango inicial.
-                if (dianResolutionEntity.InitialRange <= 0)
-                    throw new InvalidOperationException("La resolución no tiene un rango inicial válido.");
-                return dianResolutionEntity.InitialRange;
-            }
-
             int maxUsed = 0;
 
             foreach (var Doc in documents)
             {
-                string? numberStr = Doc["number"]?.ToString();
+                // Plemsi can return rejected attempts or documents from other resolutions.
+                // Only an emitted invoice in this exact resolution consumes a DIAN number.
+                if (Doc["state"] is null || Doc["prefix"] is null || Doc["resolution_number"] is null)
+                    throw new InvalidOperationException("Plemsi devolvió un documento sin datos suficientes para validar la resolución.");
 
+                if (!string.Equals(Doc["state"]?.ToString(), "Emitted", StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(Doc["prefix"]?.ToString(), dianResolutionEntity.Prefix, StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(Doc["resolution_number"]?.ToString(), dianResolutionEntity.ResolutionNumber, StringComparison.Ordinal))
+                    continue;
+
+                string? numberStr = Doc["number"]?.ToString();
                 if (!int.TryParse(numberStr, out int num) || num <= 0)
-                    throw new InvalidOperationException("Plemsi devolvió un documento sin consecutivo válido.");
+                    throw new InvalidOperationException("Plemsi devolvió una factura emitida sin consecutivo válido.");
                 maxUsed = Math.Max(maxUsed, num);
             }
 
             if (maxUsed <= 0)
             {
-                throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
+                if (dianResolutionEntity.InitialRange <= 0)
+                    throw new InvalidOperationException("La resolución no tiene un rango inicial válido.");
+                return dianResolutionEntity.InitialRange;
             }
-
             return checked(maxUsed + 1);
 
         }
