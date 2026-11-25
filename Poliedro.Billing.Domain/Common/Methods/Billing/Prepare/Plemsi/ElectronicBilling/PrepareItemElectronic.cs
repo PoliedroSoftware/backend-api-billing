@@ -61,7 +61,8 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
 
                 double DiscountAmount = TotalGross - subtotal;
 
-                double multiplierFactor = Math.Round(subtotal / TotalGross, 5, MidpointRounding.AwayFromZero);
+                double multiplierFactor = TotalGross > 0
+                    ? Math.Round(DiscountAmount / TotalGross, 5, MidpointRounding.AwayFromZero) : 0;
 
 
                 var allowanceCharges = new List<AllowanceChargeEntity>();
@@ -73,7 +74,7 @@ namespace Poliedro.Billing.Domain.Common.Methods.Billing.Prepare.Plemsi.Electron
                         AllowanceChargeReason = "Discount",
                         MultiplierFactorNumeric = (decimal)multiplierFactor,
                         Amount = (decimal)DiscountAmount,
-                        BaseAmount = Math.Round((decimal)subtotal, 2, MidpointRounding.AwayFromZero)
+                        BaseAmount = Math.Round((decimal)TotalGross, 2, MidpointRounding.AwayFromZero)
                     });
                 }
 

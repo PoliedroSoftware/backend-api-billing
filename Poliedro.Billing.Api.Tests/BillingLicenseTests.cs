@@ -61,14 +61,40 @@ public class BillingLicenseTests
         Assert.False(BillingAdminFilter.Matches(new string('y', 40), new string('x', 40)));
     }
 
+    [Fact]
+    public async Task CompanyAuthorityDoesNotChangeOtherClients()
+    {
+        var settings = Settings();
+        settings.CompanyLicenseUrls[28] = "https://odoo.example/authorize/test?db=company28";
+        var handler = new StubHandler(HttpStatusCode.OK, "{\"allowed\":true}");
+        var service = new OdooBillingLicenseAuthorizer(new HttpClient(handler), Options.Create(settings));
+        Assert.True((await service.AuthorizeAsync(28, 28, default)).Allowed);
+        Assert.Equal("odoo.example", handler.Url!.Host);
+        Assert.Equal("company28", handler.Database);
+        await service.AuthorizeAsync(10, 20, default);
+        Assert.Equal("localhost", handler.Url!.Host);
+        Assert.Equal("odoo_test", handler.Database);
+    }
+
+    [Fact]
+    public async Task InvalidCompanyAuthorityDeniesWithoutFallback()
+    {
+        var settings = Settings();
+        settings.CompanyLicenseUrls[28] = "http://public.example/authorize";
+        var service = new OdooBillingLicenseAuthorizer(new HttpClient(new FailingHandler()), Options.Create(settings));
+        Assert.False((await service.AuthorizeAsync(28, 28, default)).Allowed);
+    }
+
     private class StubHandler(HttpStatusCode status, string json) : HttpMessageHandler
     {
         public string? Body { get; private set; }
         public string? Scheme { get; private set; }
         public string? Database { get; private set; }
+        public Uri? Url { get; private set; }
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
         {
             Body = await request.Content!.ReadAsStringAsync(ct);
+            Url = request.RequestUri;
             Scheme = request.Headers.Authorization?.Scheme;
             Database = request.Headers.GetValues("X-Odoo-Database").Single();
             return new HttpResponseMessage(status) { Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json") };

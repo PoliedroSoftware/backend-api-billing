@@ -4,6 +4,8 @@ namespace Poliedro.Billing.Application.GetInvoice.Dtos;
 
 public class GetInvoiceDto
 {
+    public string? Cude { get; set; }
+
     public OrderReferenceDto OrderReference { get; set; }
     public LegalMonetaryTotalsDto LegalMonetaryTotals { get; set; }
     public string Id { get; set; }

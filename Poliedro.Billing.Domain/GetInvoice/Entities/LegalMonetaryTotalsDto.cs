@@ -3,6 +3,12 @@
 namespace Poliedro.Billing.Domain.GetInvoice.Entities;
 public class LegalMonetaryTotalsDto
 {
+    [JsonPropertyName("allowance_total_amount")]
+    public string? AllowanceTotalAmount { get; set; }
+
+    [JsonPropertyName("charge_total_amount")]
+    public string? ChargeTotalAmount { get; set; }
+
     [JsonPropertyName("line_extension_amount")]
     public string LineExtensionAmount { get; set; }
 

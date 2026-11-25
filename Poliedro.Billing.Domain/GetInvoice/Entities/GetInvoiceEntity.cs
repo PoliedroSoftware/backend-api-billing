@@ -4,6 +4,9 @@ namespace Poliedro.Billing.Domain.GetInvoice.Entities;
 
 public class GetInvoiceEntity
 {
+    [JsonPropertyName("cude")]
+    public string? Cude { get; set; }
+
     [JsonPropertyName("order_reference")]
     public OrderReferenceDto OrderReference { get; set; }
 

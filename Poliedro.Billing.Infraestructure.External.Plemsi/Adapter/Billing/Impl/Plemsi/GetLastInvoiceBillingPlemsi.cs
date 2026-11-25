@@ -6,7 +6,7 @@ using Poliedro.Billing.Domain.Common.Enum;
 using Poliedro.Billing.Domain.CompanyProvider.Entities;
 using Poliedro.Billing.Domain.Resolution.Entities;
 using System.Net.Http.Headers;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Poliedro.Billing.Infraestructure.External.Plemsi.Adapter.Billing.Impl.Plemsi;
 
@@ -67,30 +67,38 @@ public class GetLastInvoiceBillingPlemsi(
             var jObject = JObject.Parse(JsonResponse);
             var Documents = jObject["data"]?["docs"];
 
-            if (Documents == null || !Documents.HasValues)
+            if (Documents is not JArray documents)
             {
-                throw new InvalidOperationException(
-                    "Plemsi respondió correctamente, pero no se encontraron documentos para determinar el consecutivo.");
+                throw new InvalidOperationException("Plemsi no devolvió una lista de documentos válida.");
             }
 
             int maxUsed = 0;
 
-            foreach (var Doc in Documents)
+            foreach (var Doc in documents)
             {
-                string? numberStr = Doc["number"]?.ToString();
+                // Plemsi can return rejected attempts or documents from other resolutions.
+                // Only an emitted invoice in this exact resolution consumes a DIAN number.
+                if (Doc["state"] is null || Doc["prefix"] is null || Doc["resolution_number"] is null)
+                    throw new InvalidOperationException("Plemsi devolvió un documento sin datos suficientes para validar la resolución.");
 
-                if (int.TryParse(numberStr, out int num) && num > maxUsed)
-                {
-                    maxUsed = num;
-                }
+                if (!string.Equals(Doc["state"]?.ToString(), "Emitted", StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(Doc["prefix"]?.ToString(), dianResolutionEntity.Prefix, StringComparison.OrdinalIgnoreCase)
+                    || !string.Equals(Doc["resolution_number"]?.ToString(), dianResolutionEntity.ResolutionNumber, StringComparison.Ordinal))
+                    continue;
+
+                string? numberStr = Doc["number"]?.ToString();
+                if (!int.TryParse(numberStr, out int num) || num <= 0)
+                    throw new InvalidOperationException("Plemsi devolvió una factura emitida sin consecutivo válido.");
+                maxUsed = Math.Max(maxUsed, num);
             }
 
             if (maxUsed <= 0)
             {
-                throw new InvalidOperationException("No fue posible obtener el último consecutivo de facturación desde Plemsi.");
+                if (dianResolutionEntity.InitialRange <= 0)
+                    throw new InvalidOperationException("La resolución no tiene un rango inicial válido.");
+                return dianResolutionEntity.InitialRange;
             }
-
-            return maxUsed + 1;
+            return checked(maxUsed + 1);
 
         }
         catch (JsonException ex)
