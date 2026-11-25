@@ -65,9 +65,11 @@ public static class ClientResolutionStatus
         if (!root.TryGetProperty("data", out var data) || data.ValueKind != JsonValueKind.Object
             || !data.TryGetProperty("docs", out var docs) || docs.ValueKind != JsonValueKind.Array)
         { row.LookupStatus = "invalid_response"; return; }
-        // Plemsi returns documents in descending consecutive order. Never substitute another
-        // resolution sharing this prefix, or a draft/rejected document, for this resolution.
-        var matches = docs.EnumerateArray().Where(d => Text(d, "state") == "Emitted"
+        // A provider deletion does not release a number already assigned a CUDE.
+        // Never substitute another resolution, draft, or rejected attempt.
+        var matches = docs.EnumerateArray().Where(d =>
+                (string.Equals(Text(d, "state"), "Emitted", StringComparison.OrdinalIgnoreCase)
+                 || !string.IsNullOrWhiteSpace(Text(d, "cude")))
             && Text(d, "prefix") == row.Prefix && Text(d, "resolution_number") == row.ResolutionNumber)
             .Select(d => new { Document = d, Number = long.TryParse(Text(d, "number"), out var n) ? (long?)n : null })
             .Where(d => d.Number.HasValue).OrderByDescending(d => d.Number).ToList();

@@ -12,7 +12,8 @@ public class PlemsiNextNumberTests
     [InlineData("{\"data\":{\"docs\":[]}}", 100, 100)]
     [InlineData("{\"data\":{\"docs\":[{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"103\"},{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"105\"}]}}", 100, 106)]
     [InlineData("{\"data\":{\"docs\":[{\"state\":\"Error\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"105\"},{\"state\":\"Emitted\",\"prefix\":\"OTHER\",\"resolution_number\":\"123\",\"number\":\"999\"},{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"OLD\",\"number\":\"888\"}]}}", 100, 100)]
-    public async Task UsesOnlyEmittedDocumentsInExactResolution(string response, int initial, int expected)
+    [InlineData("{\"data\":{\"docs\":[{\"state\":\"Deleted\",\"cude\":\"used-cude\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"104\"},{\"state\":\"Emitted\",\"prefix\":\"QA\",\"resolution_number\":\"123\",\"number\":\"103\"}]}}", 100, 105)]
+    public async Task UsesConsumedDocumentsInExactResolution(string response, int initial, int expected)
         => Assert.Equal(expected, await Query(response, initial));
 
     [Theory]
