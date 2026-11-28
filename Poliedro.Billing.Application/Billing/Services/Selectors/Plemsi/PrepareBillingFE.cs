@@ -191,7 +191,7 @@ namespace Poliedro.Billing.Application.Billing.Services.Selectors.Plemsi
                         payment = new PaymentEntity
                         {
                             PaymentFormId = invoice.PaymentEntity.PaymentFormId,
-                            PaymentMethodId = 10,
+                            PaymentMethodId = invoice.PaymentEntity.PaymentMethodId,
                             PaymentDueDate = invoice.PaymentEntity.PaymentDueDate ?? formattedDate,
                             DurationMeasure = "30"
                         },
